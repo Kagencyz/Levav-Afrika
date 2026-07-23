@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { eq, like, sql, and, count } from 'drizzle-orm';
-import { router, publicProcedure, authedProcedure, adminProcedure } from '../router';
+import { router, publicProcedure, authedProcedure, adminProcedure } from '../trpc';
 import { db } from '../../db/connection';
 import { talents } from '../../db/schema';
 
@@ -72,6 +72,16 @@ export const talentRouter = router({
 
       return rows[0];
     }),
+
+  getOwnProfile: authedProcedure.query(async ({ ctx }) => {
+    const rows = await db
+      .select()
+      .from(talents)
+      .where(eq(talents.userId, ctx.user.userId))
+      .limit(1);
+
+    return rows[0] ?? null;
+  }),
 
   create: authedProcedure
     .input(

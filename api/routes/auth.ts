@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
-import { router, publicProcedure } from '../router';
+import { router, publicProcedure } from '../trpc';
 import { db } from '../../db/connection';
 import { users } from '../../db/schema';
 import { signToken } from '../lib/jwt';

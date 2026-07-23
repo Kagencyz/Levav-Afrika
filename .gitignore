@@ -2,6 +2,7 @@ node_modules/
 node_modules.bak*/
 dist/
 dist-ssr/
+dist-server/
 build/
 .env
 .env.local

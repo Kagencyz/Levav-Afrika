@@ -1,8 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
+import { env } from './env';
 
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'levav-dev-secret-change-in-production'
-);
+const SECRET = new TextEncoder().encode(env.JWT_SECRET);
 
 export async function signToken(payload: {
   userId: number;

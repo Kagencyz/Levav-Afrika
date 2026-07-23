@@ -1,3 +1,4 @@
+import { env } from './lib/env';
 import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
@@ -7,9 +8,9 @@ import { createContext } from './context';
 
 const app = new Hono();
 
-// CORS
+// CORS — scoped to configured origins, never '*'
 app.use('*', cors({
-  origin: '*',
+  origin: env.CORS_ORIGINS,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -67,11 +68,9 @@ app.get('*', async (c) => {
   }
 });
 
-const port = Number(process.env.PORT) || 3000;
-
 serve({
   fetch: app.fetch,
-  port,
+  port: env.PORT,
 });
 
-console.log(`Levav Talent Afrika server running on port ${port}`);
+console.log(`Levav Talent Afrika server running on port ${env.PORT}`);
