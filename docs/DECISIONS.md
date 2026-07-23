@@ -33,3 +33,13 @@ Architectural and process decisions made during the initial repository audit, wi
 **Why:** per the audit's own operating rules — understand and document before building — and because the gap between the stated Levav vision and the actual, mock-data-driven implementation is large enough that any new feature work needs this ground truth on record first, for this and future sessions.
 
 **Next decision point:** whether to approve the milestone proposed in `docs/NEXT_MILESTONE.md` (make the backend runnable, wire real auth) before any other feature work proceeds.
+
+## 2026-07-23 — Approved the "backend runtime foundation + auth + talent-profile slice" milestone, with amendments
+
+**Decision:** approved the planning package (`docs/NEXT_MILESTONE.md`, `docs/adr/001-database-platform.md`, `docs/AUTHENTICATION_ARCHITECTURE.md`) with four amendments: (1) business logic must stay platform-agnostic rather than tightly coupling to Supabase-specific SDKs/products; (2) `docs/DOMAIN_MODEL.md` was produced as the authoritative entity/relationship definition, required to exist before implementation begins; (3) the runtime module strategy was decided only after comparing three options (`tsx`+`tsconfig-paths`, a hand-rolled esbuild script, `tsup`) rather than jumping to a single recommendation — `tsup` was selected; (4) the Supabase-vs-self-hosted-Postgres question (previously flagged as unresolved in the ADR) is now resolved: proceed with Supabase.
+
+**Why:** the user wanted the specific technical direction confirmed (Postgres/Supabase, organizations-not-roles) while closing two gaps in the original planning pass — an explicit anti-lock-in principle, and a genuine comparison of runtime options rather than a single unexamined pick — plus a dedicated domain model document to reduce the risk of the schema needing an immediate rewrite once implementation starts.
+
+**What this does NOT do:** approving this planning package is explicitly **not** the same as approving implementation. No code has been written, no infrastructure provisioned, no migrations generated, nothing pushed. A further, separate approval is required before `docs/NEXT_MILESTONE.md`'s ordered implementation phases begin — see that document's "Checkpoints" section.
+
+**Next decision point:** implementation approval itself.

@@ -1,85 +1,156 @@
-# Next Milestone (Proposed — awaiting approval)
+# Next Milestone (Accepted — implementation not yet started)
 
-## Recommendation
+**Status:** Planning approved, with amendments, on 2026-07-23. No application code has been modified, no database infrastructure has been provisioned, no migrations have been generated, and nothing has been pushed. **A separate implementation-approval checkpoint is still required before any code is written** — see §9's checkpoints. This document, `docs/adr/001-database-platform.md`, `docs/AUTHENTICATION_ARCHITECTURE.md`, and `docs/DOMAIN_MODEL.md` are the complete, approved planning package.
 
-**Make the backend genuinely runnable and replace fake client-side auth with real, database-backed authentication — end to end, for exactly one vertical slice (auth + talent profile), nothing else.**
+**Amendments incorporated from approval:**
+1. Business logic must remain platform-agnostic, not tightly coupled to Supabase-specific SDKs/products — see the updated "Platform-agnostic data access" section in `docs/adr/001-database-platform.md`.
+2. `docs/DOMAIN_MODEL.md` was produced as the authoritative entity/relationship definition, to exist before implementation begins.
+3. Runtime module strategy (§5, below) now compares three options before selecting one, rather than jumping straight to a single recommendation.
 
-Rationale: every other Levav concept (WRI, matching, employer verification, roles, tenant isolation) depends on knowing who a user actually is. Right now nobody does — `Auth.tsx` accepts any credentials and mints a fake token. Fixing this first, narrowly, gives every subsequent milestone (Phases 3–11 in `docs/ROADMAP.md`) a real foundation to build on instead of another layer over localStorage. This is deliberately the *smallest* slice that proves the backend can run at all, rather than attempting the whole backend wiring in one pass.
+## Milestone
 
-## Objective
+**Backend runtime foundation + real authentication + one talent-profile vertical slice.**
 
-A user can register and log in for real: credentials are checked against a MySQL-backed `users` table, a real JWT is issued and verified server-side, and `ProtectedRoute`/`useAuth` reflect genuine server state instead of localStorage alone.
+## 1. Database decision
 
-## Business value
+See `docs/adr/001-database-platform.md` for the full comparison. **Decided: migrate now to PostgreSQL, hosted on Supabase** (Drizzle ORM is retained either way — this is a dialect/hosting decision, not an ORM decision). Rejected: staying on MySQL long-term, and "restore MySQL now, migrate later" (strictly dominated — pays full setup cost twice for zero data-continuity benefit, since no MySQL instance has ever actually run and no data exists to preserve). **Amendment:** business logic connects via a standard Postgres driver + Drizzle, not `@supabase/supabase-js` — Supabase is the hosting choice, not an application-level dependency. Full detail in the ADR's "Platform-agnostic data access" section.
 
-Removes the single most consequential gap between "looks like a product" and "is a product." Nothing else in the roadmap — employer verification, matching, WRI, admin tooling — can be real while identity itself is fake. This also de-risks every later milestone's estimate, since it forces resolution of the runtime/module issues that would otherwise resurface (and compound) in every subsequent phase.
+## 2. Authentication architecture
 
-## Dependencies
+See `docs/AUTHENTICATION_ARCHITECTURE.md` for the complete flow. **Verdict: retain the existing JWT design (`jose` + `bcryptjs`, both already correct), change token transport from `localStorage` to an `httpOnly`/`Secure`/`SameSite=Lax` cookie.** Enumeration protections, dummy-hash timing mitigation on login, and server-authoritative identity (client cache is a rendering hint only, never an authorization source) are specified there in full.
 
-- A real MySQL instance (local via Docker, or a managed dev instance) — none exists today; `DATABASE_URL` currently defaults to a localhost placeholder.
-- Decision on runtime path-alias resolution for `api`/`db` (`tsconfig-paths` package, or converting `@db/*`/`@api/*` imports to relative paths) — see `docs/ARCHITECTURE.md`.
-- The missing backend npm dependencies (`docs/DEPENDENCY_AUDIT.md`) added back deliberately this time, with a real npm script to run the server.
+## 3. Tenant and role foundation
 
-## Exact scope
+**An employer is an organization, not a user role.** Today's schema conflates the two (`employers.userId` is a 1:1 link, meaning a company can only ever have exactly one login — not how real companies work). Full entity definitions, fields, and invariants are now in **`docs/DOMAIN_MODEL.md`** (produced per the approval amendment) — the summary below is a pointer, not a duplicate source of truth.
 
-1. Add backend dependencies to `package.json` for real (not a diagnostic revert this time), plus a `dev:server`/`start:server` npm script.
-2. Resolve the `@db/*`/`@api/*` runtime import problem so `api/boot.ts` actually starts.
-3. Provision a MySQL instance for local dev; run `drizzle-kit generate` for the first time to create real migrations from `db/schema.ts`; apply them.
-4. Fix the `users.role` enum to include `'employer'` and `'champion'` (currently only `'talent' | 'client' | 'admin'`), since the frontend already assumes these roles exist.
-5. Wire `src/pages/Auth.tsx` to call the real `trpc.auth.register`/`trpc.auth.login`/`trpc.auth.me` procedures instead of generating a fake token.
-6. Update `src/hooks/useAuth.ts` so server auth state is authoritative (remove the localStorage-first fallback logic, or make it strictly a cache of server state, not a substitute for it).
-7. Fix the one bug directly in this slice's path if touched (none currently block auth specifically — `employer.ts`'s bug is out of scope, see below).
+| Concept | What it is | Modeled as |
+|---|---|---|
+| **Talent** | An individual jobseeker/professional | `users.role = 'talent'`, 1:1 with a `talents` profile |
+| **Employer** | A company/business — an organization, not a person | New `organizations` table (today's `employers` table, reshaped away from its 1:1 user link) |
+| **Employer team member** | A person who logs in on behalf of an employer organization | `users.role = 'employer_member'`, linked to one or more organizations via a new `organization_members` join table carrying an org-scoped role (`owner`, `admin`, `recruiter`, `member`) |
+| **Champion** | An earned status, not a separate account type — still fundamentally a talent | A status field/flag on the user (or a small linked table), never a value that replaces `role = 'talent'` |
+| **Administrator** | Levav's own platform admin | `users.role = 'admin'`, not tied to any organization |
+| **Platform staff** | Narrower-permission Levav staff, distinct from full admin | **Not built in this milestone** — no evidence this exists today; explicitly deferred rather than speculatively designed now. `role` stays a simple enum for now; a finer-grained permissions table is future work if/when real staff-tier needs arise |
 
-## Excluded scope (explicitly not in this milestone)
+**Minimum model needed now, to avoid an immediate rewrite:** `organizations` (id, name, industry, size, verificationStatus, businessDocuments, timestamps) + `organization_members` (id, organizationId, userId, orgRole enum, status, timestamps), and `users.role` narrowed to `talent | employer_member | admin` (dropping the current ambiguous `'client'` value). **This is documented here as the target shape only — no schema file is edited and no migration is generated in this planning pass.** Writing it out now is what prevents the auth milestone's schema from needing to be immediately rewritten once organizations are addressed for real.
 
-- Employer verification flow, job/application/message/review/notification wiring — stays mocked for now.
-- Fixing `employer.ts`'s `ctx.user.id` bug, `job.ts`'s Drizzle enum bug, or the `application.ts`/`notification.ts`/`upload.ts` authorization gaps — real, but out of scope for an auth-only slice. Tracked in `docs/SECURITY_AUDIT.md` for the milestone that touches those routers.
-- WRI, Levav 28, Learn, QuickWork, SkillSpace, Impact, Champions — none of these get schema or backend work in this milestone.
-- Any UI/visual redesign — this is a plumbing milestone, not a design one.
-- Production deployment/hosting decisions.
+## 4. Safe router exposure
 
-## Data changes
+**Enabled this milestone**, and registered in `api/router.ts`:
+- **`auth`** — full (`register`, `login`, `me`, `logout` to be added per `docs/AUTHENTICATION_ARCHITECTURE.md`).
+- **`talent`** — scoped to self-service only: create own profile, update own profile, get own profile. Public browsing/listing of all talents, `delete`, and `toggleFeatured` (admin-only today) stay out of this milestone's registered surface.
 
-- `db/migrations/` created for the first time (currently doesn't exist).
-- `users.role` enum extended: `['talent', 'client', 'admin']` → `['talent', 'employer', 'admin', 'champion']` (or however the team decides to reconcile `'client'` vs. `'employer'` naming — worth a quick product decision, not just a mechanical add).
+**Explicitly excluded — must remain disabled/unregistered from `appRouter` entirely, not merely unused by the frontend:**
+- **`upload`** — public, unauthenticated presigned-URL signing (arbitrary anonymous S3 upload risk, per `docs/SECURITY_AUDIT.md`).
+- **`application`** — `updateStatus`/`byJob` have no ownership checks.
+- **`notification`** — `create` lets any user notify any other arbitrary user.
+- **`employer`** — broken (`ctx.user.id` bug) and depends on the organization/membership model in §3, which doesn't exist yet.
+- **`job`, `message`, `review`** — unverified marketplace operations with no product requirement in this milestone's narrow vertical slice.
+- **`wri`** — stub, no reason to enable.
 
-## API changes
+Recommendation for the implementation phase: remove these from the `router({...})` call in `api/router.ts` (not merely leave them unimported/uncalled by the frontend) so they don't exist on the wire at all while unreviewed.
 
-- No new endpoints — `api/routes/auth.ts` already implements `register`/`login`/`me` correctly. The change is making it reachable at all (server actually running) and having the frontend call it for real.
+## 5. Runtime module strategy
 
-## UI changes
+**One consistent mechanism, reused everywhere — not scattered relative-import fixes.** Three options were compared before selecting one.
 
-- `src/pages/Auth.tsx` — replace fake token generation with real tRPC mutation calls; add real error handling for actual failure modes (wrong password, duplicate email) instead of the current always-succeeds path.
-- `src/hooks/useAuth.ts`, `src/components/ProtectedRoute.tsx` — adjust to trust server session state as authoritative.
+| Option | Dev execution | Tests | Production build | Server deployment | Verdict |
+|---|---|---|---|---|---|
+| **A — `tsx` + `tsconfig-paths`** | `tsx` runs TS directly, fast iteration, no separate build step | Doesn't help — Vitest resolves via Vite's own resolver, independent of `tsconfig-paths` entirely | Would need a *different* mechanism for prod (either run `tsx` in production too, or introduce a separate build step) | Same problem as production build | **Rejected.** `tsconfig-paths` is fundamentally a CommonJS `require`-hook tool; this project is full ESM (`"type": "module"`, `verbatimModuleSyntax`). Its ESM support requires an experimental loader, and stacking that under `tsx`'s own esbuild-based module hooks is a known source of resolution-order conflicts. Worse, it only ever solves *dev* — tests and production still need a separate answer, which is exactly the "scattered fixes" outcome this decision is meant to avoid. |
+| **B — hand-rolled esbuild script** | Bundle `api/boot.ts` with a custom `scripts/build-server.mjs` using the `esbuild` package (already a transitive Vite dependency), watch mode for dev | Unaffected — Vitest still uses Vite's resolver independently | Same script, one-shot instead of watch | Ship the bundled output; no runtime resolution needed | **Viable, but not preferred.** Reuses tooling already present, but esbuild's default bundling behavior pulls `node_modules` into the bundle unless every native/binary dependency (`bcryptjs`, a Postgres driver) is manually marked `external` — a real, easy-to-get-wrong footgun that has to be hand-maintained as dependencies change. |
+| **C — `tsup`** | `tsup --watch` (built on esbuild, purpose-built for bundling Node backends/packages) | Unaffected — same as B | `tsup` (no watch) — same artifact-producing mechanism as dev | Ship the bundled output — same as B | **Recommended.** Same underlying engine as B (esbuild) — so it's the same "family" of tooling Vite already uses — but with a maintained, purpose-built config surface: it reads `tsconfig.json` `paths` natively, and by default treats `package.json` dependencies as external rather than bundling them, which directly avoids B's native-module footgun without hand-maintained external-list upkeep. |
 
-## Security requirements
+**Recommendation: `tsup`.** One `tsup.config.ts`, reused identically for dev (`--watch`) and production build; Vitest (already the test-framework choice, see §8) resolves `@/`, `@db/`, `@api/`, `@contracts/` independently via Vite's own resolver, so tests were never actually a separate problem to solve — they already share Vite's mechanism. This gives exactly one alias-resolution answer for the backend (`tsup`/esbuild) and one for the frontend+tests (Vite/Vitest), rather than three different, independently-maintained mechanisms.
 
-- Confirm `JWT_SECRET` is set in local `.env` (not relying on the hardcoded dev fallback) for this work.
-- Confirm CORS is scoped appropriately for local dev (wide-open `origin: '*'` is acceptable for local-only testing, but should be flagged again before any shared/deployed environment).
-- No changes to password hashing (`bcryptjs`, cost 12) — already correct.
+This replaces directly running `tsx api/boot.ts` (which has no alias resolver and is the confirmed cause of today's boot failure) with a build step that resolves aliases once, consistently, the same way the frontend already does via Vite.
 
-## Tests
+## 6. Talent-profile vertical slice
 
-- Add tests for: register (success, duplicate email), login (success, wrong password), `me` (valid token, expired token, missing token), and the role-enum migration. This codebase currently has zero tests — this milestone should not add more untested logic to that pile.
+**The journey:** register → log in → create/update a basic profile → refresh the page or start a new session → the same profile comes back from the database.
 
-## Acceptance criteria
+**Fields included** (the minimum that makes a profile meaningfully a profile): `name`, `bio`, `category`, `skills` (array), `location`.
 
-- `npm run dev:server` (new script) boots the Hono/tRPC server against a real local MySQL instance without errors.
-- Registering a new account in the UI creates a real row in `users`.
-- Logging in with correct credentials succeeds; incorrect credentials are rejected (not silently accepted like today).
-- Refreshing the page preserves a real session (via the real JWT, not a localStorage-only simulation).
-- `npx tsc --noEmit` no longer reports the `employer.ts`/`job.ts`-adjacent "router collision" errors for `useAuth.ts`/`trpc.tsx` (confirms whether that was in fact a cascading symptom, per the open question in `docs/CURRENT_STATE.md`).
+**Fields excluded from this milestone:** `portfolio` (depends on the excluded `upload` router), `avatar` (same dependency), `rate` (a commercial/pricing concept, not needed to prove persistence), `featured` (an admin/curation concept, irrelevant here and admin-only regardless).
 
-## Risks
+## 7. Security baseline
 
-- The `users.role` enum change is a real schema migration decision with implications for every other role-gated feature (champion gating, employer-only pages) — worth a short product conversation before writing the migration, not just picking a resolution unilaterally.
-- Local MySQL provisioning is new infrastructure for this project; if the team doesn't already have a preferred way to run it (Docker Compose, a cloud dev DB), that choice itself needs a quick decision.
-- Scope discipline: it will be tempting to "just also fix" `employer.ts` or wire one more page while in this code — resist it; this milestone is intentionally narrow so it can be verified cleanly.
+Full detail in `docs/AUTHENTICATION_ARCHITECTURE.md`. Summary of what this milestone must include:
+- **Environment validation** — a zod-validated env schema at server boot (`DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `NODE_ENV`); refuse to boot without `JWT_SECRET` outside local dev, closing the currently-hardcoded fallback.
+- **Secure secret handling** — `.env` stays gitignored (already true); updated `.env.example` documents every required var.
+- **Configured CORS origins** — explicit allow-list (e.g. `http://localhost:5173`), never `'*'`; required regardless, and mandatory once cookie-based auth is adopted (credentialed CORS cannot use `'*'`).
+- **Authentication middleware** — keep `authedProcedure`/`adminProcedure`; add an explicit ownership check for the talent-profile mutations.
+- **Authorisation rules** — a talent may only create/update/view their own profile in this milestone; no cross-user access; admin override is out of scope here.
+- **Password requirements** — minimum 8 characters, enforced server-side via zod, never trusting the client-side check alone.
+- **Rate-limiting strategy** — real server-side rate limiting on `register`/`login` (in-memory limiter acceptable for a single-instance MVP; explicitly flagged as needing a real distributed limiter before any multi-instance deployment). The existing client-side 5-attempts/30s cooldown in `Auth.tsx` is trivially bypassable and is not a substitute.
+- **Safe error responses** — convert the plain `Error('UNAUTHORIZED'/'FORBIDDEN')` throws (`api/router.ts`) to proper `TRPCError`s with correct codes; never leak stack traces to the client.
+- **Secure session/token handling** — `httpOnly`/`Secure`/`SameSite=Lax` cookie, per §2.
+- **Account enumeration protection** — generic login errors + dummy-hash timing mitigation, per `docs/AUTHENTICATION_ARCHITECTURE.md`; registration intentionally reveals existence (standard practice), login does not.
 
-## Estimated complexity
+## 8. Test strategy
 
-Medium. Most of the hard backend logic (auth.ts, jwt.ts, password.ts) already exists correctly — the work is plumbing (runtime resolution, real DB, migrations) plus one schema decision, not writing new business logic from scratch.
+**Framework: Vitest** (per §5 — shares Vite's resolver, no test framework exists today). Required tests:
+- Registration: success; duplicate email.
+- Login: valid credentials; invalid credentials; missing credentials.
+- Session: expired/invalid token/cookie rejected; `me` returns the correct current user for a valid session.
+- Authorization: protected route/procedure rejects an unauthenticated caller; role validation rejects a disallowed self-assigned role at registration.
+- Profile: creation succeeds and persists; update succeeds and persists; a second session/page load retrieves the same persisted data (the vertical slice's actual acceptance test).
 
-## Rollback strategy
+## 9. Implementation plan
 
-This milestone is additive at the infrastructure level (new deps, new script, new migrations) and swaps one page's internals (`Auth.tsx`) rather than restructuring the app. If it doesn't work out: revert `Auth.tsx`/`useAuth.ts` to the current localStorage-based behavior (both are small, self-contained files), and the added backend dependencies/scripts can simply sit unused (as they do today) without affecting the rest of the app, since nothing else in this milestone's scope depends on the backend being up.
+### Ordered phases
+
+1. **Runtime foundation** — adopt `tsup` (§5) for the backend; confirm `api/boot.ts` actually starts (even against a not-yet-real database, to isolate "does the server start" from "does the database work").
+2. **Database** — provision Postgres per the ADR, rewrite `db/schema.ts` to `pgTable`/`pgEnum` syntax including the narrowed `users.role` enum and the new `organizations`/`organization_members` tables from §3, generate first migrations, apply them.
+3. **Auth** — implement the cookie-transport change and the register/login/me/logout flow exactly as specified in `docs/AUTHENTICATION_ARCHITECTURE.md`, including the environment validation and rate-limiting from §7.
+4. **Router exposure** — register only `auth` (full) and `talent` (scoped) in `api/router.ts`; explicitly remove/leave unregistered everything listed in §4.
+5. **Talent profile slice** — wire `ProfileCreate.tsx` (fixing its already-confirmed `never`-typed state bug as part of this work, since it's directly in this slice's path) and the relevant read path to the real `talent` router, for exactly the fields in §6.
+6. **Tests** — Vitest suite per §8, written alongside each phase above, not bolted on at the end.
+
+### Files likely to change
+
+`package.json` (real backend deps + `tsup`/Vitest tooling this time, not a diagnostic revert), `db/schema.ts`, `db/connection.ts`, `drizzle.config.ts`, `api/boot.ts`, `api/context.ts`, `api/router.ts`, `api/routes/auth.ts` (add `logout`, cookie handling), `api/lib/jwt.ts` (cookie helpers), `src/providers/trpc.tsx`, `src/hooks/useAuth.ts`, `src/components/ProtectedRoute.tsx`, `src/pages/Auth.tsx`, `src/pages/ProfileCreate.tsx`, `.env.example`.
+
+### New files likely to be created
+
+`tsup.config.ts` (§5's runtime module strategy), `vitest.config.ts`, test files alongside each changed backend module (e.g. `api/routes/auth.test.ts`, `api/routes/talent.test.ts`), `db/migrations/*` (generated, not hand-written), possibly a small `api/lib/env.ts` schema-validation module (a version already exists — confirm whether it can be extended rather than replaced).
+
+### Dependencies proposed
+
+Real (not diagnostic-temporary) additions: `hono`, `@hono/node-server`, `@trpc/server`, `drizzle-orm` (Postgres dialect), `postgres` or `pg` (driver, connecting via a standard connection string — not `@supabase/supabase-js`, per the platform-agnostic amendment), `drizzle-kit`, `jose`, `bcryptjs` + `@types/bcryptjs`, `zod`, `tsup`, `vitest`. **Explicitly not added yet:** `@supabase/supabase-js` (not needed — data access stays platform-agnostic), AWS SDK packages (`upload` router stays disabled), `superjson` (only needed once more of the router surface is enabled).
+
+### Migration strategy
+
+First-ever migrations, generated via `drizzle-kit generate` against the Postgres schema once §3's tables are written into `db/schema.ts`. No existing data to migrate. No `.env`/production database is touched by this planning pass — provisioning happens only after approval, per the user's explicit instruction not to install infrastructure yet.
+
+### Rollback strategy
+
+Each phase is independently revertible: the runtime/bundle change doesn't touch application logic; the schema/migration work happens against a fresh database with no prior data at stake; the auth changes are contained to the files listed above and can be reverted to the current (fake/localStorage) behavior without affecting anything else, since nothing else in this milestone's scope depends on the backend being up (mirrors the rollback framing already used in the prior version of this document).
+
+### Acceptance criteria
+
+- The backend boots via the new bundle-based dev/build process against a real Postgres instance, with no path-alias errors.
+- Registering a new account creates a real `users` row; duplicate email is rejected with the specified message.
+- Logging in with correct credentials succeeds and sets the `httpOnly` cookie; incorrect credentials are rejected with the generic message.
+- Refreshing the page, or starting an entirely new browser session, retrieves the same authenticated identity via `me` and the same persisted talent-profile fields from the database — not from `localStorage`.
+- Only `auth` and the scoped `talent` procedures are reachable; every router listed as excluded in §4 returns "not found" (i.e., is genuinely unregistered, not just unused).
+- The Vitest suite in §8 passes.
+
+### Risks
+
+- The `users.role`/organization schema is a real design decision with implications for every later role-gated feature — worth a short confirmation from the user on the exact org-role vocabulary (`owner/admin/recruiter/member`) before migrations are generated, not assumed unilaterally.
+- Keeping business logic platform-agnostic (standard Postgres driver + Drizzle, not `@supabase/supabase-js`) takes slightly more discipline than using Supabase's client SDK directly — worth a reminder during implementation review, since it would be easy to reach for the SDK out of convenience.
+- Scope discipline: it will be tempting to also fix `employer.ts` or wire one more page while touching this code — resist it; this milestone is intentionally narrow so it can be verified cleanly.
+- Cookie-based auth requires getting CORS/`credentials` configuration right in both dev and any deployed environment — worth explicit testing in both, not just assumed to work.
+
+### Exclusions (explicitly out of scope for this milestone)
+
+Employer verification flow, job/application/message/review/notification wiring, the `employer.ts` bug fix itself (tracked, not fixed here since `employer` stays unregistered), WRI/Levav 28/Learn/QuickWork/SkillSpace/Impact/Champions backend work, portfolio/avatar upload (depends on the excluded `upload` router), any visual redesign, any production deployment/hosting decisions beyond the database platform choice itself, refresh-token rotation, and a distinct "platform staff" permission tier.
+
+### Checkpoints — status
+
+1. ✅ **This planning package** (this document + the ADR + `docs/AUTHENTICATION_ARCHITECTURE.md` + `docs/DOMAIN_MODEL.md`) — **approved with amendments, 2026-07-23.**
+2. ✅ **Database platform choice** — Supabase, confirmed. No longer unresolved.
+3. ✅ **The `organizations`/`organization_members`/role-enum shape in §3 / `docs/DOMAIN_MODEL.md`** — approved as the default shape; org-role vocabulary (`owner`/`admin`/`recruiter`/`member`) and `users.role` naming (`talent`/`employer_member`/`admin`) are adopted, open to revision if the team wants different names but not blocking.
+4. ✅ **The cookie-transport change to auth** — approved, no objection raised.
+5. ⏳ **Implementation approval** — **still required.** Nothing in §9's ordered phases begins until this is explicitly given, per the instruction that approving this planning package is not the same as approving implementation.
+6. ⏳ **A final review pass** once the vertical slice is implemented, before it's considered "done" and before any further milestone begins.

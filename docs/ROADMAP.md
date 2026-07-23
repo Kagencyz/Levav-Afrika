@@ -9,10 +9,10 @@ Fixed the git-scoping issue, confirmed `levav-talent/` as canonical. See `docs/R
 Verified install/lint/typecheck/build/dev-server, documented every gap. See `docs/CURRENT_STATE.md`, `docs/DEPENDENCY_AUDIT.md`.
 
 ## Phase 2 — Architecture and data-model correction
-Fix the confirmed backend bugs (`employer.ts`, `job.ts`), resolve the `users.role` enum mismatch (`employer`/`champion` roles used in frontend but not in DB schema), decide the runtime path-alias strategy, generate real migrations.
+**Accepted in detail** — see `docs/NEXT_MILESTONE.md`, `docs/adr/001-database-platform.md`, and `docs/DOMAIN_MODEL.md`. Decided: migrate to PostgreSQL (Drizzle retained, accessed platform-agnostically — not via `@supabase/supabase-js`) hosted on Supabase; adopt `tsup` for the backend runtime (replacing direct `tsx` execution) reused consistently across dev/test/build, chosen after comparing it against `tsx`+`tsconfig-paths` and a hand-rolled esbuild script; model "employer" as an `organizations` + `organization_members` structure rather than a plain user role. The confirmed `employer.ts`/`job.ts` bugs are tracked but deliberately **not** fixed as part of the auth milestone — `employer` stays unregistered from the router until it's addressed on its own. Implementation itself awaits a separate approval checkpoint.
 
 ## Phase 3 — Authentication, organisations, roles and tenant isolation
-Replace the fake client-side auth with the real `auth.ts` backend (already mostly correct) once Phase 2 is done. Extend the `users.role` enum. Establish real ownership/tenant checks (employer ↔ their jobs/applications, talent ↔ their profile).
+**Partially covered by the milestone in `docs/NEXT_MILESTONE.md`** — the auth half (real JWT-backed login via an `httpOnly` cookie, server-authoritative identity, narrowed `users.role` enum) is in scope now, per `docs/AUTHENTICATION_ARCHITECTURE.md`. Full organisation/tenant-membership enforcement (the `employer` router itself, org-role permissions like `owner`/`admin`/`recruiter`/`member` actually gating behavior) is scoped for the *next* milestone after auth lands — this phase's schema groundwork is being laid now specifically so it doesn't need to be redone.
 
 ## Phase 4 — Talent onboarding and Levav ID
 Decide what "Levav ID" actually is as a concept (currently no distinct implementation exists — see `docs/PRODUCT_SYSTEM_MAP.md`) before building it; don't build a name without a defined mechanism.
