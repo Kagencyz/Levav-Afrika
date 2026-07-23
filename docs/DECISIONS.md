@@ -1,0 +1,35 @@
+# Decisions Log
+
+Architectural and process decisions made during the initial repository audit, with rationale. Append new entries chronologically; don't rewrite history here.
+
+## 2026-07-23 — Re-scoped git to a dedicated repository inside `levav-talent/`
+
+**Decision:** initialized a fresh `git init` inside `levav-talent/` rather than continuing to use the pre-existing repository rooted at `~/Downloads`.
+
+**Why:** the old repository's root was the entire `~/Downloads` folder, commingling this project with hundreds of unrelated personal files, and its index held ~660 staged-but-uncommitted entries spanning that whole folder (installer images, other client projects, a SQL dump, financial CSVs). The canonical `levav-talent/` folder itself was entirely untracked in that repository. See `docs/REPOSITORY_AUDIT.md` for full detail.
+
+**What was NOT done:** the old `~/Downloads/.git` was not deleted, modified, committed to, or pushed. It was left exactly as found, in case anything there is still needed.
+
+## 2026-07-23 — `levav-talent/` confirmed as the canonical codebase
+
+**Decision:** treat `levav-talent/` (full-stack: Vite/React + Hono/tRPC/Drizzle/MySQL) as the canonical Levav Talent codebase, and the sibling `app/` folder (frontend-only, from the original Kimi generation) as historical reference only.
+
+**Why:** confirmed directly by the user. `app/`'s only connection to git history is the original single commit in the old Downloads-rooted repo; it is not part of `levav-talent/`'s new repository and should not be edited as if it were live.
+
+## 2026-07-23 — Verified backend runnability via a temporary, reverted dependency addition
+
+**Decision:** temporarily added the 11 missing backend npm dependencies to `package.json`, ran `npx tsc --noEmit` and attempted `tsx api/boot.ts` to establish ground truth about the backend's actual state, then reverted `package.json`/`package-lock.json` back to the frontend-only baseline afterward.
+
+**Why:** the only way to distinguish "the backend has real bugs" from "the backend can't even be evaluated because modules are missing" was to actually install the dependencies and try. Reverting afterward keeps `package.json` an honest reflection of what's actually wired up today (nothing) rather than implying the backend is one `npm install` away from working — it is not, per the runtime path-alias issue also discovered during this same diagnostic (see `docs/ARCHITECTURE.md`).
+
+**What this produced:** confirmed `employer.ts`'s `ctx.user.id` bug and `job.ts`'s Drizzle enum-comparison bug independent of the missing-module noise; confirmed the backend fails on its very first import under plain `tsx` due to the `@db/*` path alias having no runtime resolver; confirmed ~150 real frontend typecheck errors exist regardless of backend state, dominated by a single framer-motion `Easing` typing issue. Full detail in `docs/CURRENT_STATE.md`.
+
+**Follow-up commit kept:** `package-lock.json` was committed (frontend-only) as part of this same session, since it hadn't existed in the initial checkpoint commit and is needed for reproducible installs.
+
+## 2026-07-23 — Wrote the full Phase 7 documentation set before any feature work
+
+**Decision:** produced `CLAUDE.md`, `AGENTS.md`, and the `docs/` set (`REPOSITORY_AUDIT`, `ARCHITECTURE`, `PRODUCT_SYSTEM_MAP`, `UI_UX_AUDIT`, `SECURITY_AUDIT`, `DEPENDENCY_AUDIT`, `CURRENT_STATE`, `ROADMAP`, `NEXT_MILESTONE`, this file) reflecting only verified findings, with no application code changes.
+
+**Why:** per the audit's own operating rules — understand and document before building — and because the gap between the stated Levav vision and the actual, mock-data-driven implementation is large enough that any new feature work needs this ground truth on record first, for this and future sessions.
+
+**Next decision point:** whether to approve the milestone proposed in `docs/NEXT_MILESTONE.md` (make the backend runnable, wire real auth) before any other feature work proceeds.
