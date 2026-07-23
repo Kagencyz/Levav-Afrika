@@ -25,14 +25,14 @@ See `docs/AUTHENTICATION_ARCHITECTURE.md` for the complete flow. **Verdict: reta
 
 | Concept | What it is | Modeled as |
 |---|---|---|
-| **Talent** | An individual jobseeker/professional | `users.role = 'talent'`, 1:1 with a `talents` profile |
-| **Employer** | A company/business — an organization, not a person | New `organizations` table (today's `employers` table, reshaped away from its 1:1 user link) |
-| **Employer team member** | A person who logs in on behalf of an employer organization | `users.role = 'employer_member'`, linked to one or more organizations via a new `organization_members` join table carrying an org-scoped role (`owner`, `admin`, `recruiter`, `member`) |
-| **Champion** | An earned status, not a separate account type — still fundamentally a talent | A status field/flag on the user (or a small linked table), never a value that replaces `role = 'talent'` |
-| **Administrator** | Levav's own platform admin | `users.role = 'admin'`, not tied to any organization |
-| **Platform staff** | Narrower-permission Levav staff, distinct from full admin | **Not built in this milestone** — no evidence this exists today; explicitly deferred rather than speculatively designed now. `role` stays a simple enum for now; a finer-grained permissions table is future work if/when real staff-tier needs arise |
+| **Talent** | An individual jobseeker/professional | Derived from the existence of a `talents` row (1:1 via `userId`) — not a stored role. See `docs/DOMAIN_MODEL.md`'s "Business capability derivation." |
+| **Employer** | A company/business — an organization, not a person | New `organizations` table (the old `employers` table, reshaped away from its 1:1 user link), carrying `organizationType` |
+| **Employer team member** | A person who logs in on behalf of an employer organization | Derived from an active `organizationMembers` row for that user, linked to one or more organizations, carrying an org-scoped role (`owner`, `admin`, `recruiter`, `member`) |
+| **Champion** | An earned status, not a separate account type — still fundamentally a talent | Explicitly deferred (not in the schema); if built later, its own additive field or table, never a value inside `accessLevel` |
+| **Administrator** | Levav's own platform admin | `users.accessLevel = 'admin'`, not tied to any organization |
+| **Platform staff** | Narrower-permission Levav staff, distinct from full admin | **Not built in this milestone** — no evidence this exists today; explicitly deferred rather than speculatively designed now. `accessLevel` stays a simple enum for now; a finer-grained permissions table is future work if/when real staff-tier needs arise |
 
-**Minimum model needed now, to avoid an immediate rewrite:** `organizations` (id, name, industry, size, verificationStatus, businessDocuments, timestamps) + `organization_members` (id, organizationId, userId, orgRole enum, status, timestamps), and `users.role` narrowed to `talent | employer_member | admin` (dropping the current ambiguous `'client'` value). **This is documented here as the target shape only — no schema file is edited and no migration is generated in this planning pass.** Writing it out now is what prevents the auth milestone's schema from needing to be immediately rewritten once organizations are addressed for real.
+**Minimum model needed now, to avoid an immediate rewrite:** `organizations` (id, name, organizationType, industry, size, verificationStatus, businessDocuments, timestamps) + `organization_members` (id, organizationId, userId, orgRole enum, status, invitedByUserId, timestamps), and `users.accessLevel` (`standard | admin`) capturing platform access only — business identity is never stored on `users`. **This has been implemented and a migration generated** (not yet applied) — see `docs/DOMAIN_MODEL.md` for the authoritative shape and `docs/DECISIONS.md` for the amendment history.
 
 ## 4. Safe router exposure
 
@@ -100,7 +100,7 @@ Full detail in `docs/AUTHENTICATION_ARCHITECTURE.md`. Summary of what this miles
 ### Ordered phases
 
 1. **Runtime foundation** — adopt `tsup` (§5) for the backend; confirm `api/boot.ts` actually starts (even against a not-yet-real database, to isolate "does the server start" from "does the database work").
-2. **Database** — provision Postgres per the ADR, rewrite `db/schema.ts` to `pgTable`/`pgEnum` syntax including the narrowed `users.role` enum and the new `organizations`/`organization_members` tables from §3, generate first migrations, apply them.
+2. **Database** — provision Postgres per the ADR, rewrite `db/schema.ts` to `pgTable`/`pgEnum` syntax including `users.accessLevel` and the new `organizations`/`organization_members` tables from §3, generate first migrations, apply them. **Done** (schema written, migration generated) — not yet applied.
 3. **Auth** — implement the cookie-transport change and the register/login/me/logout flow exactly as specified in `docs/AUTHENTICATION_ARCHITECTURE.md`, including the environment validation and rate-limiting from §7.
 4. **Router exposure** — register only `auth` (full) and `talent` (scoped) in `api/router.ts`; explicitly remove/leave unregistered everything listed in §4.
 5. **Talent profile slice** — wire `ProfileCreate.tsx` (fixing its already-confirmed `never`-typed state bug as part of this work, since it's directly in this slice's path) and the relevant read path to the real `talent` router, for exactly the fields in §6.
@@ -137,7 +137,7 @@ Each phase is independently revertible: the runtime/bundle change doesn't touch 
 
 ### Risks
 
-- The `users.role`/organization schema is a real design decision with implications for every later role-gated feature — worth a short confirmation from the user on the exact org-role vocabulary (`owner/admin/recruiter/member`) before migrations are generated, not assumed unilaterally.
+- The `users.accessLevel`/organization schema is a real design decision with implications for every later role-gated feature — confirmed with the user on the exact org-role vocabulary (`owner/admin/recruiter/member`) and the access-level model before the migration was generated, not assumed unilaterally.
 - Keeping business logic platform-agnostic (standard Postgres driver + Drizzle, not `@supabase/supabase-js`) takes slightly more discipline than using Supabase's client SDK directly — worth a reminder during implementation review, since it would be easy to reach for the SDK out of convenience.
 - Scope discipline: it will be tempting to also fix `employer.ts` or wire one more page while touching this code — resist it; this milestone is intentionally narrow so it can be verified cleanly.
 - Cookie-based auth requires getting CORS/`credentials` configuration right in both dev and any deployed environment — worth explicit testing in both, not just assumed to work.
@@ -150,7 +150,7 @@ Employer verification flow, job/application/message/review/notification wiring, 
 
 1. ✅ **This planning package** (this document + the ADR + `docs/AUTHENTICATION_ARCHITECTURE.md` + `docs/DOMAIN_MODEL.md`) — **approved with amendments, 2026-07-23.**
 2. ✅ **Database platform choice** — Supabase, confirmed. No longer unresolved.
-3. ✅ **The `organizations`/`organization_members`/role-enum shape in §3 / `docs/DOMAIN_MODEL.md`** — approved as the default shape; org-role vocabulary (`owner`/`admin`/`recruiter`/`member`) and `users.role` naming (`talent`/`employer_member`/`admin`) are adopted, open to revision if the team wants different names but not blocking.
+3. ✅ **The `organizations`/`organization_members` shape in §3 / `docs/DOMAIN_MODEL.md`** — approved, then amended: `users.role` replaced with `users.accessLevel` (`standard`/`admin`), `organizations.organizationType` added, `organization_members.invitedByUserId` added. Org-role vocabulary (`owner`/`admin`/`recruiter`/`member`) unchanged. See `docs/DECISIONS.md` for the amendment round.
 4. ✅ **The cookie-transport change to auth** — approved, no objection raised.
 5. ⏳ **Implementation approval** — **still required.** Nothing in §9's ordered phases begins until this is explicitly given, per the instruction that approving this planning package is not the same as approving implementation.
 6. ⏳ **A final review pass** once the vertical slice is implemented, before it's considered "done" and before any further milestone begins.

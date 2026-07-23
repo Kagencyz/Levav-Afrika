@@ -21,7 +21,7 @@ const adminMiddleware = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {
     throw new Error('UNAUTHORIZED');
   }
-  if (ctx.user.role !== 'admin') {
+  if (ctx.user.accessLevel !== 'admin') {
     throw new Error('FORBIDDEN');
   }
   return next({ ctx: { ...ctx, user: ctx.user } });

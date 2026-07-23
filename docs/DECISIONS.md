@@ -43,3 +43,21 @@ Architectural and process decisions made during the initial repository audit, wi
 **What this does NOT do:** approving this planning package is explicitly **not** the same as approving implementation. No code has been written, no infrastructure provisioned, no migrations generated, nothing pushed. A further, separate approval is required before `docs/NEXT_MILESTONE.md`'s ordered implementation phases begin — see that document's "Checkpoints" section.
 
 **Next decision point:** implementation approval itself.
+
+## 2026-07-23 — Stage B amended: platform access model, organization type, invitation provenance
+
+**Decision:** after Stage B's initial schema/migration (users/talents/organizations/organization_members on PostgreSQL) was implemented and reported, three amendments were approved before applying the migration:
+
+1. **`users.role` (`talent | employer_member | admin`) replaced with `users.accessLevel` (`standard | admin`).** Business identity (talent, organization team member) is no longer stored on `users` at all — it's derived from the existence of related rows (`talents.userId`, active `organizationMembers.userId`). This also removes an earlier structural limitation: a user can now simultaneously be a Talent and an active organization member, which the old exclusive-enum design forbade.
+2. **`organizations.organizationType` added** — a required (no default) enum of `company | church | non_profit | government | school | university | agency | startup | other`, reflecting that Levav's employer base spans more than conventional companies.
+3. **`organizationMembers.invitedByUserId` added** — nullable (null = founding member), `ON DELETE SET NULL` rather than `CASCADE`, since it references a different user than the row's own subject and deleting the inviter must never delete the invitee's membership.
+
+**Why:** the original `role` enum conflated a genuine platform-access concept (`admin`) with business identities that should be derivable facts, not a stored, mutually-exclusive flag — a real correctness gap the user caught before the migration was applied, which is exactly when it's cheapest to fix. `organizationType` and invitation provenance close two real gaps in the organization model ahead of the `employer` router's eventual review.
+
+**Mechanical follow-through required** (not new feature work, same principle as the original Stage B report): `api/trpc.ts`'s `adminProcedure` check, `api/lib/jwt.ts`'s token payload, and `api/routes/auth.ts`/`api/routes/talent.ts`'s references were updated from `role` to `accessLevel` so the registered surface kept compiling. `auth.ts#register` no longer accepts a `role` input — there's nothing meaningful to accept at the platform level in this model. Caught in the same pass: `register`/`login` weren't normalizing email before querying/inserting, which would have violated the `users_email_normalized` CHECK constraint added in the original Stage B pass — fixed alongside the rename since it's a correctness bug against a constraint already committed to, not new scope.
+
+**Documentation brought back into alignment:** `docs/DOMAIN_MODEL.md` rewritten to match — every `role = 'talent'`/`role = 'employer_member'` reference removed, a new "Business capability derivation" section added as the authoritative statement of how talent/org identity are derived rather than stored, `organizationType` and `invitedByUserId` documented in full. `championStatus` remains explicitly deferred (moved out of the User fields table, since it was never actually part of the schema, into "What is explicitly deferred," with an explicit note that if built later it must never become a value inside `accessLevel`).
+
+**What this does NOT do:** the migration was regenerated (schema changed) but **not applied**. Nothing committed, nothing pushed. Approval of these amendments is not approval to apply the migration — that remains a separate, explicit checkpoint.
+
+**Next decision point:** whether to apply the migration.

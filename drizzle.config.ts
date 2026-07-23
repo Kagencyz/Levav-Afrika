@@ -3,8 +3,8 @@ import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
   schema: './db/schema.ts',
   out: './db/migrations',
-  dialect: 'mysql',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL || 'mysql://root@localhost:3306/levav',
+    url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/levav',
   },
 });

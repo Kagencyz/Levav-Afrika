@@ -4,9 +4,9 @@ import { env } from './env';
 const SECRET = new TextEncoder().encode(env.JWT_SECRET);
 
 export async function signToken(payload: {
-  userId: number;
+  userId: string;
   email: string;
-  role: string;
+  accessLevel: string;
 }) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -20,7 +20,7 @@ export async function verifyToken(token: string) {
     const { payload } = await jwtVerify(token, SECRET, {
       clockTolerance: 60,
     });
-    return payload as { userId: number; email: string; role: string };
+    return payload as { userId: string; email: string; accessLevel: string };
   } catch {
     return null;
   }

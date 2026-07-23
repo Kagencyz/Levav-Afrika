@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { eq, like, sql, and, count } from 'drizzle-orm';
+import { eq, like, and, count } from 'drizzle-orm';
 import { router, publicProcedure, authedProcedure, adminProcedure } from '../trpc';
 import { db } from '../../db/connection';
 import { talents } from '../../db/schema';
@@ -58,7 +58,7 @@ export const talentRouter = router({
     }),
 
   getById: publicProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.string().uuid() }))
     .query(async ({ input }) => {
       const rows = await db
         .select()
@@ -91,44 +91,33 @@ export const talentRouter = router({
         category: z.string().min(1),
         skills: z.array(z.string()),
         location: z.string().min(1),
-        rate: z.string().min(1),
-        avatar: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const result = await db.insert(talents).values({
-        userId: ctx.user.userId,
-        name: input.name,
-        bio: input.bio,
-        category: input.category,
-        skills: input.skills,
-        portfolio: [],
-        avatar: input.avatar ?? '',
-        location: input.location,
-        rate: input.rate,
-      });
+      const [newTalent] = await db
+        .insert(talents)
+        .values({
+          userId: ctx.user.userId,
+          name: input.name,
+          bio: input.bio,
+          category: input.category,
+          skills: input.skills,
+          location: input.location,
+        })
+        .returning();
 
-      const id = Number(result[0].insertId);
-      const rows = await db
-        .select()
-        .from(talents)
-        .where(eq(talents.id, id))
-        .limit(1);
-
-      return rows[0];
+      return newTalent;
     }),
 
   update: authedProcedure
     .input(
       z.object({
-        id: z.number(),
+        id: z.string().uuid(),
         name: z.string().min(1).optional(),
         bio: z.string().min(1).optional(),
         category: z.string().min(1).optional(),
         skills: z.array(z.string()).optional(),
         location: z.string().min(1).optional(),
-        rate: z.string().min(1).optional(),
-        avatar: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -147,55 +136,28 @@ export const talentRouter = router({
       // Only allow update if admin or owner
       if (
         existing[0].userId !== ctx.user.userId &&
-        ctx.user.role !== 'admin'
+        ctx.user.accessLevel !== 'admin'
       ) {
         throw new Error('FORBIDDEN');
       }
 
-      await db
+      const [updated] = await db
         .update(talents)
         .set({
           ...updates,
           skills: updates.skills ?? existing[0].skills,
+          updatedAt: new Date(),
         })
-        .where(eq(talents.id, id));
-
-      const rows = await db
-        .select()
-        .from(talents)
         .where(eq(talents.id, id))
-        .limit(1);
+        .returning();
 
-      return rows[0];
+      return updated;
     }),
 
   delete: adminProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ input }) => {
       await db.delete(talents).where(eq(talents.id, input.id));
       return { success: true };
-    }),
-
-  toggleFeatured: adminProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      const rows = await db
-        .select()
-        .from(talents)
-        .where(eq(talents.id, input.id))
-        .limit(1);
-
-      if (rows.length === 0) {
-        throw new Error('Talent not found');
-      }
-
-      const newFeatured = !rows[0].featured;
-
-      await db
-        .update(talents)
-        .set({ featured: newFeatured })
-        .where(eq(talents.id, input.id));
-
-      return { id: input.id, featured: newFeatured };
     }),
 });

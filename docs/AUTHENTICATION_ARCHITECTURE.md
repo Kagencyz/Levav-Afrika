@@ -14,7 +14,7 @@ Why: today's design has the frontend read `auth_token` out of `localStorage` and
 
 ### Registration
 
-1. Client submits `{ email, password, role }` where `role` is restricted to `'talent' | 'employer_member'` only — **the registration endpoint must reject or ignore any attempt to set `role: 'admin'`**, enforced server-side in the zod input schema (an enum of exactly those two values), not just in the UI. Champion status is never set at registration (see Role assignment, below).
+1. Client submits `{ email, password, name }`. There is no `role` field to choose — per `docs/DOMAIN_MODEL.md`, business identity (talent, organization member) is never stored on `users` or set at registration; it's established later by creating a `talents` row or being added to an `organizationMembers` row. `users.accessLevel` defaults to `'standard'` and is never accepted as registration input — **the registration endpoint must reject or ignore any attempt to set `accessLevel: 'admin'`**, enforced server-side (see Role assignment, below).
 2. Server checks for an existing user with that email.
    - If found: return a clear `409`-style error, **"email already in use."** (Registration is the one endpoint where revealing existence is normal and expected — nearly every production system does this. Enumeration hardening applies to login, not registration — see Security baseline.)
    - If not found: hash the password with `bcryptjs` (cost 12, unchanged), insert the `users` row, issue a JWT, set it as the `httpOnly` cookie, and return the created user's public fields (never the password hash).
@@ -59,9 +59,9 @@ See Login, above: generic "Invalid email or password" for both nonexistent-email
 
 ### Role assignment
 
-- Registration may only set `'talent'` or `'employer_member'` (see §3 of `docs/NEXT_MILESTONE.md` for the full role/tenant model — employer is an **organization**, not just a role, and organization membership is a separate concern from the platform-level `role` field).
-- `'admin'` is never self-assignable — seeded/assigned out-of-band only (e.g., directly in the database by an operator).
-- `'champion'` status is not part of the `role` enum at all in the target model — it's an earned status via the existing `ChampionApply` flow (approval process, out of scope for this milestone to build, but the schema shouldn't conflict with it existing later — see `docs/NEXT_MILESTONE.md`).
+- Registration sets nothing beyond `accessLevel = 'standard'` (the column default). There is no business identity to choose — see `docs/DOMAIN_MODEL.md`'s "Business capability derivation." Becoming a talent means creating a `talents` row (via the talent-profile vertical slice); becoming an organization member means an `organizationMembers` row is created for the user (typically via invitation, out of scope for this milestone since the `employer` router stays unregistered).
+- `accessLevel = 'admin'` is never self-assignable — seeded/assigned out-of-band only (e.g., directly in the database by an operator).
+- Champion status is not part of `accessLevel` or any business-identity field — per `docs/DOMAIN_MODEL.md` it remains explicitly deferred; if built later it's an earned status via the existing `ChampionApply` flow, modeled as its own additive field or table, never a value inside `accessLevel`.
 
 ### Protected routes
 
@@ -76,7 +76,7 @@ Client-side: `ProtectedRoute.tsx` continues to gate route rendering, but must be
 ## Sequence summary
 
 ```
-Register:  client → POST register{email,password,role} → server checks email →
+Register:  client → POST register{email,password,name} → server checks email →
            hash password → insert user → sign JWT → Set-Cookie(httpOnly) → return user
 
 Login:     client → POST login{email,password} → server looks up user (dummy-hash if missing) →

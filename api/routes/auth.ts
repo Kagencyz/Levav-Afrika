@@ -14,15 +14,14 @@ export const authRouter = router({
         email: z.string().email(),
         password: z.string().min(6),
         name: z.string().min(2),
-        role: z.enum(['talent', 'client']).default('client'),
       })
     )
     .mutation(async ({ input }) => {
-      const existing = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, input.email))
-        .limit(1);
+      // Normalized before persistence to satisfy the users_email_normalized
+      // CHECK constraint and enforce case-insensitive uniqueness.
+      const email = input.email.trim().toLowerCase();
+
+      const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
       if (existing.length > 0) {
         throw new TRPCError({
@@ -33,29 +32,33 @@ export const authRouter = router({
 
       const passwordHash = await hashPassword(input.password);
 
-      const result = await db.insert(users).values({
-        email: input.email,
-        passwordHash,
-        name: input.name,
-        role: input.role,
-      });
-
-      const userId = Number(result[0].insertId);
+      // accessLevel is never accepted as input — every new account starts
+      // 'standard' (the column default). 'admin' is assigned out-of-band
+      // only. Business identity (talent / employer team member) is not set
+      // here at all — it's established later by creating a talents row or
+      // an organization_members row, not by this registration step.
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          email,
+          passwordHash,
+          name: input.name,
+        })
+        .returning();
 
       const token = await signToken({
-        userId,
-        email: input.email,
-        role: input.role,
+        userId: newUser.id,
+        email: newUser.email,
+        accessLevel: newUser.accessLevel,
       });
 
       return {
         token,
         user: {
-          id: userId,
-          email: input.email,
-          name: input.name,
-          role: input.role,
-          avatar: null,
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          accessLevel: newUser.accessLevel,
         },
       };
     }),
@@ -68,11 +71,9 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const rows = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, input.email))
-        .limit(1);
+      const email = input.email.trim().toLowerCase();
+
+      const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
       if (rows.length === 0) {
         throw new TRPCError({
@@ -94,7 +95,7 @@ export const authRouter = router({
       const token = await signToken({
         userId: user.id,
         email: user.email,
-        role: user.role,
+        accessLevel: user.accessLevel,
       });
 
       return {
@@ -103,8 +104,7 @@ export const authRouter = router({
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
-          avatar: user.avatar,
+          accessLevel: user.accessLevel,
         },
       };
     }),
@@ -119,8 +119,7 @@ export const authRouter = router({
         id: users.id,
         email: users.email,
         name: users.name,
-        role: users.role,
-        avatar: users.avatar,
+        accessLevel: users.accessLevel,
       })
       .from(users)
       .where(eq(users.id, ctx.user.userId))
