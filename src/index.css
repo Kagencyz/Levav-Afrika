@@ -1,0 +1,303 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== MOBILE KEYBOARD FIXES ========== */
+
+/* 1. Prevent iOS zoom on input focus (REQUIRED for iOS) */
+input, select, textarea {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 2. Prevent layout shift when virtual keyboard appears */
+html, body, #root {
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* 3. Force GPU compositing on form containers to prevent flicker */
+form, .form-container, .glass-card {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 4. Smooth keyboard appearance */
+input:focus, select:focus, textarea:focus {
+  scroll-margin-bottom: 300px;
+  -webkit-scroll-margin-bottom: 300px;
+}
+
+/* 5. Prevent body scroll when form is focused on mobile */
+@media (max-width: 768px) {
+  body:has(input:focus) {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* 6. Ensure inputs stay stable during typing */
+input, select, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 7. Prevent double-tap zoom on buttons */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* 8. Safe area for iPhone X+ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 78 100% 60%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 262 82% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 0 0% 8%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0.06;
+    --input: 0 0% 100% / 0.06;
+    --ring: 78 100% 60%;
+    --radius: 0.625rem;
+
+    --lime: #C6FF34;
+    --violet: #7E3BED;
+    --midnight: #000000;
+    --surface: #0A0A0A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0A0A0;
+    --text-muted: #666666;
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  body {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background: rgba(198, 255, 52, 0.3);
+    color: #FFFFFF;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #000000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+@layer components {
+  .gradient-text {
+    background: linear-gradient(135deg, #C6FF34, #7E3BED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-animated {
+    background: linear-gradient(135deg, #C6FF34, #7E3BED, #C6FF34);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-strong {
+    background: rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-hover {
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .glass-hover:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(198, 255, 52, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .glass-glow {
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .glass-glow:hover {
+    box-shadow: 0 0 30px rgba(198, 255, 52, 0.15), 0 0 60px rgba(126, 59, 237, 0.1);
+    border-color: rgba(198, 255, 52, 0.3);
+  }
+
+  .btn-lime {
+    background: #C6FF34;
+    color: #000000;
+    font-weight: 600;
+    padding: 0.625rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .btn-lime:hover {
+    background: #d4ff5c;
+    transform: scale(1.02) translateY(-1px);
+    box-shadow: 0 4px 24px rgba(198, 255, 52, 0.3);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .border-glass {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .bg-midnight {
+    background-color: #000000;
+  }
+
+  .bg-surface {
+    background-color: #0A0A0A;
+  }
+
+  .text-lime {
+    color: #C6FF34;
+  }
+
+  .text-violet {
+    color: #7E3BED;
+  }
+
+  .bg-lime {
+    background-color: #C6FF34;
+  }
+
+  .bg-violet {
+    background-color: #7E3BED;
+  }
+
+  .border-lime {
+    border-color: #C6FF34;
+  }
+
+  .border-violet {
+    border-color: #7E3BED;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(198, 255, 52, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(198, 255, 52, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

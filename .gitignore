@@ -1,0 +1,15 @@
+node_modules/
+node_modules.bak*/
+dist/
+dist-ssr/
+build/
+.env
+.env.local
+.env.*.local
+*.local
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/*
+!.vscode/extensions.json
+*.tsbuildinfo
