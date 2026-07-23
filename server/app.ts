@@ -1,12 +1,11 @@
 import { env } from './lib/env';
 import { Hono } from 'hono';
-import { serve } from '@hono/node-server';
 import { cors } from 'hono/cors';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { appRouter } from './router';
 import { createContext } from './context';
 
-const app = new Hono();
+export const app = new Hono();
 
 // CORS — scoped to configured origins, never '*'
 app.use('*', cors({
@@ -29,7 +28,10 @@ app.all('/api/trpc/*', async (c) => {
   });
 });
 
-// SPA fallback — serve dist/index.html for non-API routes in production
+// SPA fallback — serve dist/index.html for non-API routes when this app is
+// run as the standalone Node server (server/boot.ts). Not exercised when
+// deployed on Vercel, since vercel.json only routes /api/* to this app —
+// Vercel's own static hosting serves the frontend directly in that case.
 app.get('*', async (c) => {
   try {
     const fs = await import('node:fs/promises');
@@ -67,10 +69,3 @@ app.get('*', async (c) => {
     return c.text('Not Found', 404);
   }
 });
-
-serve({
-  fetch: app.fetch,
-  port: env.PORT,
-});
-
-console.log(`Levav Talent Afrika server running on port ${env.PORT}`);

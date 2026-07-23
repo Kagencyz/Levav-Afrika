@@ -9,7 +9,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@db': path.resolve(__dirname, './db'),
-      '@api': path.resolve(__dirname, './api'),
+      '@api': path.resolve(__dirname, './server'),
       '@contracts': path.resolve(__dirname, './contracts'),
     },
   },
@@ -28,6 +28,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['api/**/*.test.ts', 'db/**/*.test.ts'],
+    include: ['server/**/*.test.ts', 'db/**/*.test.ts'],
   },
 });

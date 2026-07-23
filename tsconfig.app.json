@@ -10,7 +10,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@db/*": ["./db/*"],
-      "@api/*": ["./api/*"],
+      "@api/*": ["./server/*"],
       "@contracts/*": ["./contracts/*"]
     },
     "moduleResolution": "bundler",
@@ -24,5 +24,5 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "api", "db", "contracts"]
+  "include": ["src", "api", "server", "db", "contracts"]
 }

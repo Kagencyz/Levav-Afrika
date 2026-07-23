@@ -2,7 +2,7 @@ import path from 'path';
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: { boot: 'api/boot.ts' },
+  entry: { boot: 'server/boot.ts' },
   outDir: 'dist-server',
   format: ['esm'],
   platform: 'node',
@@ -12,7 +12,7 @@ export default defineConfig({
   esbuildOptions(options) {
     options.alias = {
       '@db': path.resolve(__dirname, './db'),
-      '@api': path.resolve(__dirname, './api'),
+      '@api': path.resolve(__dirname, './server'),
       '@contracts': path.resolve(__dirname, './contracts'),
     };
   },
