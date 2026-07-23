@@ -133,7 +133,7 @@ export default function SettingsSection() {
   const apiKeys = [
     { name: "Public API Key", value: settings.api.publicKey, env: "LEVAV_PUBLIC_KEY" },
     { name: "Secret API Key", value: settings.api.privateKey, env: "LEVAV_SECRET_KEY" },
-    { name: "Webhook URL", value: settings.api.webhookUrl || "whsec_9Kj7Lh4Mn3Pq2Rs5Tv8Ux6Wy1Zc", env: "LEVAV_WEBHOOK_SECRET" },
+    { name: "Webhook Secret", value: settings.api.webhookUrl ? "Configured" : "Not configured", env: "LEVAV_WEBHOOK_SECRET" },
   ];
 
   return (
