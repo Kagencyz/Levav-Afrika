@@ -102,12 +102,10 @@ export default function HeroSection() {
                 ease: 'easeInOut',
               }}
             >
-              <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl px-6 py-4 min-w-[160px] text-center">
-                <stat.Icon
-                  size={18}
-                  className="mx-auto mb-2 text-[#C6FF34]"
-                  strokeWidth={1.5}
-                />
+              <div className="glass rounded-2xl px-6 py-4 min-w-[160px] text-center">
+                <div className="w-10 h-10 rounded-xl bg-[#C6FF34]/10 border border-[#C6FF34]/20 flex items-center justify-center mx-auto mb-2.5">
+                  <stat.Icon size={20} className="text-[#C6FF34]" strokeWidth={2} />
+                </div>
                 <div className="text-2xl font-bold gradient-text font-display">
                   {stat.value}
                 </div>
@@ -179,16 +177,14 @@ export default function HeroSection() {
           {heroStats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl px-4 py-3 text-center"
+              className="glass rounded-2xl px-4 py-3 text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
             >
-              <stat.Icon
-                size={14}
-                className="mx-auto mb-1 text-[#C6FF34]"
-                strokeWidth={1.5}
-              />
+              <div className="w-8 h-8 rounded-lg bg-[#C6FF34]/10 border border-[#C6FF34]/20 flex items-center justify-center mx-auto mb-1.5">
+                <stat.Icon size={16} className="text-[#C6FF34]" strokeWidth={2} />
+              </div>
               <div className="text-xl font-bold gradient-text font-display">
                 {stat.value}
               </div>
