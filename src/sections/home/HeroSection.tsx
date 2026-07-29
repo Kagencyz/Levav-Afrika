@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, type Variants } from 'framer-motion';
 import { Link } from 'react-router';
 import { ArrowRight, ChevronDown, Users, Globe, CheckCircle, Layers } from 'lucide-react';
 
@@ -21,14 +21,14 @@ const heroStats = [
   { value: '150+', label: 'Categories', Icon: Layers },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.1 },
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
@@ -158,10 +158,10 @@ export default function HeroSection() {
           variants={itemVariants}
         >
           <Link
-            to="/onboarding"
-            className="btn-lime inline-flex items-center gap-2 text-sm font-medium"
+            to="/auth?mode=signup"
+            className="btn-lime inline-flex items-center gap-2 text-sm font-medium px-8 py-3"
           >
-            Start Your Levav 28&trade; Journey
+            Create a Free Account
             <ArrowRight size={16} />
           </Link>
           <Link
@@ -171,6 +171,14 @@ export default function HeroSection() {
             Hire Workforce-Ready Talent
           </Link>
         </motion.div>
+
+        {/* Free-account reassurance */}
+        <motion.p
+          className="text-xs text-white/40 -mt-8 mb-12 font-body"
+          variants={itemVariants}
+        >
+          Free for individuals. Jobs, QuickWork&trade;, Levav 28&trade;, courses, and community — one account.
+        </motion.p>
 
         {/* Mobile stats */}
         <div className="lg:hidden grid grid-cols-2 gap-3 max-w-sm mx-auto">

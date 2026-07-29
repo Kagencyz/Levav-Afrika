@@ -1,13 +1,18 @@
 import ParticleField from '@/components/ParticleField';
 import HeroSection from '@/sections/home/HeroSection';
+import PathsSection from '@/sections/home/PathsSection';
 import JourneySection from '@/sections/home/JourneySection';
 import EcosystemSection from '@/sections/home/EcosystemSection';
+import Levav28PathwaysSection from '@/sections/home/Levav28PathwaysSection';
+import FeedPreviewSection from '@/sections/home/FeedPreviewSection';
+import ProfilePreviewSection from '@/sections/home/ProfilePreviewSection';
 import HumanStoriesSection from '@/sections/home/HumanStoriesSection';
 import VisionSection from '@/sections/home/VisionSection';
 
 /* ╔═══════════════════════════════════════════════════════════════╗
    ║  HOMEPAGE — Cinematic scroll-driven storytelling experience  ║
-   ║  Five moments answering five fundamental questions           ║
+   ║  Layout per docs/UPGRADE_BRIEF.md §2: one primary free-      ║
+   ║  account CTA, path choice, previews, trust, final signup.    ║
    ╚═══════════════════════════════════════════════════════════════╝ */
 
 export default function Home() {
@@ -16,19 +21,31 @@ export default function Home() {
       {/* Persistent ambient particle field */}
       <ParticleField count={40} density="low" />
 
-      {/* Moment 1 — Hero: "Why does Levav exist?" */}
+      {/* Hero: "Why does Levav exist?" — primary Create a Free Account CTA */}
       <HeroSection />
 
-      {/* Moment 2 — The Journey: "How does it work?" */}
+      {/* Path choice: talent, work, hiring, gigs, volunteering, courses, community */}
+      <PathsSection />
+
+      {/* The Journey: "How does it work?" */}
       <JourneySection />
 
-      {/* Moment 3 — Ecosystem: "Why is it different?" */}
+      {/* Ecosystem: "Why is it different?" */}
       <EcosystemSection />
 
-      {/* Moment 4 — Human Stories: "How does it change lives?" */}
+      {/* Levav 28 for employed and unemployed users */}
+      <Levav28PathwaysSection />
+
+      {/* Professional feed + verified opportunities preview */}
+      <FeedPreviewSection />
+
+      {/* Levav ID / WRI / work evidence preview + employers + trust signals */}
+      <ProfilePreviewSection />
+
+      {/* Human Stories: "How does it change lives?" */}
       <HumanStoriesSection />
 
-      {/* Moment 5 — Vision: "How does it strengthen Africa?" */}
+      {/* Vision + final signup CTA: "How does it strengthen Africa?" */}
       <VisionSection />
     </div>
   );

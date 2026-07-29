@@ -162,7 +162,7 @@ export default function VisionSection() {
             to="/auth?mode=signup"
             className="btn-lime inline-flex items-center gap-2 text-sm font-medium px-8 py-3"
           >
-            Join the Movement
+            Create a Free Account
             <ArrowRight size={16} />
           </Link>
           <Link
