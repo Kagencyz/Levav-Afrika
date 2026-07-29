@@ -59,6 +59,12 @@ button, a, [role="button"] {
   }
 }
 
+/* Bottom-nav padding that respects the iPhone home-indicator safe area
+   without collapsing to 0 on devices that don't report one. */
+.bottom-nav-safe-pad {
+  padding-bottom: max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom)));
+}
+
 @layer base {
   :root {
     --background: 0 0% 0%;
@@ -156,18 +162,54 @@ button, a, [role="button"] {
     animation: gradient-shift 4s ease infinite;
   }
 
+  /*
+   * Liquid-glass material system.
+   * Real frosted glass needs three things layered together, not just
+   * backdrop-blur: (1) saturate() so content behind the glass stays vivid
+   * instead of graying out, (2) an inset top highlight simulating light
+   * catching the upper edge, (3) a soft outer shadow for depth/lift.
+   */
   .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 8px 32px rgba(0, 0, 0, 0.35);
   }
 
   .glass-strong {
-    background: rgba(10, 10, 10, 0.7);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(20, 20, 20, 0.85), rgba(8, 8, 8, 0.75));
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Tuned for fixed nav chrome — heavier blur/saturation, no lift shadow
+     (it sits flush against the viewport edge, not floating above content). */
+  .glass-nav {
+    background: rgba(6, 6, 6, 0.72);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+  }
+
+  /* Diagonal specular sheen for hero/feature surfaces that want the
+     extra "catching the light" highlight — use sparingly. */
+  .glass-specular {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-specular::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 35%);
+    pointer-events: none;
   }
 
   .glass-hover {
@@ -175,8 +217,8 @@ button, a, [role="button"] {
   }
 
   .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(198, 255, 52, 0.2);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border-color: rgba(198, 255, 52, 0.25);
     transform: translateY(-2px);
   }
 
