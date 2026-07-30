@@ -165,12 +165,12 @@ export default function Auth() {
         const name = sanitizeInput(
           `${formData.firstName} ${formData.lastName}`.trim()
         );
-        const result = await registerMutation.mutateAsync({
+        await registerMutation.mutateAsync({
           email,
           password: formData.password,
           name,
         });
-        localStorage.setItem('auth_token', result.token);
+        // No token to store — the server set it as an httpOnly cookie.
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();
         attemptCountRef.current = 0;
@@ -181,11 +181,11 @@ export default function Auth() {
         const goal = searchParams.get('goal');
         navigate(goal ? `/welcome?goal=${encodeURIComponent(goal)}` : '/welcome');
       } else {
-        const result = await loginMutation.mutateAsync({
+        await loginMutation.mutateAsync({
           email,
           password: formData.password,
         });
-        localStorage.setItem('auth_token', result.token);
+        // No token to store — the server set it as an httpOnly cookie.
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();
         attemptCountRef.current = 0;

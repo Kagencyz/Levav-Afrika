@@ -11,6 +11,7 @@ import { appRouter } from './router';
 const ALLOWED_PROCEDURES = [
   'auth.register',
   'auth.login',
+  'auth.logout',
   'auth.me',
   'onboarding.complete',
   'onboarding.get',

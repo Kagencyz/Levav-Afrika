@@ -69,13 +69,17 @@ don't delete the `router.test.ts` allowlist assertion to "make it easier" to add
 | QuickWork, Levav Impact, Feed, Levav 28, Learn | **Frontend-only localStorage, zero backend counterpart** — by deliberate design this session, matching the existing prototype pattern |
 | Payments/Subscriptions | Not implemented anywhere |
 
-## One undocumented security deviation from the original plan
+## Auth transport — resolved 2026-07-30
 
-`docs/AUTHENTICATION_ARCHITECTURE.md` specifies `httpOnly` cookie transport for the auth token.
-What's actually implemented (`src/providers/trpc.tsx`, `server/context.ts`) is a Bearer token read
-from `localStorage.getItem('auth_token')` — real and working, but not what was planned, and it
-reintroduces the XSS-exposed-token risk the cookie plan existed to avoid. This was never logged as
-a decision anywhere. Flagging it here; see "Open decision points" below.
+This section originally flagged that the auth token was a Bearer token read from
+`localStorage.getItem('auth_token')`, not the `httpOnly` cookie `docs/AUTHENTICATION_ARCHITECTURE.md`
+specifies — a real, undocumented deviation with an XSS-exposed-token implication. That's fixed: the
+token is now an `httpOnly`, `SameSite=Lax` cookie (`Secure` in production), set via `server/app.ts`'s
+`responseMeta` reading a `ctx.session` intent written by `auth.register`/`auth.login`/the new
+`auth.logout`. No auth token or session flag exists in `localStorage` anywhere in the app. Verified
+end-to-end with Playwright against the real dev stack (see `docs/DECISIONS.md`'s 2026-07-30 "Auth
+token moved..." entry for the full verification list). `open decision #1` below is resolved and no
+longer open.
 
 ## What's now stale in the older docs
 
@@ -105,16 +109,14 @@ a decision anywhere. Flagging it here; see "Open decision points" below.
 
 None of these were implemented in this pass — this is a review, not a migration. Per this repo's
 own precedent (`docs/DECISIONS.md`'s "Approved... with amendments" pattern), each of the following
-is a real fork that should be decided explicitly, not assumed:
+is a real fork that should be decided explicitly, not assumed. ~~Item 1 (cookie vs. Bearer-token
+transport) was resolved 2026-07-30~~ — see "Auth transport — resolved" above.
 
-1. **Cookie vs. Bearer-token auth transport.** Ship the originally-planned `httpOnly` cookie (more
-   work, closes the XSS gap), or formally accept Bearer-in-localStorage as the real design and
-   update `docs/AUTHENTICATION_ARCHITECTURE.md` to match reality.
-2. **Which quarantined route gets fixed and registered first**, if any — `employer.ts`'s
+1. **Which quarantined route gets fixed and registered first**, if any — `employer.ts`'s
    `ctx.user.id` bug plus its reference to a dropped `employers` table means it needs real rework,
    not a one-line fix, before it could be safely registered.
-3. **Which frontend-only feature (QuickWork, Impact, Feed, Levav 28, Learn) gets a real schema and
+2. **Which frontend-only feature (QuickWork, Impact, Feed, Levav 28, Learn) gets a real schema and
    backend next**, and in what order — each is its own schema-design-plus-migration-plus-route
    project, same shape as the original auth/talent milestone.
-4. **Documentation debt**: full rewrite of `ARCHITECTURE.md`/`CURRENT_STATE.md`/`DEPENDENCY_AUDIT.md`
+3. **Documentation debt**: full rewrite of `ARCHITECTURE.md`/`CURRENT_STATE.md`/`DEPENDENCY_AUDIT.md`
    for the Postgres/Vercel generation, vs. leaving the staleness banners in place for now.

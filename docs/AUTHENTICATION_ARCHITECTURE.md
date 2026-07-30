@@ -1,6 +1,11 @@
 # Authentication Architecture
 
-**Status:** Accepted (approved with amendments, 2026-07-23). Not yet implemented. No application code changed as part of writing this document — implementation requires a separate approval checkpoint, per `docs/NEXT_MILESTONE.md`.
+**Status:** ✅ Implemented 2026-07-30, matching this document's design closely — `httpOnly`/
+`SameSite=Lax` cookie transport, server-cleared on logout, `trpc.auth.me` as sole source of truth.
+See `docs/DECISIONS.md`'s 2026-07-30 "Auth token moved..." entry for what shipped and how it was
+verified. File paths below still say `api/context.ts`/`api/boot.ts` from this doc's original
+2026-07-23 draft — the real files are `server/context.ts`/`server/app.ts` (the backend moved from
+`api/` to `server/` in a later pass); the design itself is otherwise accurate as implemented.
 
 ## Verdict: retain the existing JWT design, change its transport
 

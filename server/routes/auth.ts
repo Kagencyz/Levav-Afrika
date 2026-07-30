@@ -16,7 +16,7 @@ export const authRouter = router({
         name: z.string().min(2),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       // Normalized before persistence to satisfy the users_email_normalized
       // CHECK constraint and enforce case-insensitive uniqueness.
       const email = input.email.trim().toLowerCase();
@@ -52,8 +52,13 @@ export const authRouter = router({
         accessLevel: newUser.accessLevel,
       });
 
+      // The token is never returned in the response body — only set as an
+      // httpOnly cookie (via server/app.ts's responseMeta) so it's not
+      // readable by JS at all, closing the XSS-exposed-token gap the
+      // previous Bearer-in-localStorage design had.
+      ctx.session.setToken = token;
+
       return {
-        token,
         user: {
           id: newUser.id,
           email: newUser.email,
@@ -70,7 +75,7 @@ export const authRouter = router({
         password: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const email = input.email.trim().toLowerCase();
 
       const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -98,8 +103,9 @@ export const authRouter = router({
         accessLevel: user.accessLevel,
       });
 
+      ctx.session.setToken = token;
+
       return {
-        token,
         user: {
           id: user.id,
           email: user.email,
@@ -108,6 +114,15 @@ export const authRouter = router({
         },
       };
     }),
+
+  logout: publicProcedure.mutation(async ({ ctx }) => {
+    // Works even with an already-expired/invalid token — logging out is
+    // always safe to attempt. Clearing an httpOnly cookie can only be done
+    // server-side (JS can't read or write it), so this is a real endpoint,
+    // not just a client-side localStorage clear like the previous design.
+    ctx.session.clearToken = true;
+    return { success: true };
+  }),
 
   me: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.user) {

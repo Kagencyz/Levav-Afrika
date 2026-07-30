@@ -3,19 +3,44 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { appRouter } from './router';
-import { createContext } from './context';
+import { createContext, AUTH_COOKIE_NAME } from './context';
 
 export const app = new Hono();
 
-// CORS — scoped to configured origins, never '*'
+// CORS — scoped to configured origins, never '*'. credentials: true is
+// required for the httpOnly auth cookie to be sent/accepted cross-origin
+// (e.g. a preview deployment on a different subdomain); the frontend and
+// API are same-origin in production, where this is a no-op safety net.
 app.use('*', cors({
   origin: env.CORS_ORIGINS,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok', time: new Date().toISOString() }));
+
+const SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60;
+
+/**
+ * Auth is transported as an httpOnly cookie, not a token in the response
+ * body — a procedure can't set response headers directly, so auth.ts
+ * signals intent via ctx.session and this reads it back once the request
+ * has resolved. See docs/BACKEND_READINESS_REVIEW.md for why this replaced
+ * the earlier Bearer-token-in-localStorage design.
+ */
+function buildAuthCookie(token: string | null): string {
+  const parts = [
+    `${AUTH_COOKIE_NAME}=${token ?? ''}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+  ];
+  if (env.NODE_ENV === 'production') parts.push('Secure');
+  parts.push(token ? `Max-Age=${SEVEN_DAYS_SECONDS}` : 'Max-Age=0');
+  return parts.join('; ');
+}
 
 // tRPC handler
 app.all('/api/trpc/*', async (c) => {
@@ -25,6 +50,15 @@ app.all('/api/trpc/*', async (c) => {
     req,
     router: appRouter,
     createContext: async () => createContext(req),
+    responseMeta({ ctx }) {
+      if (ctx?.session.setToken) {
+        return { headers: new Headers({ 'Set-Cookie': buildAuthCookie(ctx.session.setToken) }) };
+      }
+      if (ctx?.session.clearToken) {
+        return { headers: new Headers({ 'Set-Cookie': buildAuthCookie(null) }) };
+      }
+      return {};
+    },
   });
 });
 

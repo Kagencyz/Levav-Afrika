@@ -26,11 +26,12 @@ export function TRPCProvider({ children }: { children: ReactNode }) {
         httpBatchLink({
           url: '/api/trpc',
           transformer: superjson,
-          headers() {
-            const token = localStorage.getItem('auth_token');
-            return token
-              ? { Authorization: `Bearer ${token}` }
-              : {};
+          // Auth is an httpOnly cookie now, not a header the client attaches
+          // itself — 'include' ensures it's sent even if the browser's
+          // same-origin default credentials mode were ever insufficient
+          // (e.g. a cross-subdomain preview deployment).
+          fetch(url, options) {
+            return fetch(url, { ...options, credentials: 'include' });
           },
         }),
       ],

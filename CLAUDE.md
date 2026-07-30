@@ -41,7 +41,7 @@ There is no `lint` script. `eslint.config.js` exists but its dependencies (`esli
 
 ## Security rules
 
-- Auth is real for `register`/`login`/`me` (bcrypt, normalized email, JWT via `jose`) — but the token is carried as a Bearer token sourced from `localStorage.getItem('auth_token')`, not the `httpOnly` cookie `docs/AUTHENTICATION_ARCHITECTURE.md` originally specified. This is a real, undocumented deviation with an XSS-exposed-token implication — treat it as an open decision (see `docs/BACKEND_READINESS_REVIEW.md`), not a settled design.
+- Auth is real for `register`/`login`/`me`/`logout` (bcrypt, normalized email, JWT via `jose`), and as of 2026-07-30 the token is carried as an `httpOnly`, `SameSite=Lax` cookie (`server/context.ts` + `server/app.ts`'s `responseMeta`), matching `docs/AUTHENTICATION_ARCHITECTURE.md`'s original spec — not readable or writable from JS. No auth token or session flag lives in `localStorage` anywhere in the app; don't reintroduce one.
 - `server/routes/employer.ts`'s `ctx.user.id` bug (should be `ctx.user.userId`) is still present, and it also references an `employers` table that no longer exists in the current schema — needs real rework, not a one-line fix, before registering. `application.ts#updateStatus`, `notification.ts#create`, and `upload.ts#getPresignedUrl` still have missing or insufficient authorization checks. None of these four are registered on `appRouter` today, and `server/router.test.ts` enforces that — don't register any of them without fixing the underlying bug first, and don't weaken or remove that test to make registering one "easier."
 - Never weaken auth/authorization to make a feature "work." Never commit `.env` (it's gitignored — keep it that way).
 
