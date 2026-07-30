@@ -103,6 +103,21 @@ export interface ImpactOpportunity {
   hoursRequired: number;
   skills: string[];
   logo: string;
+  isOrgPosted?: boolean;
+  commitment?: string;
+  status?: 'open' | 'closed';
+  postedAt?: string;
+}
+
+export interface ImpactApplicant {
+  id: string;
+  opportunityId: string;
+  applicantUserId: string;
+  applicantName: string;
+  message: string;
+  hoursCommitted: number;
+  status: 'pending' | 'accepted' | 'declined' | 'completed';
+  appliedAt: string;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -604,6 +619,8 @@ const LS_KEYS = {
   quickworkApplications: 'quickwork_applications',
   quickworkMyGigs: 'quickwork_my_gigs',
   quickworkPostedGigs: 'quickwork_posted_gigs',
+  impactPostedOpportunities: 'impact_posted_opportunities',
+  impactApplicants: 'impact_applicants',
   wriScore: 'wri_score',
   contentStudio: 'content_studio',
 };
@@ -745,6 +762,89 @@ export function postGig(input: {
   posted.unshift(gig);
   localStorage.setItem(LS_KEYS.quickworkPostedGigs, JSON.stringify(posted));
   return gig;
+}
+
+// ─── Levav Impact: organization-posted opportunities ───
+// Same client-side/localStorage pattern as postGig — makes the *posting*
+// side of Impact real (an NGO can list an opportunity and manage
+// applicants today) without waiting on the real backend/verified-NGO
+// milestone described in docs/CHAMPION_NGO_REVENUE_SHARE.md.
+export function getPostedOpportunities(): ImpactOpportunity[] {
+  return safeJSONParse<ImpactOpportunity[]>(LS_KEYS.impactPostedOpportunities, []);
+}
+
+export function postOpportunity(input: {
+  organization: string;
+  type: string;
+  location: string;
+  description: string;
+  hoursRequired: number;
+  skills: string[];
+  commitment: string;
+}): ImpactOpportunity {
+  const opportunity: ImpactOpportunity = {
+    id: `imp-user-${Date.now()}`,
+    organization: input.organization,
+    type: input.type,
+    location: input.location,
+    description: input.description,
+    hoursRequired: input.hoursRequired,
+    skills: input.skills,
+    logo: '🤝',
+    isOrgPosted: true,
+    commitment: input.commitment,
+    status: 'open',
+    postedAt: 'Just now',
+  };
+  const posted = getPostedOpportunities();
+  posted.unshift(opportunity);
+  localStorage.setItem(LS_KEYS.impactPostedOpportunities, JSON.stringify(posted));
+  return opportunity;
+}
+
+export function toggleOpportunityStatus(opportunityId: string) {
+  const posted = getPostedOpportunities();
+  const opportunity = posted.find((o) => o.id === opportunityId);
+  if (opportunity) {
+    opportunity.status = opportunity.status === 'closed' ? 'open' : 'closed';
+    localStorage.setItem(LS_KEYS.impactPostedOpportunities, JSON.stringify(posted));
+  }
+}
+
+export function getImpactApplicants(): ImpactApplicant[] {
+  return safeJSONParse<ImpactApplicant[]>(LS_KEYS.impactApplicants, []);
+}
+
+export function applyToOpportunity(input: {
+  opportunityId: string;
+  applicantUserId: string;
+  applicantName: string;
+  message: string;
+  hoursCommitted: number;
+}): ImpactApplicant {
+  const applicant: ImpactApplicant = {
+    id: `imp-app-${Date.now()}`,
+    opportunityId: input.opportunityId,
+    applicantUserId: input.applicantUserId,
+    applicantName: input.applicantName,
+    message: input.message,
+    hoursCommitted: input.hoursCommitted,
+    status: 'pending',
+    appliedAt: new Date().toISOString(),
+  };
+  const applicants = getImpactApplicants();
+  applicants.unshift(applicant);
+  localStorage.setItem(LS_KEYS.impactApplicants, JSON.stringify(applicants));
+  return applicant;
+}
+
+export function updateApplicantStatus(applicantId: string, status: ImpactApplicant['status']) {
+  const applicants = getImpactApplicants();
+  const applicant = applicants.find((a) => a.id === applicantId);
+  if (applicant) {
+    applicant.status = status;
+    localStorage.setItem(LS_KEYS.impactApplicants, JSON.stringify(applicants));
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
