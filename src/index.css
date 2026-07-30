@@ -10,10 +10,12 @@ input, select, textarea {
   -webkit-text-size-adjust: 100%;
 }
 
-/* 2. Prevent layout shift when virtual keyboard appears */
+/* 2. Keep the page height independent of the virtual keyboard.
+   NOTE: never lock height to 100dvh — dvh SHRINKS when the mobile keyboard
+   opens, so a hard lock forces a full-app relayout on every keyboard
+   open/close, which is exactly the kind of disruption that can dismiss it. */
 html, body, #root {
   min-height: 100dvh;
-  height: 100dvh;
   overflow-x: hidden;
 }
 
@@ -31,14 +33,9 @@ input:focus, select:focus, textarea:focus {
   -webkit-scroll-margin-bottom: 300px;
 }
 
-/* 5. Prevent body scroll when form is focused on mobile */
-@media (max-width: 768px) {
-  body:has(input:focus) {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-  }
-}
+/* 5. (removed) A body:has(input:focus){position:fixed} rule used to live
+   here — on iOS Safari that resets scroll position and fights the
+   keyboard, causing jumps and dropped focus. Do not reintroduce it. */
 
 /* 6. Ensure inputs stay stable during typing */
 input, select, textarea {
