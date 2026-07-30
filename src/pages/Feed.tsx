@@ -15,6 +15,13 @@ import {
   UserCheck,
   Sparkles,
   Globe,
+  Trophy,
+  Rocket,
+  BookOpen,
+  Globe2,
+  Lightbulb,
+  Zap,
+  type LucideIcon,
 } from 'lucide-react';
 import { StableTextarea } from '@/components/StableInputs';
 import {
@@ -29,12 +36,26 @@ import {
   toggleFollow,
   awardWriPoints,
 } from '@/lib/levavData';
-import type { FeedPost, FeedComment } from '@/lib/levavData';
+import type { FeedPost, FeedComment, FeedMood } from '@/lib/levavData';
 import { useAuth } from '@/hooks/useAuth';
 
 type FilterTab = 'for-you' | 'following';
 
-const MOOD_EMOJI = ['🎉', '🚀', '📚', '🌍', '💡', '⚡'];
+/* Professional, vector iconography for post "mood" instead of raw emoji —
+   matches the icon-badge treatment used across QuickWork/Impact rather
+   than an oversized emoji standing in for a photo. */
+const MOOD_OPTIONS: { key: FeedMood; label: string; icon: LucideIcon }[] = [
+  { key: 'milestone', label: 'Milestone', icon: Trophy },
+  { key: 'launch', label: 'Launch', icon: Rocket },
+  { key: 'learning', label: 'Learning', icon: BookOpen },
+  { key: 'community', label: 'Community', icon: Globe2 },
+  { key: 'idea', label: 'Idea', icon: Lightbulb },
+  { key: 'quickwin', label: 'Quick Win', icon: Zap },
+];
+const MOOD_MAP: Record<FeedMood, { label: string; icon: LucideIcon }> = MOOD_OPTIONS.reduce(
+  (acc, m) => ({ ...acc, [m.key]: { label: m.label, icon: m.icon } }),
+  {} as Record<FeedMood, { label: string; icon: LucideIcon }>
+);
 const POST_TAGS = ['Milestone', 'Hiring insight', 'QuickWork™ win', 'Community', 'Motivation'];
 
 function timeAgo(iso: string): string {
@@ -118,16 +139,20 @@ function PostCard({
 
       <p className="text-sm text-white/75 leading-relaxed mb-3 whitespace-pre-wrap font-body">{post.body}</p>
 
-      {post.imageEmoji && (
-        <div className="w-full h-32 rounded-xl bg-gradient-to-br from-[#C6FF34]/[0.06] to-[#7E3BED]/[0.06] border border-white/[0.06] flex items-center justify-center text-5xl mb-3">
-          {post.imageEmoji}
+      {(post.tag || post.moodIcon) && (
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          {post.moodIcon && MOOD_MAP[post.moodIcon] && (
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-[#C6FF34] bg-[#C6FF34]/10 border border-[#C6FF34]/25 rounded-md px-2 py-0.5">
+              {React.createElement(MOOD_MAP[post.moodIcon].icon, { size: 11 })}
+              {MOOD_MAP[post.moodIcon].label}
+            </span>
+          )}
+          {post.tag && (
+            <span className="inline-block text-[10px] font-medium uppercase tracking-wider text-[#7E3BED] bg-[#7E3BED]/10 border border-[#7E3BED]/25 rounded-md px-2 py-0.5">
+              {post.tag}
+            </span>
+          )}
         </div>
-      )}
-
-      {post.tag && (
-        <span className="inline-block text-[10px] font-medium uppercase tracking-wider text-[#7E3BED] bg-[#7E3BED]/10 border border-[#7E3BED]/25 rounded-md px-2 py-0.5 mb-3">
-          {post.tag}
-        </span>
       )}
 
       <div className="flex items-center gap-5 text-white/40 text-xs border-t border-white/[0.06] pt-3">
@@ -200,7 +225,7 @@ export default function Feed() {
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [filterTab, setFilterTab] = React.useState<FilterTab>('for-you');
   const [postBody, setPostBody] = React.useState('');
-  const [postMood, setPostMood] = React.useState<string | undefined>(undefined);
+  const [postMood, setPostMood] = React.useState<FeedMood | undefined>(undefined);
   const [postTag, setPostTag] = React.useState<string | undefined>(undefined);
 
   const userPosts = React.useMemo(() => getUserPosts(), [refreshKey]);
@@ -261,7 +286,7 @@ export default function Feed() {
       authorId: myId,
       authorName: myName,
       body: postBody.trim(),
-      imageEmoji: postMood,
+      moodIcon: postMood,
       tag: postTag,
     });
     awardWriPoints('feed-first-post');
@@ -306,15 +331,21 @@ export default function Feed() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            {MOOD_EMOJI.map((emoji) => (
+            {MOOD_OPTIONS.map((mood) => (
               <button
-                key={emoji}
-                onClick={() => setPostMood(postMood === emoji ? undefined : emoji)}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-base transition-all ${
-                  postMood === emoji ? 'bg-[#C6FF34]/20 border border-[#C6FF34]/40' : 'bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06]'
+                key={mood.key}
+                type="button"
+                title={mood.label}
+                aria-label={mood.label}
+                aria-pressed={postMood === mood.key}
+                onClick={() => setPostMood(postMood === mood.key ? undefined : mood.key)}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                  postMood === mood.key
+                    ? 'bg-[#C6FF34]/20 border border-[#C6FF34]/40 text-[#C6FF34]'
+                    : 'bg-white/[0.03] border border-white/[0.06] text-[#A0A0A0] hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
-                {emoji}
+                <mood.icon size={15} strokeWidth={2} />
               </button>
             ))}
             <span className="w-px h-5 bg-white/[0.08] mx-1" />

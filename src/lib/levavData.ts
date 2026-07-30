@@ -120,6 +120,8 @@ export interface ImpactApplicant {
   appliedAt: string;
 }
 
+export type FeedMood = 'milestone' | 'launch' | 'learning' | 'community' | 'idea' | 'quickwin';
+
 export interface FeedComment {
   id: string;
   authorId: string;
@@ -136,7 +138,7 @@ export interface FeedPost {
   authorMeta: string; // role · city, e.g. "Product Designer · Lusaka"
   verified?: boolean;
   body: string;
-  imageEmoji?: string; // a light-weight stand-in for an uploaded image
+  moodIcon?: FeedMood; // an icon key resolved to a lucide icon in the UI — no image uploads
   tag?: string;
   likedBy: string[];
   comments: FeedComment[];
@@ -641,7 +643,7 @@ export const FEED_POSTS: FeedPost[] = [
     id: 'feed-1', authorId: 'seed-grace', authorName: 'Grace Lungu', authorInitials: 'GL',
     authorMeta: 'Product Designer · Lusaka', verified: true,
     body: 'Day 21 of Levav 28™: shipped my first full case study. The mock-office brief pushed me harder than any tutorial ever has. Grateful for the cohort that kept me accountable.',
-    tag: 'Levav 28™ milestone', imageEmoji: '🎨',
+    tag: 'Levav 28™ milestone', moodIcon: 'milestone',
     likedBy: ['seed-kofi', 'seed-amara'], comments: [
       { id: 'c-1', authorId: 'seed-kofi', authorName: 'Kofi Mensah', body: 'This is excellent work, Grace. The layout system alone shows real range.', createdAt: '2026-07-25T09:00:00.000Z' },
     ], createdAt: '2026-07-24T14:00:00.000Z', isSeed: true,
@@ -657,14 +659,14 @@ export const FEED_POSTS: FeedPost[] = [
     id: 'feed-3', authorId: 'seed-amara', authorName: 'Amara Okafor', authorInitials: 'AO',
     authorMeta: 'Founder, Riverbend Studio · Lagos', verified: true,
     body: 'Posted a QuickWork gig on a Tuesday morning. Had three qualified applicants by lunch. This is what hiring for short-term expertise should feel like — no agencies, no three-week back-and-forth.',
-    tag: 'QuickWork™ win', imageEmoji: '⚡',
+    tag: 'QuickWork™ win', moodIcon: 'quickwin',
     likedBy: ['seed-kofi'], comments: [], createdAt: '2026-07-22T08:15:00.000Z', isSeed: true,
   },
   {
     id: 'feed-4', authorId: 'seed-thandiwe', authorName: 'Thandiwe Banda', authorInitials: 'TB',
     authorMeta: 'Volunteer Coordinator, Teach For Zambia · Lusaka',
     body: 'Six new tutors joined us this month through Levav Impact. Watching a first-year computer science student explain fractions to a room of ten-year-olds with this much patience — that\'s leadership too.',
-    tag: 'Community', imageEmoji: '📚',
+    tag: 'Community', moodIcon: 'learning',
     likedBy: ['seed-grace', 'seed-kofi', 'seed-amara'], comments: [
       { id: 'c-2', authorId: 'seed-grace', authorName: 'Grace Lungu', body: 'This made my morning. Thank you for the work you do.', createdAt: '2026-07-21T16:00:00.000Z' },
     ], createdAt: '2026-07-20T13:45:00.000Z', isSeed: true,
@@ -680,7 +682,7 @@ export const FEED_POSTS: FeedPost[] = [
     id: 'feed-6', authorId: 'seed-fatima', authorName: 'Fatima Diallo', authorInitials: 'FD',
     authorMeta: 'Data Analyst · Dakar', verified: true,
     body: 'Reminder for anyone building in public: your Levav ID isn\'t a resume, it\'s a record of what you\'ve actually done. Every gig, every course, every volunteer hour compounds. Show up today.',
-    tag: 'Motivation', imageEmoji: '🌍',
+    tag: 'Motivation', moodIcon: 'community',
     likedBy: ['seed-grace', 'seed-chidi', 'seed-kofi', 'seed-amara'], comments: [], createdAt: '2026-07-18T07:00:00.000Z', isSeed: true,
   },
 ];
@@ -938,7 +940,7 @@ export function createPost(input: {
   authorId: string;
   authorName: string;
   body: string;
-  imageEmoji?: string;
+  moodIcon?: FeedMood;
   tag?: string;
 }): FeedPost {
   const initials = input.authorName
@@ -954,7 +956,7 @@ export function createPost(input: {
     authorInitials: initials,
     authorMeta: 'Levav member',
     body: input.body,
-    imageEmoji: input.imageEmoji,
+    moodIcon: input.moodIcon,
     tag: input.tag,
     likedBy: [],
     comments: [],
