@@ -88,6 +88,10 @@ export interface QuickWorkGig {
   completed?: boolean;
   reviewed?: boolean;
   myRating?: number;
+  /** True for gigs posted by a client/startup through the app, as opposed
+   *  to the seeded catalogue — lets the UI show "New" instead of a rating
+   *  history that doesn't exist yet. */
+  isClientPosted?: boolean;
 }
 
 export interface ImpactOpportunity {
@@ -516,7 +520,7 @@ export const LEARN_COURSES: LearnCourse[] = [
       { id: 'wd-l9', title: 'Project: Build a Portfolio Site', duration: '45 min', type: 'project', completed: false, content: 'Build and deploy your own portfolio website from scratch.' },
       { id: 'wd-l10', title: 'Mobile-First Development', duration: '30 min', type: 'video', completed: false, content: 'Designing and building websites that work perfectly on mobile devices.' },
       { id: 'wd-l11', title: 'Performance Optimization', duration: '35 min', type: 'article', completed: false, content: 'Making your web app fast. Lazy loading, code splitting, and caching strategies.' },
-      { id: 'wd-l12', title: 'Getting Your First Dev Job', duration: '30 min', type: 'video', completed: false, false: false, content: 'Interview preparation, portfolio reviews, and job search strategies for African developers.' },
+      { id: 'wd-l12', title: 'Getting Your First Dev Job', duration: '30 min', type: 'video', completed: false, content: 'Interview preparation, portfolio reviews, and job search strategies for African developers.' },
     ],
   },
 ];
@@ -599,6 +603,7 @@ const LS_KEYS = {
   learnProgress: 'learn_progress',
   quickworkApplications: 'quickwork_applications',
   quickworkMyGigs: 'quickwork_my_gigs',
+  quickworkPostedGigs: 'quickwork_posted_gigs',
   wriScore: 'wri_score',
   contentStudio: 'content_studio',
 };
@@ -697,6 +702,49 @@ export function updateGigStatus(gigId: string, status: 'applied' | 'in-progress'
     gigs.push({ gigId, status, clientRating });
   }
   localStorage.setItem(LS_KEYS.quickworkMyGigs, JSON.stringify(gigs));
+}
+
+// ─── QuickWork Client: post a gig ───
+// Client-side/localStorage for now, matching the rest of the prototype —
+// this is the QuickWork Client half of brief §11 ("post verified gigs,
+// invite talent, manage delivery"). Verification/payment stays out of
+// scope until the real backend milestone; this makes the *posting* flow
+// real so a startup can actually list short-term work today.
+export function getPostedGigs(): QuickWorkGig[] {
+  return safeJSONParse<QuickWorkGig[]>(LS_KEYS.quickworkPostedGigs, []);
+}
+
+export function postGig(input: {
+  title: string;
+  description: string;
+  category: string;
+  skills: string[];
+  budget: string;
+  duration: string;
+  location: string;
+  employer: string;
+}): QuickWorkGig {
+  const gig: QuickWorkGig = {
+    id: `qw-user-${Date.now()}`,
+    title: input.title,
+    description: input.description,
+    category: input.category,
+    skills: input.skills,
+    budget: input.budget,
+    duration: input.duration,
+    location: input.location,
+    employer: input.employer,
+    employerRating: 0,
+    postedAt: 'Just now',
+    deadline: '',
+    applicants: 0,
+    status: 'open',
+    isClientPosted: true,
+  };
+  const posted = getPostedGigs();
+  posted.unshift(gig);
+  localStorage.setItem(LS_KEYS.quickworkPostedGigs, JSON.stringify(posted));
+  return gig;
 }
 
 // ═══════════════════════════════════════════════════════════════
