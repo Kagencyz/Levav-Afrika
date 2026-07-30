@@ -194,18 +194,17 @@ export default function Auth() {
         navigate('/dashboard');
       }
     } catch (err) {
-      const message =
-        err instanceof Error && err.message
-          ? err.message
-          : 'Something went wrong. Please try again.';
-      // Server-side field-level messages surface under the form; everything
-      // else lands in a toast.
-      if (/email already registered/i.test(message)) {
+      const rawMessage = err instanceof Error ? err.message : '';
+      // Only ever surface known, safe, user-facing messages from the server.
+      // Anything else (network failures, browser/library internals, an
+      // unexpected server error) must never be shown verbatim — it can leak
+      // implementation details and is rarely meaningful to the user.
+      if (/email already registered/i.test(rawMessage)) {
         setErrors({ email: 'This email is already registered — try signing in.' });
-      } else if (/invalid email or password/i.test(message)) {
+      } else if (/invalid email or password/i.test(rawMessage)) {
         setErrors({ password: 'Invalid email or password.' });
       } else {
-        toast.error(message);
+        toast.error('Something went wrong. Please try again.');
       }
     } finally {
       setIsLoading(false);
