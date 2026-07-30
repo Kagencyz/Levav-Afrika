@@ -40,6 +40,9 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [talentMenuOpen, setTalentMenuOpen] = useState(false);
+  const [employerMenuOpen, setEmployerMenuOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -77,6 +80,24 @@ export default function Navbar() {
       active ? 'text-[#C6FF34]' : 'text-[#A0A0A0] hover:text-white'
     }`;
 
+  // Fully controlled dropdowns (rather than Radix's own onSelect-driven
+  // open/close) -- under concurrent rendering, closing the menu and firing
+  // navigate() from the same Radix-internal event occasionally raced: the
+  // URL updated but the route content and the menu's own closed state never
+  // committed, leaving the previous page stuck on screen until a reload.
+  // Closing the menu as its own explicit state update, then navigating on
+  // the next tick once that's committed, removes the race entirely.
+  const closeAllMenus = () => {
+    setTalentMenuOpen(false);
+    setEmployerMenuOpen(false);
+    setAccountMenuOpen(false);
+  };
+
+  const handleNavigate = (path: string) => {
+    closeAllMenus();
+    setTimeout(() => navigate(path), 0);
+  };
+
   const NavIndicator = () => (
     <motion.div
       layoutId="navbar-indicator"
@@ -106,7 +127,7 @@ export default function Navbar() {
               {isHome && <NavIndicator />}
             </Link>
 
-            <DropdownMenu>
+            <DropdownMenu open={talentMenuOpen} onOpenChange={setTalentMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button
                   className={`${navLinkClass(isTalentGroupActive)} inline-flex items-center gap-1 data-[state=open]:text-white`}
@@ -121,21 +142,20 @@ export default function Navbar() {
                 className="glass-strong border-white/[0.1] min-w-[190px] p-1.5"
               >
                 {talentLinks.map((link) => (
-                  <DropdownMenuItem key={link.path} asChild>
-                    <Link
-                      to={link.path}
-                      className={`font-body cursor-pointer ${
-                        location.pathname.startsWith(link.path) ? 'text-[#C6FF34]' : 'text-white/80'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
+                  <DropdownMenuItem
+                    key={link.path}
+                    onSelect={() => handleNavigate(link.path)}
+                    className={`font-body cursor-pointer ${
+                      location.pathname.startsWith(link.path) ? 'text-[#C6FF34]' : 'text-white/80'
+                    }`}
+                  >
+                    {link.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DropdownMenu>
+            <DropdownMenu open={employerMenuOpen} onOpenChange={setEmployerMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button
                   className={`${navLinkClass(isEmployerGroupActive)} inline-flex items-center gap-1 data-[state=open]:text-white`}
@@ -150,15 +170,14 @@ export default function Navbar() {
                 className="glass-strong border-white/[0.1] min-w-[190px] p-1.5"
               >
                 {employerLinks.map((link) => (
-                  <DropdownMenuItem key={link.path} asChild>
-                    <Link
-                      to={link.path}
-                      className={`font-body cursor-pointer ${
-                        location.pathname.startsWith(link.path) ? 'text-[#C6FF34]' : 'text-white/80'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
+                  <DropdownMenuItem
+                    key={link.path}
+                    onSelect={() => handleNavigate(link.path)}
+                    className={`font-body cursor-pointer ${
+                      location.pathname.startsWith(link.path) ? 'text-[#C6FF34]' : 'text-white/80'
+                    }`}
+                  >
+                    {link.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -174,7 +193,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <NotificationBell />
             {isAuthenticated && user ? (
-              <DropdownMenu>
+              <DropdownMenu open={accountMenuOpen} onOpenChange={setAccountMenuOpen}>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors font-body rounded-full">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C6FF34] to-[#7E3BED] flex items-center justify-center text-xs font-bold text-black">
@@ -185,33 +204,28 @@ export default function Navbar() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="glass-strong border-white/[0.1] min-w-[200px] p-1.5">
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="font-body cursor-pointer text-white/80">
-                      <LayoutDashboard size={15} className="mr-1" />
-                      Dashboard
-                    </Link>
+                  <DropdownMenuItem onSelect={() => handleNavigate('/dashboard')} className="font-body cursor-pointer text-white/80">
+                    <LayoutDashboard size={15} className="mr-1" />
+                    Dashboard
                   </DropdownMenuItem>
                   {user.role === 'champion' && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/content-studio" className="font-body cursor-pointer text-white/80">
-                        <Sparkles size={15} className="mr-1" />
-                        Content Studio
-                      </Link>
+                    <DropdownMenuItem onSelect={() => handleNavigate('/content-studio')} className="font-body cursor-pointer text-white/80">
+                      <Sparkles size={15} className="mr-1" />
+                      Content Studio
                     </DropdownMenuItem>
                   )}
                   {user.role === 'admin' && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin" className="font-body cursor-pointer text-white/80">
-                        <ShieldCheck size={15} className="mr-1" />
-                        Admin
-                      </Link>
+                    <DropdownMenuItem onSelect={() => handleNavigate('/admin')} className="font-body cursor-pointer text-white/80">
+                      <ShieldCheck size={15} className="mr-1" />
+                      Admin
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator className="bg-white/[0.08]" />
                   <DropdownMenuItem
-                    onClick={() => {
+                    onSelect={() => {
+                      closeAllMenus();
                       logout();
-                      navigate('/');
+                      setTimeout(() => navigate('/'), 0);
                     }}
                     className="font-body cursor-pointer text-white/80"
                   >
