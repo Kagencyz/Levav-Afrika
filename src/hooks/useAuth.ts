@@ -48,7 +48,19 @@ export function useAuth() {
     return null;
   }, []);
 
-  const user = serverUser || localUser;
+  // Server users carry only `name`; derive first/last for UI that expects them.
+  const enrichedServerUser = useMemo(() => {
+    if (!serverUser) return null;
+    const parts = (serverUser.name ?? '').trim().split(/\s+/);
+    return {
+      ...serverUser,
+      firstName: parts[0] ?? '',
+      lastName: parts.slice(1).join(' '),
+      role: serverUser.accessLevel === 'admin' ? 'admin' : 'talent',
+    } as User;
+  }, [serverUser]);
+
+  const user = enrichedServerUser || localUser;
   const isLoading = serverLoading;
 
   const logout = useCallback(() => {

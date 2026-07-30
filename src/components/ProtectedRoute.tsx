@@ -7,9 +7,11 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-/** Validate that a token is a properly formatted demo token */
+/** Accept a demo token or a real JWT (three dot-separated base64url segments) */
 function isValidToken(token: string | null): boolean {
-  return !!token && token.startsWith('demo_token_') && token.length > 'demo_token_'.length;
+  if (!token) return false;
+  if (token.startsWith('demo_token_') && token.length > 'demo_token_'.length) return true;
+  return /^[\w-]+\.[\w-]+\.[\w-]+$/.test(token);
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {

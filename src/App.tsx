@@ -15,6 +15,7 @@ import Contact from '@/pages/Contact';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import Onboarding from '@/pages/Onboarding';
+import Welcome from '@/pages/Welcome';
 import ProfileCreate from '@/pages/ProfileCreate';
 import JobApply from '@/pages/JobApply';
 import Messages from '@/pages/Messages';
@@ -65,6 +66,7 @@ function AnimatedRoutes() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/profile/create" element={<ProfileCreate />} />
             <Route path="/apply/:jobId" element={<JobApply />} />

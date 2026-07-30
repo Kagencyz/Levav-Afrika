@@ -1,11 +1,12 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router';
 import { Eye, EyeOff, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { sanitizeInput, isValidEmail } from '@/lib/safeJSON';
-import { StableInput, StableTextarea, StableSelect } from '@/components/StableInputs';
+import { StableInput } from '@/components/StableInputs';
 import { logWithCurrentUser } from '@/lib/auditService';
+import { trpc } from '@/providers/trpc';
 import GlassCard from '@/components/GlassCard';
 
 /** Rate limit: max attempts before cooldown */
@@ -26,6 +27,12 @@ export default function Auth() {
   const navigate = useNavigate();
   const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
+
+  // Keep mode in sync when a nav link changes ?mode= while already mounted.
+  useEffect(() => {
+    const urlMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
+    setMode(urlMode);
+  }, [searchParams]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,8 +43,11 @@ export default function Auth() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'talent',
   });
+
+  const utils = trpc.useUtils();
+  const registerMutation = trpc.auth.register.useMutation();
+  const loginMutation = trpc.auth.login.useMutation();
 
   // SECURITY FIX: Rate limiting state
   const attemptCountRef = useRef(0);
@@ -124,7 +134,7 @@ export default function Auth() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
@@ -148,48 +158,58 @@ export default function Auth() {
 
     setIsLoading(true);
 
-    // CLIENT-SIDE ONLY (no backend in static deployment)
-    const sanitizedFirstName = sanitizeInput(formData.firstName);
-    const sanitizedLastName = sanitizeInput(formData.lastName);
-    const sanitizedEmail = formData.email.trim().toLowerCase();
+    const email = formData.email.trim().toLowerCase();
 
-    const userData = {
-      id: Math.floor(Math.random() * 100000),
-      name:
-        mode === 'signup'
-          ? sanitizeInput(`${formData.firstName} ${formData.lastName}`.trim())
-          : sanitizedEmail.split('@')[0],
-      email: sanitizedEmail,
-      firstName: sanitizedFirstName || sanitizedEmail.split('@')[0],
-      lastName: sanitizedLastName || '',
-      role: formData.role || 'talent',
-      avatar: null,
-    };
-
-    // Store auth data in localStorage
-    localStorage.setItem('auth_token', 'demo_token_' + Date.now());
-    localStorage.setItem('token', 'demo_token_' + Date.now());
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    // Show success and navigate
-    setTimeout(() => {
-      setIsLoading(false);
-      // Reset rate limit on successful auth
-      attemptCountRef.current = 0;
+    try {
       if (mode === 'signup') {
-        logWithCurrentUser('register', 'Authentication', 'success', `Registered as ${formData.role}`);
+        const name = sanitizeInput(
+          `${formData.firstName} ${formData.lastName}`.trim()
+        );
+        const result = await registerMutation.mutateAsync({
+          email,
+          password: formData.password,
+          name,
+        });
+        localStorage.setItem('auth_token', result.token);
+        await utils.auth.me.fetch().catch(() => null);
+        await utils.auth.me.invalidate();
+        attemptCountRef.current = 0;
+        logWithCurrentUser('register', 'Authentication', 'success');
         toast.success('Account created!');
-        if (formData.role === 'employer') {
-          navigate('/employers');
-        } else {
-          navigate('/onboarding');
-        }
+        // Preference selection next (upgrade brief §3); a goal carried from
+        // a landing-page path card rides along to pre-select itself.
+        const goal = searchParams.get('goal');
+        navigate(goal ? `/welcome?goal=${encodeURIComponent(goal)}` : '/welcome');
       } else {
+        const result = await loginMutation.mutateAsync({
+          email,
+          password: formData.password,
+        });
+        localStorage.setItem('auth_token', result.token);
+        await utils.auth.me.fetch().catch(() => null);
+        await utils.auth.me.invalidate();
+        attemptCountRef.current = 0;
         logWithCurrentUser('login', 'Authentication', 'success');
         toast.success('Welcome back!');
         navigate('/dashboard');
       }
-    }, 400);
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : 'Something went wrong. Please try again.';
+      // Server-side field-level messages surface under the form; everything
+      // else lands in a toast.
+      if (/email already registered/i.test(message)) {
+        setErrors({ email: 'This email is already registered — try signing in.' });
+      } else if (/invalid email or password/i.test(message)) {
+        setErrors({ password: 'Invalid email or password.' });
+      } else {
+        toast.error(message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleMode = () => {
@@ -318,6 +338,9 @@ export default function Auth() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>
+                )}
               </div>
 
               {mode === 'signup' && (
@@ -353,35 +376,11 @@ export default function Auth() {
               )}
 
               {mode === 'signup' && (
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    I am a
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: 'talent' })}
-                      className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all ${
-                        formData.role === 'talent'
-                          ? 'border-[#C6FF34]/50 bg-[#C6FF34]/10 text-[#C6FF34]'
-                          : 'border-white/[0.06] text-[#A0A0A0] hover:border-white/[0.12]'
-                      }`}
-                    >
-                      Talent
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: 'employer' })}
-                      className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all ${
-                        formData.role === 'employer'
-                          ? 'border-[#C6FF34]/50 bg-[#C6FF34]/10 text-[#C6FF34]'
-                          : 'border-white/[0.06] text-[#A0A0A0] hover:border-white/[0.12]'
-                      }`}
-                    >
-                      Employer
-                    </button>
-                  </div>
-                </div>
+                <p className="text-xs text-white/40 leading-relaxed">
+                  One free account for everything — you&apos;ll choose what you
+                  want to do (find work, hire, develop, volunteer...) right
+                  after this step.
+                </p>
               )}
 
               {/* Rate limit warning */}
