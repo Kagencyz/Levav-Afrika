@@ -268,47 +268,47 @@ export default function Navbar() {
             transition={{ duration: 0.2 }}
             className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-2xl [backdrop-filter:blur(32px)_saturate(180%)] overflow-y-auto md:hidden"
           >
-            <div className="flex flex-col items-center min-h-full gap-2 pt-[88px] pb-28 px-6">
-              {/* Notification Bell in mobile menu */}
+            <div className="flex flex-col min-h-full pt-[88px] pb-8">
+              {/* Notification bell — small, top-right utility icon rather than a full row */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ delay: 0, duration: 0.3 }}
-                className="mb-4"
+                className="flex justify-end px-6 mb-2"
               >
                 <NotificationBell />
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.03, duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-              >
-                <Link
-                  to="/"
-                  onClick={() => setMobileOpen(false)}
-                  className={`block py-2 px-4 text-xl sm:text-2xl font-semibold transition-colors font-display break-words text-center ${
-                    isHome ? 'text-[#C6FF34]' : 'text-white hover:text-[#C6FF34]'
-                  }`}
+              {/* Link list — left-aligned rows with dividers */}
+              <div className="flex-1 px-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: 0.03, duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
                 >
-                  Home
-                </Link>
-              </motion.div>
+                  <Link
+                    to="/"
+                    onClick={() => setMobileOpen(false)}
+                    className={`block py-4 text-2xl font-semibold transition-colors font-display border-b border-white/[0.1] ${
+                      isHome ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
+                    }`}
+                  >
+                    Home
+                  </Link>
+                </motion.div>
 
-              {/* For Talent group */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.08, duration: 0.3 }}
-                className="w-full max-w-xs mt-4"
-              >
-                <p className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30 mb-2">
-                  For Talent
-                </p>
-                <div className="flex flex-col items-center gap-1">
+                {/* For Talent group */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: 0.08, duration: 0.3 }}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30 pt-5 pb-1.5">
+                    For Talent
+                  </p>
                   {talentLinks.map((link) => {
                     const active = location.pathname.startsWith(link.path);
                     return (
@@ -316,29 +316,26 @@ export default function Navbar() {
                         key={link.path}
                         to={link.path}
                         onClick={() => setMobileOpen(false)}
-                        className={`block py-1.5 px-4 text-lg font-semibold transition-colors font-display text-center ${
-                          active ? 'text-[#C6FF34]' : 'text-white hover:text-[#C6FF34]'
+                        className={`block py-3 text-xl font-medium transition-colors font-display border-b border-white/[0.1] ${
+                          active ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
                         }`}
                       >
                         {link.label}
                       </Link>
                     );
                   })}
-                </div>
-              </motion.div>
+                </motion.div>
 
-              {/* For Employers group */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.13, duration: 0.3 }}
-                className="w-full max-w-xs mt-4"
-              >
-                <p className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30 mb-2">
-                  For Employers
-                </p>
-                <div className="flex flex-col items-center gap-1">
+                {/* For Employers group */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: 0.13, duration: 0.3 }}
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30 pt-5 pb-1.5">
+                    For Employers
+                  </p>
                   {employerLinks.map((link) => {
                     const active = location.pathname.startsWith(link.path);
                     return (
@@ -346,50 +343,45 @@ export default function Navbar() {
                         key={link.path}
                         to={link.path}
                         onClick={() => setMobileOpen(false)}
-                        className={`block py-1.5 px-4 text-lg font-semibold transition-colors font-display text-center ${
-                          active ? 'text-[#C6FF34]' : 'text-white hover:text-[#C6FF34]'
+                        className={`block py-3 text-xl font-medium transition-colors font-display border-b border-white/[0.1] ${
+                          active ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
                         }`}
                       >
                         {link.label}
                       </Link>
                     );
                   })}
-                </div>
-              </motion.div>
+                </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.18, duration: 0.3 }}
-                className="mt-4"
-              >
-                <Link
-                  to="/about"
-                  onClick={() => setMobileOpen(false)}
-                  className={`block py-2 px-4 text-xl font-semibold transition-colors font-display text-center ${
-                    isAboutActive ? 'text-[#C6FF34]' : 'text-white hover:text-[#C6FF34]'
-                  }`}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: 0.18, duration: 0.3 }}
                 >
-                  About
-                </Link>
-              </motion.div>
+                  <Link
+                    to="/about"
+                    onClick={() => setMobileOpen(false)}
+                    className={`block py-4 mt-5 text-2xl font-semibold transition-colors font-display border-b border-white/[0.1] ${
+                      isAboutActive ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
+                    }`}
+                  >
+                    About
+                  </Link>
+                </motion.div>
 
-              {/* Mobile Auth */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.24, duration: 0.3 }}
-                className="flex flex-col items-center gap-4 mt-6 pt-6 border-t border-white/[0.08] w-full max-w-xs"
-              >
-                {isAuthenticated ? (
-                  <>
+                {isAuthenticated && (user?.role === 'admin' || user?.role === 'champion') && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ delay: 0.21, duration: 0.3 }}
+                  >
                     {user?.role === 'admin' && (
                       <Link
                         to="/admin"
                         onClick={() => setMobileOpen(false)}
-                        className="text-lg font-medium text-[#A0A0A0] hover:text-white font-body"
+                        className="block py-3 text-lg font-medium text-white/60 active:text-[#C6FF34] font-body border-b border-white/[0.1]"
                       >
                         Admin
                       </Link>
@@ -398,42 +390,56 @@ export default function Navbar() {
                       <Link
                         to="/content-studio"
                         onClick={() => setMobileOpen(false)}
-                        className="text-lg font-medium text-[#A0A0A0] hover:text-white font-body"
+                        className="block py-3 text-lg font-medium text-white/60 active:text-[#C6FF34] font-body border-b border-white/[0.1]"
                       >
                         Content Studio
                       </Link>
                     )}
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setMobileOpen(false)}
-                      className="text-lg font-medium text-[#A0A0A0] hover:text-white font-body"
-                    >
-                      Dashboard
-                    </Link>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Pinned bottom action — one secondary link, one primary button */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ delay: 0.26, duration: 0.3 }}
+                className="px-6 pt-4 bottom-nav-safe-pad"
+              >
+                {isAuthenticated ? (
+                  <>
                     <button
                       onClick={() => {
                         setMobileOpen(false);
                         logout();
                         navigate('/');
                       }}
-                      className="text-lg font-medium text-[#A0A0A0] hover:text-white font-body"
+                      className="block w-full text-center text-sm font-medium text-white/50 active:text-white font-body mb-3"
                     >
                       Log Out
                     </button>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className="btn-lime block w-full text-center font-body py-4 text-base"
+                    >
+                      Dashboard
+                    </Link>
                   </>
                 ) : (
                   <>
                     <Link
                       to="/auth"
                       onClick={() => setMobileOpen(false)}
-                      className="text-lg font-medium text-[#A0A0A0] hover:text-white font-body"
+                      className="block w-full text-center text-sm font-medium text-white/50 active:text-white font-body mb-3"
                     >
                       Log In
                     </Link>
                     <Link
                       to="/auth?mode=signup"
                       onClick={() => setMobileOpen(false)}
-                      className="btn-lime font-body"
+                      className="btn-lime block w-full text-center font-body py-4 text-base"
                     >
                       Get Started
                     </Link>
