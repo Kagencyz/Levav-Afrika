@@ -8,6 +8,7 @@ import Employers from '@/pages/Employers';
 import Opportunities from '@/pages/Opportunities';
 import JobDetail from '@/pages/JobDetail';
 import Impact from '@/pages/Impact';
+import Feed from '@/pages/Feed';
 import Learn from '@/pages/Learn';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
@@ -63,6 +64,7 @@ function AnimatedRoutes() {
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/impact" element={<Impact />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />

@@ -21,6 +21,7 @@ import {
  * just grouped by who it's for.
  */
 const talentLinks = [
+  { label: 'Feed', path: '/feed' },
   { label: 'Opportunities', path: '/opportunities' },
   { label: 'QuickWork™', path: '/quickwork' },
   { label: 'Learn', path: '/learn' },
