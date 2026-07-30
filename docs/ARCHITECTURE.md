@@ -1,5 +1,11 @@
 # Architecture
 
+> **⚠️ STALE (as of 2026-07-30).** This document describes the pre-`bcfeb83` backend generation:
+> MySQL, an `api/`-only layout, zero installed backend dependencies, never-run. The backend has
+> since been rebuilt on Postgres/Supabase under `server/`, is deployed as a real Vercel serverless
+> function, and has real auth/onboarding wired end-to-end. See `docs/BACKEND_READINESS_REVIEW.md`
+> for current, verified ground truth. This file has not yet been rewritten for the new generation.
+
 This describes what actually exists and actually runs, verified by reading code and executing commands — not the intended architecture. Where intent and reality diverge, both are stated.
 
 ## High-level shape

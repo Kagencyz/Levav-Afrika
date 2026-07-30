@@ -1,5 +1,11 @@
 # Dependency Audit
 
+> **⚠️ STALE on backend claims (as of 2026-07-30).** If this document says backend dependencies
+> (`hono`, `@trpc/server`, `drizzle-orm`, `jose`, `bcryptjs`, etc.) are absent from `package.json`,
+> that's no longer true — they're real `dependencies` today, installed and running in production.
+> See `docs/BACKEND_READINESS_REVIEW.md` for current, verified ground truth. The frontend
+> dependency findings below are unaffected and still accurate.
+
 Verified by reading `package.json`, running `npm install`, and cross-checking against actual imports in the code.
 
 ## Declared and installed (frontend) — clean
