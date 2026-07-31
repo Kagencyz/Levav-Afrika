@@ -17,6 +17,12 @@ export const appRouter = router({
     createOwnProfile: talentRouter.create,
     updateOwnProfile: talentRouter.update,
     getOwnProfile: talentRouter.getOwnProfile,
+    // list/getById are plain public reads (no auth, no known issues) —
+    // needed so TalentDirectory/TalentProfile can show real profiles to
+    // every visitor, not just the browser that created them. `delete`
+    // stays unregistered; nothing calls it yet.
+    list: talentRouter.list,
+    getById: talentRouter.getById,
   }),
 });
 

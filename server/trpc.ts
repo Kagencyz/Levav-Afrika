@@ -1,4 +1,4 @@
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import type { Context } from './context';
 
@@ -12,17 +12,19 @@ export const middleware = t.middleware;
 
 const authedMiddleware = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {
-    throw new Error('UNAUTHORIZED');
+    // A plain Error here is reported to the client as a 500
+    // INTERNAL_SERVER_ERROR — TRPCError is what actually produces a 401.
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   return next({ ctx: { ...ctx, user: ctx.user } });
 });
 
 const adminMiddleware = t.middleware(({ ctx, next }) => {
   if (!ctx.user) {
-    throw new Error('UNAUTHORIZED');
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   if (ctx.user.accessLevel !== 'admin') {
-    throw new Error('FORBIDDEN');
+    throw new TRPCError({ code: 'FORBIDDEN' });
   }
   return next({ ctx: { ...ctx, user: ctx.user } });
 });

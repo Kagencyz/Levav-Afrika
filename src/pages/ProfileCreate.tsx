@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { safeJSONParse, safeJSONSet } from '@/lib/safeJSON';
+import { useOwnTalentProfile } from '@/hooks/useOwnTalentProfile';
 import {
   User,
   Briefcase,
@@ -584,6 +585,7 @@ interface Step3PhotoReviewProps {
   handleSubmit: () => void;
   handleBack: () => void;
   isSubmitting: boolean;
+  isEditing: boolean;
 }
 
 function Step3PhotoReview({
@@ -594,6 +596,7 @@ function Step3PhotoReview({
   handleSubmit,
   handleBack,
   isSubmitting,
+  isEditing,
 }: Step3PhotoReviewProps) {
   return (
     <motion.div
@@ -759,12 +762,12 @@ function Step3PhotoReview({
           {isSubmitting ? (
             <>
               <Loader2 size={18} className="animate-spin" />
-              Creating...
+              {isEditing ? 'Saving...' : 'Creating...'}
             </>
           ) : (
             <>
               <Sparkles size={18} />
-              Create My Profile
+              {isEditing ? 'Save Changes' : 'Create My Profile'}
             </>
           )}
         </motion.button>
@@ -786,6 +789,7 @@ function Step3PhotoReview({
 // ─── Main Component ──────────────────────────────────────
 export default function ProfileCreate() {
   const navigate = useNavigate();
+  const { profile: ownProfile, save: saveTalentProfile, isSaving } = useOwnTalentProfile();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -810,7 +814,7 @@ export default function ProfileCreate() {
     return /^https?:\/\/.+/.test(url);
   };
 
-  // Auto-fill from onboarding data if available
+  // Auto-fill from onboarding data if available (weakest source)
   useEffect(() => {
     const parsed = safeJSONParse('onboarding_data', null);
     if (parsed) {
@@ -830,7 +834,36 @@ export default function ProfileCreate() {
         skills: skills.length > 0 ? skills : prev.skills,
       }));
     }
+    // Rate/portfolio/avatar have no column in the talents table yet (see
+    // db/schema.ts) — kept as a local supplement to the real profile rather
+    // than blocked on a schema change, under a key dedicated to this one
+    // browser's own extras (not the old talent_profiles mock/display list).
+    const extras = safeJSONParse<{ rate?: string; avatar?: string; portfolio?: PortfolioItem[] }>(
+      'talent_profile_extras',
+      {}
+    );
+    setFormData((prev) => ({
+      ...prev,
+      rate: extras.rate || prev.rate,
+      avatar: extras.avatar || prev.avatar,
+      portfolio: extras.portfolio?.length ? extras.portfolio : prev.portfolio,
+    }));
   }, []);
+
+  // The real talent profile (name/bio/category/skills/location) is the
+  // authoritative source once it exists — takes priority over onboarding
+  // data or anything stale in localStorage.
+  useEffect(() => {
+    if (!ownProfile) return;
+    setFormData((prev) => ({
+      ...prev,
+      name: ownProfile.name,
+      bio: ownProfile.bio ?? prev.bio,
+      category: ownProfile.category ?? prev.category,
+      skills: ownProfile.skills.length > 0 ? ownProfile.skills : prev.skills,
+      location: ownProfile.location ?? prev.location,
+    }));
+  }, [ownProfile]);
 
   // ─── Form Handlers ────────────────────────────────────
   const updateField = useCallback(<K extends keyof FormData>(
@@ -967,13 +1000,12 @@ export default function ProfileCreate() {
     }
   }, [currentStep]);
 
-  const handleSubmit = useCallback(() => {
-    if (isSubmitting) return;
+  const handleSubmit = useCallback(async () => {
+    if (isSubmitting || isSaving) return;
     if (!validateStep(3)) return;
 
     setIsSubmitting(true);
 
-    // Sanitize inputs before saving
     const sanitizedName = sanitizeInput(formData.name);
     const sanitizedBio = sanitizeInput(formData.bio);
     const sanitizedLocation = sanitizeInput(formData.location);
@@ -985,40 +1017,36 @@ export default function ProfileCreate() {
       url: item.url.trim(),
     }));
 
-    // Save the enhanced profile
-    const profiles = safeJSONParse<any[]>('talent_profiles', []);
-    const existing = profiles.find((p: any) => p.name === sanitizedName);
-    if (existing) {
-      Object.assign(existing, {
-        bio: sanitizedBio,
-        category: formData.category,
-        skills: sanitizedSkills,
-        location: sanitizedLocation,
-        rate: sanitizedRate,
-        avatar: sanitizedAvatar,
-        portfolio: sanitizedPortfolio,
-        updatedAt: new Date().toISOString(),
-      });
-    } else {
-      profiles.push({
-        id: Date.now(),
+    try {
+      // Name/bio/category/skills/location are the fields the real talents
+      // table models — these are the ones that actually persist to the
+      // database now, visible to every visitor via talent.list/getById.
+      await saveTalentProfile({
         name: sanitizedName,
         bio: sanitizedBio,
         category: formData.category,
         skills: sanitizedSkills,
         location: sanitizedLocation,
+      });
+
+      // Rate/portfolio/avatar have no backend column yet (db/schema.ts) —
+      // kept locally so the fields aren't silently dropped, merged back in
+      // by TalentDirectory/TalentProfile when rendering this user's own row.
+      safeJSONSet('talent_profile_extras', {
         rate: sanitizedRate,
         avatar: sanitizedAvatar,
         portfolio: sanitizedPortfolio,
-        featured: false,
-        wri: Math.round(Math.random() * 40) + 60,
-        createdAt: new Date().toISOString(),
       });
+
+      toast.success(ownProfile ? 'Profile updated!' : 'Profile created!');
+      navigate('/talent');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
-    safeJSONSet('talent_profiles', profiles);
-    toast.success('Profile created!');
-    navigate('/talent');
-  }, [formData, validateStep, navigate, isSubmitting]);
+  }, [formData, validateStep, navigate, isSubmitting, isSaving, saveTalentProfile, ownProfile]);
 
   // ─── Render ───────────────────────────────────────────
   return (
@@ -1037,10 +1065,10 @@ export default function ProfileCreate() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <h1 className="text-2xl sm:text-3xl font-bold text-white font-display mb-2">
-            Create Your Profile
+            {ownProfile ? 'Edit Your Profile' : 'Create Your Profile'}
           </h1>
           <p className="text-sm text-white/50">
-            Showcase your talent to the world
+            {ownProfile ? 'Keep your talent profile up to date' : 'Showcase your talent to the world'}
           </p>
         </motion.div>
 
@@ -1092,6 +1120,7 @@ export default function ProfileCreate() {
                 handleSubmit={handleSubmit}
                 handleBack={handleBack}
                 isSubmitting={isSubmitting}
+                isEditing={!!ownProfile}
               />
             )}
           </AnimatePresence>

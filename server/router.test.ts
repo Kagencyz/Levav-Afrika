@@ -18,6 +18,8 @@ const ALLOWED_PROCEDURES = [
   'talent.createOwnProfile',
   'talent.updateOwnProfile',
   'talent.getOwnProfile',
+  'talent.list',
+  'talent.getById',
 ].sort();
 
 describe('appRouter surface', () => {

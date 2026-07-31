@@ -17,6 +17,11 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
+import { trpc } from "@/providers/trpc";
+import { safeJSONParse } from "@/lib/safeJSON";
+import { useAuth } from "@/hooks/useAuth";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /* ───────────────────── Animation Variants ───────────────────── */
 const fadeUp = {
@@ -528,23 +533,46 @@ export default function TalentProfile() {
   const { id } = useParams<{ id: string }>();
   const [saved, setSaved] = useState(false);
 
-  /* ── Merge localStorage with mock data ── */
-  const talent = useMemo(() => {
-    let localProfiles: TalentProfile[] = [];
-    try {
-      const stored = localStorage.getItem("talent_profiles");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        localProfiles = Array.isArray(parsed) ? parsed : [];
-      }
-    } catch {
-      localProfiles = [];
-    }
+  // Real talent ids are UUIDs; mock ids are small integers like "1" — only
+  // query the backend when the id actually looks like a real profile,
+  // otherwise talent.getById's zod input validation would reject it.
+  const isRealId = !!id && UUID_RE.test(id);
+  const { data: realTalent } = trpc.talent.getById.useQuery(
+    { id: id ?? "" },
+    { enabled: isRealId }
+  );
+  const { isAuthenticated } = useAuth();
+  const { data: ownProfile } = trpc.talent.getOwnProfile.useQuery(undefined, { enabled: isAuthenticated });
 
-    const allTalents = [...localProfiles, ...MOCK_TALENTS];
-    const found = allTalents.find((t) => String(t.id) === String(id));
+  /* ── Merge real backend data + mock data ── */
+  const talent = useMemo(() => {
+    if (isRealId) {
+      if (!realTalent) return null;
+      const extras = safeJSONParse<{ rate?: string; avatar?: string; portfolio?: TalentProfile["portfolio"] }>(
+        "talent_profile_extras",
+        {}
+      );
+      const isOwn = realTalent.id === ownProfile?.id;
+      const mapped: TalentProfile = {
+        id: realTalent.id,
+        name: realTalent.name,
+        role: realTalent.category ?? "Professional",
+        category: realTalent.category ?? "General",
+        tier: "Silver",
+        location: realTalent.location ?? "Remote",
+        rate: isOwn ? extras.rate || "Not set" : "Not set",
+        bio: realTalent.bio ?? "",
+        skills: realTalent.skills,
+        wri: 0,
+        avatar: isOwn ? extras.avatar ?? null : null,
+        portfolio: isOwn ? extras.portfolio ?? [] : [],
+        memberSince: realTalent.createdAt ? new Date(realTalent.createdAt).toISOString() : undefined,
+      };
+      return mapped;
+    }
+    const found = MOCK_TALENTS.find((t) => String(t.id) === String(id));
     return found || null;
-  }, [id]);
+  }, [id, isRealId, realTalent, ownProfile]);
 
   if (!talent) return <TalentNotFound />;
 

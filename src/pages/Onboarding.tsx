@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { isValidEmail, sanitizeInput, safeJSONSet, safeJSONParse } from '@/lib/safeJSON';
+import { isValidEmail, sanitizeInput, safeJSONSet } from '@/lib/safeJSON';
 import { awardWriPoints } from '@/lib/levavData';
 import { logWithCurrentUser } from '@/lib/auditService';
+import { useOwnTalentProfile } from '@/hooks/useOwnTalentProfile';
+import { toast } from 'sonner';
 import {
   User,
   Briefcase,
@@ -1258,6 +1260,7 @@ function SuccessState({
 // ─── Main Component ──────────────────────────────────────
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { save: saveTalentProfile } = useOwnTalentProfile();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -1403,63 +1406,66 @@ export default function Onboarding() {
   }, [formData]);
 
   // ─── Navigation ───────────────────────────────────────
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (isSubmitting) return;
-    if (validateStep(currentStep)) {
-      if (currentStep < 3) {
-        setDirection('forward');
-        setCurrentStep((s) => s + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        setIsSubmitting(true);
-        setIsComplete(true);
-        // Log onboarding completion
-        logWithCurrentUser('profile_update', 'Onboarding Complete', 'success', 'Completed Levav onboarding');
-        // Save all onboarding data for profile creation
-        safeJSONSet('onboarding_data', {
-          firstName: sanitizeInput(formData.firstName),
-          lastName: sanitizeInput(formData.lastName),
-          phone: formData.phoneNumber,
-          email: formData.email.trim(),
-          city: sanitizeInput(formData.city),
-          country: sanitizeInput(formData.country),
-          profession: sanitizeInput(formData.profession),
-          experience: formData.yearsOfExperience,
-          primarySkills: formData.primarySkills,
-          employmentStatus: formData.employmentStatus,
-          education: formData.highestEducation,
-          linkedIn: formData.linkedinUrl.trim(),
-          biggestChallenge: sanitizeInput(formData.careerChallenge),
-          goals: sanitizeInput(formData.yearlyGoal),
-          motivation: formData.motivation,
-          confidenceLevel: formData.confidenceLevel,
-          communicationLevel: formData.communicationSkills,
-          leadershipLevel: formData.leadershipPotential,
-          openToRelocate: formData.openToRelocate,
-          completedAt: new Date().toISOString(),
-        });
-        // Auto-create a talent profile from onboarding data
-        const existingProfiles = safeJSONParse<any[]>('talent_profiles', []);
-        const newProfile = {
-          id: Date.now(),
-          name: `${formData.firstName} ${formData.lastName}`,
-          bio: `Professional in ${formData.profession}. ${formData.yearlyGoal || ''}`,
-          category: formData.profession || 'Technology',
-          skills: formData.primarySkills || [],
-          portfolio: [],
-          location: `${formData.city}${formData.city && formData.country ? ', ' : ''}${formData.country}`,
-          rate: 'Negotiable',
-          featured: false,
-          wri: Math.round((formData.confidenceLevel || 5) * 10),
-          createdAt: new Date().toISOString(),
-        };
-        safeJSONSet('talent_profiles', [...existingProfiles, newProfile]);
-        // Award WRI points for profile completion
-        awardWriPoints('profile-complete');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+    if (!validateStep(currentStep)) return;
+
+    if (currentStep < 3) {
+      setDirection('forward');
+      setCurrentStep((s) => s + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
-  }, [currentStep, validateStep, formData, isSubmitting]);
+
+    setIsSubmitting(true);
+
+    // Levav 28™ personalization (challenge, motivation, confidence sliders,
+    // relocation) has no backend home yet — intentionally local, matching
+    // the rest of this prototype's Levav 28/WRI data.
+    safeJSONSet('onboarding_data', {
+      firstName: sanitizeInput(formData.firstName),
+      lastName: sanitizeInput(formData.lastName),
+      phone: formData.phoneNumber,
+      email: formData.email.trim(),
+      city: sanitizeInput(formData.city),
+      country: sanitizeInput(formData.country),
+      profession: sanitizeInput(formData.profession),
+      experience: formData.yearsOfExperience,
+      primarySkills: formData.primarySkills,
+      employmentStatus: formData.employmentStatus,
+      education: formData.highestEducation,
+      linkedIn: formData.linkedinUrl.trim(),
+      biggestChallenge: sanitizeInput(formData.careerChallenge),
+      goals: sanitizeInput(formData.yearlyGoal),
+      motivation: formData.motivation,
+      confidenceLevel: formData.confidenceLevel,
+      communicationLevel: formData.communicationSkills,
+      leadershipLevel: formData.leadershipPotential,
+      openToRelocate: formData.openToRelocate,
+      completedAt: new Date().toISOString(),
+    });
+
+    try {
+      // The fields the real talents table actually models — this is what
+      // makes the profile visible on /talent, not just saved to this browser.
+      await saveTalentProfile({
+        name: sanitizeInput(`${formData.firstName} ${formData.lastName}`),
+        bio: sanitizeInput(`Professional in ${formData.profession}. ${formData.yearlyGoal || ''}`.trim()),
+        category: sanitizeInput(formData.profession) || 'Technology',
+        skills: formData.primarySkills,
+        location: sanitizeInput(`${formData.city}${formData.city && formData.country ? ', ' : ''}${formData.country}`),
+      });
+
+      logWithCurrentUser('profile_update', 'Onboarding Complete', 'success', 'Completed Levav onboarding');
+      awardWriPoints('profile-complete');
+      setIsComplete(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      toast.error(message);
+      setIsSubmitting(false);
+    }
+  }, [currentStep, validateStep, formData, isSubmitting, saveTalentProfile]);
 
   const handleBack = useCallback(() => {
     if (currentStep > 1) {
