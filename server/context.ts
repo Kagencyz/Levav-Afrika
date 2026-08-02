@@ -1,4 +1,4 @@
-import { verifyToken } from './lib/jwt';
+import { verifyToken } from './lib/jwt.js';
 
 export const AUTH_COOKIE_NAME = 'auth_token';
 

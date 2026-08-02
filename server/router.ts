@@ -1,9 +1,9 @@
-export { router, publicProcedure, authedProcedure, adminProcedure, middleware } from './trpc';
+export { router, publicProcedure, authedProcedure, adminProcedure, middleware } from './trpc.js';
 
-import { router } from './trpc';
-import { authRouter } from './routes/auth';
-import { talentRouter } from './routes/talent';
-import { onboardingRouter } from './routes/onboarding';
+import { router } from './trpc.js';
+import { authRouter } from './routes/auth.js';
+import { talentRouter } from './routes/talent.js';
+import { onboardingRouter } from './routes/onboarding.js';
 // Stage A: upload, employer, job, application, message, notification, review,
 // and wri are intentionally NOT imported — see docs/NEXT_MILESTONE.md §4.
 // They must stay unreachable, not merely unregistered.

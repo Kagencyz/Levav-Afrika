@@ -1,9 +1,9 @@
-import { env } from './lib/env';
+import { env } from './lib/env.js';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
-import { appRouter } from './router';
-import { createContext, AUTH_COOKIE_NAME } from './context';
+import { appRouter } from './router.js';
+import { createContext, AUTH_COOKIE_NAME } from './context.js';
 
 export const app = new Hono();
 

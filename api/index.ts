@@ -1,5 +1,5 @@
 import { handle } from 'hono/vercel';
-import { app } from '../server/app';
+import { app } from '../server/app.js';
 
 // The ONLY public file under api/ — this is deliberate. Vercel's Node.js
 // runtime treats every file directly under api/ (at any depth) as its own

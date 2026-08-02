@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { router, authedProcedure } from '../trpc';
-import { db } from '../../db/connection';
-import { userOnboarding } from '../../db/schema';
+import { router, authedProcedure } from '../trpc.js';
+import { db } from '../../db/connection.js';
+import { userOnboarding } from '../../db/schema.js';
 
 // Canonical goal slugs (upgrade brief §3.1). Must stay in sync with
 // SIGNUP_GOALS in src/lib/onboardingRouting.ts — enforced by

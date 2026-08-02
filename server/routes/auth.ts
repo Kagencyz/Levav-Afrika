@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
-import { router, publicProcedure } from '../trpc';
-import { db } from '../../db/connection';
-import { users } from '../../db/schema';
-import { signToken } from '../lib/jwt';
-import { hashPassword, comparePassword } from '../lib/password';
+import { router, publicProcedure } from '../trpc.js';
+import { db } from '../../db/connection.js';
+import { users } from '../../db/schema.js';
+import { signToken } from '../lib/jwt.js';
+import { hashPassword, comparePassword } from '../lib/password.js';
 
 export const authRouter = router({
   register: publicProcedure
