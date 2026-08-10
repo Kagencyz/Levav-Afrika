@@ -17,11 +17,20 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Temporary timing instrumentation — this project is a single Vercel
+      // Hobby-plan function with a hard 10s execution limit, and register
+      // has been timing out in production with no visible cause. These
+      // logs pinpoint which step is actually slow instead of guessing
+      // further. Remove once the real bottleneck is confirmed and fixed.
+      const t0 = Date.now();
+      const mark = (label: string) => console.log(`[auth.register] ${label} +${Date.now() - t0}ms`);
+
       // Normalized before persistence to satisfy the users_email_normalized
       // CHECK constraint and enforce case-insensitive uniqueness.
       const email = input.email.trim().toLowerCase();
 
       const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      mark('duplicate-check done');
 
       if (existing.length > 0) {
         throw new TRPCError({
@@ -31,6 +40,7 @@ export const authRouter = router({
       }
 
       const passwordHash = await hashPassword(input.password);
+      mark('bcrypt hash done');
 
       // accessLevel is never accepted as input — every new account starts
       // 'standard' (the column default). 'admin' is assigned out-of-band
@@ -45,12 +55,14 @@ export const authRouter = router({
           name: input.name,
         })
         .returning();
+      mark('insert done');
 
       const token = await signToken({
         userId: newUser.id,
         email: newUser.email,
         accessLevel: newUser.accessLevel,
       });
+      mark('jwt signed');
 
       // The token is never returned in the response body — only set as an
       // httpOnly cookie (via server/app.ts's responseMeta) so it's not
@@ -76,9 +88,15 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Same temporary timing instrumentation as register — see comment
+      // there. Remove once the real bottleneck is confirmed and fixed.
+      const t0 = Date.now();
+      const mark = (label: string) => console.log(`[auth.login] ${label} +${Date.now() - t0}ms`);
+
       const email = input.email.trim().toLowerCase();
 
       const rows = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      mark('lookup done');
 
       if (rows.length === 0) {
         throw new TRPCError({
@@ -89,6 +107,7 @@ export const authRouter = router({
 
       const user = rows[0];
       const valid = await comparePassword(input.password, user.passwordHash);
+      mark('bcrypt compare done');
 
       if (!valid) {
         throw new TRPCError({
@@ -102,6 +121,7 @@ export const authRouter = router({
         email: user.email,
         accessLevel: user.accessLevel,
       });
+      mark('jwt signed');
 
       ctx.session.setToken = token;
 
