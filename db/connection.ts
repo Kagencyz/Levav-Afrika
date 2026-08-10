@@ -8,12 +8,22 @@ if (!process.env.DATABASE_URL) {
 
 // Supabase's pooler requires TLS on external connections; pg does not
 // negotiate SSL on its own unless told to, and a TLS-expecting server
-// getting a plaintext handshake tends to hang rather than fail fast. Local
-// dev Postgres (no NODE_ENV=production) has no TLS listener, so this stays
-// off there.
+// getting a plaintext handshake tends to hang rather than fail fast.
+// Gating this on NODE_ENV === 'production' is unreliable — Vercel sets
+// that during the build step but doesn't consistently propagate it into a
+// serverless function's runtime process.env — so key it on the actual
+// connection target instead: local/loopback Postgres has no TLS listener,
+// anything else (Supabase's pooler) does.
+const dbHost = new URL(process.env.DATABASE_URL).hostname;
+const isLocalDb = dbHost === 'localhost' || dbHost === '127.0.0.1' || dbHost === '::1';
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+  ssl: isLocalDb ? undefined : { rejectUnauthorized: false },
+  // Fail fast instead of hanging until Vercel force-kills the function on
+  // its execution-time limit, which is what turned a bad connection into
+  // an infinite spinner for the user instead of a clear error.
+  connectionTimeoutMillis: 8000,
 });
 
 export const db = drizzle(pool, { schema });
