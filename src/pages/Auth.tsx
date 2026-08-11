@@ -165,11 +165,18 @@ export default function Auth() {
         const name = sanitizeInput(
           `${formData.firstName} ${formData.lastName}`.trim()
         );
-        await registerMutation.mutateAsync({
+        const result = await registerMutation.mutateAsync({
           email,
           password: formData.password,
           name,
         });
+        if (result.requiresEmailConfirmation) {
+          attemptCountRef.current = 0;
+          toast.success('Account created. Check your email to confirm it, then sign in.');
+          setMode('login');
+          setFormData((current) => ({ ...current, password: '', confirmPassword: '' }));
+          return;
+        }
         // No token to store — the server set it as an httpOnly cookie.
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();

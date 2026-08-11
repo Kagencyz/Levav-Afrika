@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server.tsbuildinfo",
+    "types": ["node"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": [
+    "api/index.ts",
+    "server/app.ts",
+    "server/boot.ts",
+    "server/context.ts",
+    "server/router.ts",
+    "server/trpc.ts",
+    "server/lib/env.ts",
+    "server/lib/jwt.ts",
+    "server/lib/supabase.ts",
+    "server/routes/auth.ts",
+    "server/routes/onboarding.ts",
+    "server/routes/talent.ts",
+    "db/**/*.ts",
+    "contracts/**/*.ts"
+  ],
+  "exclude": ["**/*.test.ts"]
+}

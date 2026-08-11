@@ -4,6 +4,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
+  SUPABASE_PUBLISHABLE_KEY: z.string().min(1, 'SUPABASE_PUBLISHABLE_KEY is required'),
   JWT_SECRET: z.string().min(1).optional(),
   CORS_ORIGIN: z.string().min(1, 'CORS_ORIGIN is required'),
 });
@@ -37,6 +39,8 @@ function loadEnv() {
     NODE_ENV: data.NODE_ENV,
     PORT: data.PORT,
     DATABASE_URL: data.DATABASE_URL,
+    SUPABASE_URL: data.SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY: data.SUPABASE_PUBLISHABLE_KEY,
     JWT_SECRET: jwtSecret,
     CORS_ORIGINS: data.CORS_ORIGIN.split(',').map((s) => s.trim()).filter(Boolean),
   };

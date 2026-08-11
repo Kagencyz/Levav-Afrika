@@ -214,8 +214,40 @@ export const userOnboarding = pgTable(
   (table) => [
     // One onboarding record per user; re-running onboarding updates it.
     uniqueIndex('user_onboarding_user_id_unique').on(table.userId),
+    pgPolicy('user_onboarding_select_own', {
+      for: 'select',
+      to: authenticatedRole,
+      using: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy('user_onboarding_insert_own', {
+      for: 'insert',
+      to: authenticatedRole,
+      withCheck: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy('user_onboarding_update_own', {
+      for: 'update',
+      to: authenticatedRole,
+      using: sql`${table.userId} = ${authUid}`,
+      withCheck: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy('user_onboarding_service_select', {
+      for: 'select',
+      to: levavAppRole,
+      using: sql`true`,
+    }),
+    pgPolicy('user_onboarding_service_insert', {
+      for: 'insert',
+      to: levavAppRole,
+      withCheck: sql`true`,
+    }),
+    pgPolicy('user_onboarding_service_update', {
+      for: 'update',
+      to: levavAppRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
   ]
-);
+).enableRLS();
 
 export const organizations = pgTable(
   'organizations',

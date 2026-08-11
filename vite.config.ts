@@ -35,6 +35,8 @@ export default defineConfig({
       DATABASE_URL: 'postgres://test:test@localhost:5432/test',
       CORS_ORIGIN: 'http://localhost:5173',
       JWT_SECRET: 'vitest-only-secret-not-used-anywhere-real',
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_vitest-only',
     },
   },
 });

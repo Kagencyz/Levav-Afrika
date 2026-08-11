@@ -3,7 +3,8 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { appRouter } from './router.js';
-import { createContext, AUTH_COOKIE_NAME } from './context.js';
+import { createContext } from './context.js';
+import { buildAuthCookie } from './lib/jwt.js';
 
 export const app = new Hono();
 
@@ -19,28 +20,10 @@ app.use('*', cors({
 }));
 
 // Health check
-app.get('/health', (c) => c.json({ status: 'ok', time: new Date().toISOString() }));
-
-const SEVEN_DAYS_SECONDS = 7 * 24 * 60 * 60;
-
-/**
- * Auth is transported as an httpOnly cookie, not a token in the response
- * body — a procedure can't set response headers directly, so auth.ts
- * signals intent via ctx.session and this reads it back once the request
- * has resolved. See docs/BACKEND_READINESS_REVIEW.md for why this replaced
- * the earlier Bearer-token-in-localStorage design.
- */
-function buildAuthCookie(token: string | null): string {
-  const parts = [
-    `${AUTH_COOKIE_NAME}=${token ?? ''}`,
-    'Path=/',
-    'HttpOnly',
-    'SameSite=Lax',
-  ];
-  if (env.NODE_ENV === 'production') parts.push('Secure');
-  parts.push(token ? `Max-Age=${SEVEN_DAYS_SECONDS}` : 'Max-Age=0');
-  return parts.join('; ');
-}
+const healthResponse = () => ({ status: 'ok' as const, time: new Date().toISOString() });
+app.get('/health', (c) => c.json(healthResponse()));
+// Vercel preserves the original /api path when rewriting to api/index.
+app.get('/api/health', (c) => c.json(healthResponse()));
 
 // tRPC handler
 app.all('/api/trpc/*', async (c) => {

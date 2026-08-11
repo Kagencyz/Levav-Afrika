@@ -28,14 +28,9 @@ export async function verifyToken(token: string) {
   }
 }
 
-export function buildAuthCookie(token: string) {
+export function buildAuthCookie(token: string | null) {
   const isSecure = env.NODE_ENV === 'production';
   const securePart = isSecure ? ' Secure;' : '';
-  return `${AUTH_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax;${securePart} Max-Age=${60 * 60 * 24 * 7}`;
-}
-
-export function clearAuthCookie() {
-  const isSecure = env.NODE_ENV === 'production';
-  const securePart = isSecure ? ' Secure;' : '';
-  return `${AUTH_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax;${securePart} Max-Age=0`;
+  const maxAge = token ? 60 * 60 * 24 * 7 : 0;
+  return `${AUTH_COOKIE_NAME}=${token ?? ''}; Path=/; HttpOnly; SameSite=Lax;${securePart} Max-Age=${maxAge}`;
 }
