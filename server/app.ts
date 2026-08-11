@@ -45,7 +45,7 @@ function buildAuthCookie(token: string | null): string {
 // tRPC handler
 app.all('/api/trpc/*', async (c) => {
   const req = c.req.raw;
-  return fetchRequestHandler({
+  const response = await fetchRequestHandler({
     endpoint: '/api/trpc',
     req,
     router: appRouter,
@@ -60,6 +60,8 @@ app.all('/api/trpc/*', async (c) => {
       return {};
     },
   });
+
+  return response;
 });
 
 // SPA fallback — serve dist/index.html for non-API routes when this app is

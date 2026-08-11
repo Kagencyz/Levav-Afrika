@@ -32,7 +32,7 @@ So this upgrade is not a UI reskin — most of the brief is **new domain model +
 - **Current:** `src/pages/Messages.tsx` is mocked (`MockMessage`/`MockConversation` types, localStorage-seeded), one-to-one only.
 - **Gap:** Real conversations/messages model, context-bound threads (application, proposal, placement), group threads (cohorts/teams), message requests, blocking, reporting, attachment controls, unsolicited-contact limits. All server-dependent.
 
-### §8 Courses in feed — Effort: M (controlled catalogue) 
+### §8 Courses in feed — Effort: M (controlled catalogue)
 - **Current:** `src/pages/Learn.tsx` renders a static catalogue from `levavData.ts` with localStorage progress. No providers, no approval, no cards.
 - **Gap:** Course card component + provider/approval flags. Brief explicitly permits a controlled catalogue without the full Skills Marketplace (stays "Coming Soon" — currently `SkillGap.tsx` is a static placeholder, consistent with that).
 

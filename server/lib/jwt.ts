@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { env } from './env.js';
 
+export const AUTH_COOKIE_NAME = 'levav_auth_token';
+
 const SECRET = new TextEncoder().encode(env.JWT_SECRET);
 
 export async function signToken(payload: {
@@ -24,4 +26,16 @@ export async function verifyToken(token: string) {
   } catch {
     return null;
   }
+}
+
+export function buildAuthCookie(token: string) {
+  const isSecure = env.NODE_ENV === 'production';
+  const securePart = isSecure ? ' Secure;' : '';
+  return `${AUTH_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax;${securePart} Max-Age=${60 * 60 * 24 * 7}`;
+}
+
+export function clearAuthCookie() {
+  const isSecure = env.NODE_ENV === 'production';
+  const securePart = isSecure ? ' Secure;' : '';
+  return `${AUTH_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax;${securePart} Max-Age=0`;
 }

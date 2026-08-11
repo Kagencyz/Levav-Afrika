@@ -1,6 +1,6 @@
 {
-  "id": "b6884d1f-898b-4651-bb52-12f7141b8833",
-  "prevId": "1fa2287c-99e3-44de-828f-8ca3b44fa467",
+  "id": "a378e84f-c338-4a18-998c-886b8e42c5f9",
+  "prevId": "e27c7c90-6698-423c-a18c-d8c5442e4308",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -442,6 +442,103 @@
       "checkConstraints": {},
       "isRLSEnabled": true
     },
+    "public.user_onboarding": {
+      "name": "user_onboarding",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "goals": {
+          "name": "goals",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "primary_goal": {
+          "name": "primary_goal",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "personal_status": {
+          "name": "personal_status",
+          "type": "personal_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "user_onboarding_user_id_unique": {
+          "name": "user_onboarding_user_id_unique",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "user_onboarding_user_id_users_id_fk": {
+          "name": "user_onboarding_user_id_users_id_fk",
+          "tableFrom": "user_onboarding",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -600,6 +697,21 @@
         "in_review",
         "verified",
         "rejected"
+      ]
+    },
+    "public.personal_status": {
+      "name": "personal_status",
+      "schema": "public",
+      "values": [
+        "employed",
+        "unemployed",
+        "self_employed",
+        "freelancing",
+        "studying",
+        "volunteering",
+        "changing_careers",
+        "returning_to_work",
+        "running_organization"
       ]
     },
     "public.user_access_level": {

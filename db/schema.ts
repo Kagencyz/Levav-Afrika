@@ -9,12 +9,33 @@ import {
   pgEnum,
   uniqueIndex,
   check,
+  pgPolicy,
+  pgRole,
 } from 'drizzle-orm/pg-core';
+import { authUid, authUsers, authenticatedRole } from 'drizzle-orm/supabase';
 
 // Stage B: only the four approved foundational entities are modeled here.
 // Levav 28, Learn, QuickWork, SkillSpace, Impact, Champions, subscriptions,
 // payments, jobs, applications, messaging, reviews, and WRI are intentionally
 // NOT part of this schema — see docs/DOMAIN_MODEL.md and docs/NEXT_MILESTONE.md.
+
+// Restricted runtime role used by the Hono/tRPC server (Slice 1 auth
+// architecture — see docs/full-stack/*.md). NOT service_role, NOT postgres.
+// `.existing()`: this is a typed REFERENCE for policy `to:` clauses only —
+// Drizzle's PgRoleConfig has no `login`/password concept, so letting
+// drizzle-kit generate `CREATE ROLE` from this declaration would produce a
+// role that can't authenticate. The real `CREATE ROLE levav_app LOGIN` (no
+// password — set out-of-band per environment, never committed) is
+// hand-written in the custom grants migration instead.
+//
+// Grants + the policies below define exactly what this role may touch.
+// Application-level ownership/membership checks in tRPC remain the load-
+// bearing authorization boundary for everything this role does — policies
+// granted `TO levavAppRole` are a reviewable formality (Postgres denies by
+// default once RLS is enabled with no matching policy), not row-level
+// tenancy enforcement. Real per-row `auth.uid()` enforcement is what the
+// `authenticatedRole` policies below provide, for the Storage/gateway path.
+export const levavAppRole = pgRole('levav_app').existing();
 
 // Platform-level access only — NOT a business identity. Whether a user "is a
 // talent" is derived from the existence of a row in `talents` (userId FK);
@@ -65,9 +86,16 @@ export const personalStatusEnum = pgEnum('personal_status', [
 export const users = pgTable(
   'users',
   {
-    id: uuid('id').primaryKey().defaultRandom(),
+    // Equals auth.users.id — set only by the handle_new_user() trigger on
+    // signup (custom grants migration), never generated here and never
+    // written by the app directly.
+    id: uuid('id')
+      .primaryKey()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
     email: varchar('email', { length: 255 }).notNull(),
-    passwordHash: text('password_hash').notNull(),
+    // password_hash removed: Supabase Auth (auth.users) owns password
+    // storage/hashing entirely as of the Slice 1 auth architecture — see
+    // docs/full-stack/*.md.
     name: varchar('name', { length: 255 }).notNull(),
     // Platform-level access tier only. See the comment on userAccessLevelEnum
     // above — business identity (talent / employer team member) is derived
@@ -80,11 +108,26 @@ export const users = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
-    emailUnique: uniqueIndex('users_email_unique').on(table.email),
-    emailNormalized: check('users_email_normalized', sql`${table.email} = lower(${table.email})`),
-  })
-);
+  (table) => [
+    uniqueIndex('users_email_unique').on(table.email),
+    check('users_email_normalized', sql`${table.email} = lower(${table.email})`),
+    // Real, auth.uid()-scoped policy — protects the Storage/gateway path.
+    pgPolicy('users_select_own', {
+      for: 'select',
+      to: authenticatedRole,
+      using: sql`${table.id} = ${authUid}`,
+    }),
+    // Formality only, not tenancy enforcement — see the levavAppRole comment
+    // above. SELECT-only: no insert/update/delete policy exists here because
+    // none is granted either; the signup/email-sync triggers (security
+    // definer) are the only writers to this table.
+    pgPolicy('users_service_select', {
+      for: 'select',
+      to: levavAppRole,
+      using: sql`true`,
+    }),
+  ]
+).enableRLS();
 
 export const talents = pgTable(
   'talents',
@@ -101,13 +144,55 @@ export const talents = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
+  (table) => [
     // Enforces the 1:1 User<->Talent invariant from docs/DOMAIN_MODEL.md.
     // The existence of this row IS the "talent" business capability — see
     // the comment on userAccessLevelEnum above.
-    userIdUnique: uniqueIndex('talents_user_id_unique').on(table.userId),
-  })
-);
+    uniqueIndex('talents_user_id_unique').on(table.userId),
+    pgPolicy('talents_select_own', {
+      for: 'select',
+      to: authenticatedRole,
+      using: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy('talents_insert_own', {
+      for: 'insert',
+      to: authenticatedRole,
+      withCheck: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy('talents_update_own', {
+      for: 'update',
+      to: authenticatedRole,
+      using: sql`${table.userId} = ${authUid}`,
+      withCheck: sql`${table.userId} = ${authUid}`,
+    }),
+    // Separately named, deliberately permissive service-path policies for
+    // the direct tRPC connection (levav_app) — split by operation (rather
+    // than one `for: 'all'` policy) so DELETE is denied independently at
+    // both the RLS layer and the grant layer, not dependent on the grant
+    // alone. NOT tenant-isolation controls — see the levavAppRole comment
+    // on `users` above. Real ownership enforcement for this path is tRPC's
+    // authedProcedure checks; these policies only exist because Postgres
+    // denies-by-default once RLS is enabled with no matching policy for a
+    // role. No `talents_service_delete` policy exists, deliberately — see
+    // the matching grant, which also never includes DELETE.
+    pgPolicy('talents_service_select', {
+      for: 'select',
+      to: levavAppRole,
+      using: sql`true`,
+    }),
+    pgPolicy('talents_service_insert', {
+      for: 'insert',
+      to: levavAppRole,
+      withCheck: sql`true`,
+    }),
+    pgPolicy('talents_service_update', {
+      for: 'update',
+      to: levavAppRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
+  ]
+).enableRLS();
 
 export const userOnboarding = pgTable(
   'user_onboarding',
@@ -126,26 +211,56 @@ export const userOnboarding = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
+  (table) => [
     // One onboarding record per user; re-running onboarding updates it.
-    userIdUnique: uniqueIndex('user_onboarding_user_id_unique').on(table.userId),
-  })
+    uniqueIndex('user_onboarding_user_id_unique').on(table.userId),
+  ]
 );
 
-export const organizations = pgTable('organizations', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: varchar('name', { length: 255 }).notNull(),
-  organizationType: orgTypeEnum('organization_type').notNull(),
-  industry: varchar('industry', { length: 120 }),
-  size: varchar('size', { length: 60 }),
-  verificationStatus: orgVerificationEnum('verification_status').notNull().default('pending'),
-  businessDocuments: jsonb('business_documents').$type<string[]>().notNull().default([]),
-  // Archival instead of hard delete — an organization going through dispute
-  // or offboarding shouldn't disappear outright.
-  archivedAt: timestamp('archived_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+export const organizations = pgTable(
+  'organizations',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: varchar('name', { length: 255 }).notNull(),
+    organizationType: orgTypeEnum('organization_type').notNull(),
+    industry: varchar('industry', { length: 120 }),
+    size: varchar('size', { length: 60 }),
+    verificationStatus: orgVerificationEnum('verification_status').notNull().default('pending'),
+    businessDocuments: jsonb('business_documents').$type<string[]>().notNull().default([]),
+    // Archival instead of hard delete — an organization going through dispute
+    // or offboarding shouldn't disappear outright.
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  () => [
+    // Slice 1 conservative model — service-path only, per
+    // docs/full-stack/ORGANIZATION_DOMAIN_MODEL.md §1: these policies grant
+    // levav_app no row-level discrimination and are not an authorization
+    // mechanism. Real authorization (organization creation, updates,
+    // membership, ownership transfer) is entirely Hono/tRPC's
+    // responsibility — see that document's Organization domain API. No
+    // authenticated-role policy exists yet (the Data API is disabled, so
+    // one would currently be evaluated by nothing) and no delete policy
+    // exists at all, matching the grant, which never includes DELETE.
+    pgPolicy('organizations_service_select', {
+      for: 'select',
+      to: levavAppRole,
+      using: sql`true`,
+    }),
+    pgPolicy('organizations_service_insert', {
+      for: 'insert',
+      to: levavAppRole,
+      withCheck: sql`true`,
+    }),
+    pgPolicy('organizations_service_update', {
+      for: 'update',
+      to: levavAppRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
+  ]
+).enableRLS();
 
 export const organizationMembers = pgTable(
   'organization_members',
@@ -179,10 +294,36 @@ export const organizationMembers = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => ({
+  (table) => [
     // Enforces "one membership per user per organization" from docs/DOMAIN_MODEL.md.
     // Also serves organizationId-first lookups — no separate index is added
     // for userId-alone lookups since no access path in this milestone needs it.
-    uniqueMembership: uniqueIndex('org_member_unique').on(table.organizationId, table.userId),
-  })
-);
+    uniqueIndex('org_member_unique').on(table.organizationId, table.userId),
+    // Slice 1 conservative model — service-path only, per
+    // docs/full-stack/ORGANIZATION_DOMAIN_MODEL.md. Deliberately NOT the
+    // authenticated-role policies proposed and rejected earlier in this
+    // design process (founding-owner insert, invitation-provenance insert,
+    // role-transition update) — those encode real, still-partially-open
+    // business rules (§4-§7 of that document) and are implemented only in
+    // Hono/tRPC, not here, while the Data API stays disabled. No
+    // org_members_select_own policy either — deferred per that document's
+    // §3 (correct-but-inert while nothing evaluates it). No delete policy,
+    // matching the grant, which never includes DELETE.
+    pgPolicy('org_members_service_select', {
+      for: 'select',
+      to: levavAppRole,
+      using: sql`true`,
+    }),
+    pgPolicy('org_members_service_insert', {
+      for: 'insert',
+      to: levavAppRole,
+      withCheck: sql`true`,
+    }),
+    pgPolicy('org_members_service_update', {
+      for: 'update',
+      to: levavAppRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
+  ]
+).enableRLS();
