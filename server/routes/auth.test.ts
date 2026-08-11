@@ -80,4 +80,19 @@ describe('Supabase-backed authentication', () => {
       caller.login({ email: profile.email, password: 'wrong-password' })
     ).rejects.toMatchObject({ code: 'UNAUTHORIZED', message: 'Invalid email or password' });
   });
+
+  it('explains when Supabase has temporarily exhausted confirmation emails', async () => {
+    mocks.signUp.mockResolvedValue({
+      data: { user: null, session: null },
+      error: { status: 429, code: 'over_email_send_rate_limit' },
+    });
+    const { caller } = createCaller();
+
+    await expect(
+      caller.register({ email: profile.email, password: 'safe-password', name: profile.name })
+    ).rejects.toMatchObject({
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Confirmation email limit reached. Please wait an hour and try again.',
+    });
+  });
 });
