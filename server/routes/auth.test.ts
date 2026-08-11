@@ -7,12 +7,8 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../lib/supabase.js', () => ({
-  createSupabaseAuthClient: () => ({
-    auth: {
-      signUp: mocks.signUp,
-      signInWithPassword: mocks.signInWithPassword,
-    },
-  }),
+  signUpWithPassword: mocks.signUp,
+  signInWithPassword: mocks.signInWithPassword,
 }));
 
 vi.mock('../../db/connection.js', () => ({
