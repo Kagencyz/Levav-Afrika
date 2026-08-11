@@ -5,7 +5,7 @@ import { router, publicProcedure } from '../trpc.js';
 import { db } from '../../db/connection.js';
 import { users } from '../../db/schema.js';
 import { signToken } from '../lib/jwt.js';
-import { createSupabaseAuthClient } from '../lib/supabase.js';
+import { signInWithPassword, signUpWithPassword } from '../lib/supabase.js';
 
 async function getPublicProfile(userId: string) {
   const rows = await db
@@ -52,18 +52,13 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const supabase = createSupabaseAuthClient();
       const email = input.email.trim().toLowerCase();
       const startedAt = Date.now();
       console.log(JSON.stringify({ level: 'info', message: 'Supabase signup started' }));
 
       let signupResult;
       try {
-        signupResult = await supabase.auth.signUp({
-          email,
-          password: input.password,
-          options: { data: { name: input.name } },
-        });
+        signupResult = await signUpWithPassword(email, input.password, input.name);
       } catch (error) {
         console.error(JSON.stringify({
           level: 'error',
@@ -120,16 +115,15 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const supabase = createSupabaseAuthClient();
       const startedAt = Date.now();
       console.log(JSON.stringify({ level: 'info', message: 'Supabase login started' }));
 
       let loginResult;
       try {
-        loginResult = await supabase.auth.signInWithPassword({
-          email: input.email.trim().toLowerCase(),
-          password: input.password,
-        });
+        loginResult = await signInWithPassword(
+          input.email.trim().toLowerCase(),
+          input.password
+        );
       } catch (error) {
         console.error(JSON.stringify({
           level: 'error',
