@@ -1,5 +1,5 @@
 import { SignJWT, jwtVerify } from 'jose';
-import { env } from './env';
+import { env } from './env.js';
 
 export const AUTH_COOKIE_NAME = 'levav_auth_token';
 

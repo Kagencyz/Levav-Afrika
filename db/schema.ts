@@ -67,6 +67,22 @@ export const orgVerificationEnum = pgEnum('org_verification_status', [
 export const orgRoleEnum = pgEnum('org_role', ['owner', 'admin', 'recruiter', 'member']);
 export const orgMemberStatusEnum = pgEnum('org_member_status', ['invited', 'active', 'removed']);
 
+// Onboarding preference capture (upgrade brief §3): what the user wants to
+// do (goals, multi-select) and their personal status. This is preference
+// data, NOT identity — business capabilities remain derived from `talents` /
+// `organizationMembers` rows per the domain model.
+export const personalStatusEnum = pgEnum('personal_status', [
+  'employed',
+  'unemployed',
+  'self_employed',
+  'freelancing',
+  'studying',
+  'volunteering',
+  'changing_careers',
+  'returning_to_work',
+  'running_organization',
+]);
+
 export const users = pgTable(
   'users',
   {
@@ -177,6 +193,29 @@ export const talents = pgTable(
     }),
   ]
 ).enableRLS();
+
+export const userOnboarding = pgTable(
+  'user_onboarding',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    // Multi-select signup goals (slugs, e.g. 'find-job', 'develop').
+    // Validated against the canonical list in server/routes/onboarding.ts.
+    goals: jsonb('goals').$type<string[]>().notNull().default([]),
+    // First selected goal — drives the user's first-run routing.
+    primaryGoal: varchar('primary_goal', { length: 40 }).notNull(),
+    personalStatus: personalStatusEnum('personal_status').notNull(),
+    completedAt: timestamp('completed_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // One onboarding record per user; re-running onboarding updates it.
+    uniqueIndex('user_onboarding_user_id_unique').on(table.userId),
+  ]
+);
 
 export const organizations = pgTable(
   'organizations',

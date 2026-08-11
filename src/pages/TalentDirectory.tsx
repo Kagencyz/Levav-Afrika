@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { RateDisplay } from "@/components/CurrencyDisplay";
+import { trpc } from "@/providers/trpc";
+import { safeJSONParse } from "@/lib/safeJSON";
+import { useAuth } from "@/hooks/useAuth";
 
 /* ───────────────────── Animation Variants ───────────────────── */
 const fadeUp = {
@@ -60,6 +63,14 @@ const avatarUrls = [
 
 function getAvatar(index: number) {
   return avatarUrls[index % avatarUrls.length];
+}
+
+/** Deterministic avatar pick for any id string — real talent ids are UUIDs,
+ * not the small integers getAvatar(Number(id)) was written for. */
+function getAvatarForId(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  return getAvatar(hash);
 }
 
 /* ───────────────────── Mock Talent Data ───────────────────── */
@@ -255,7 +266,7 @@ function TalentCard({
         {/* Image */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={talent.avatar ?? getAvatar(Number(talent.id))}
+            src={talent.avatar ?? getAvatarForId(talent.id)}
             alt={talent.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
@@ -322,20 +333,31 @@ export default function TalentDirectory() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // Merge mock data with localStorage profiles
-  const talents = useMemo(() => {
-    let localProfiles: typeof MOCK_TALENTS = [];
-    try {
-      const stored = localStorage.getItem("talent_profiles");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        localProfiles = Array.isArray(parsed) ? parsed : [];
-      }
-    } catch {
-      localProfiles = [];
-    }
+  // Real profiles, backed by the database — every visitor sees these, not
+  // just the browser that created them. Generous limit since this is still
+  // prototype-scale; paginate for real once volume warrants it.
+  const { isAuthenticated } = useAuth();
+  const { data: realTalentsPage } = trpc.talent.list.useQuery({ limit: 100 });
+  const { data: ownProfile } = trpc.talent.getOwnProfile.useQuery(undefined, { enabled: isAuthenticated });
 
-    const allTalents = [...localProfiles, ...MOCK_TALENTS];
+  // Merge real + mock talents
+  const talents = useMemo(() => {
+    // rate/portfolio/avatar have no backend column yet (db/schema.ts) — only
+    // the current browser's own profile can show them, from local storage.
+    const extras = safeJSONParse<{ rate?: string; avatar?: string }>("talent_profile_extras", {});
+
+    const realTalents = (realTalentsPage?.talents ?? []).map((t) => ({
+      ...t,
+      category: t.category ?? "General",
+      role: t.category ?? undefined,
+      featured: false,
+      wri: undefined as number | undefined,
+      tier: undefined as string | undefined,
+      rate: t.id === ownProfile?.id ? extras.rate ?? null : null,
+      avatar: t.id === ownProfile?.id ? extras.avatar ?? null : null,
+    }));
+
+    const allTalents = [...realTalents, ...MOCK_TALENTS];
 
     let result = [...allTalents];
 
@@ -356,7 +378,7 @@ export default function TalentDirectory() {
     }
 
     return result;
-  }, [searchQuery, activeFilter]);
+  }, [searchQuery, activeFilter, realTalentsPage, ownProfile]);
 
   const totalCount = talents.length;
 

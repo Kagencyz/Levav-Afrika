@@ -27,6 +27,10 @@ import {
   AlertCircle,
   Search,
   Target,
+  PlusCircle,
+  Timer,
+  Rocket,
+  ShieldCheck,
 } from 'lucide-react';
 import { StableInput, StableTextarea, StableSelect } from '@/components/StableInputs';
 import { StarRating } from '@/components/StarRating';
@@ -39,14 +43,17 @@ import {
   getMyGigs,
   updateGigStatus,
   awardWriPoints,
+  getPostedGigs,
+  postGig,
 } from '@/lib/levavData';
 import type { QuickWorkGig } from '@/lib/levavData';
+import { useAuth } from '@/hooks/useAuth';
 
 /* ═══════════════════════════════════════════
    TYPES
    ═══════════════════════════════════════════ */
 type FilterCategory = 'All' | 'Design' | 'Development' | 'Marketing' | 'Writing' | 'Creative' | 'Data' | 'Translation' | 'Operations';
-type ActiveTab = 'available' | 'applications' | 'completed';
+type ActiveTab = 'available' | 'applications' | 'completed' | 'post';
 type ToastType = 'success' | 'error' | 'info';
 
 interface Toast {
@@ -100,6 +107,8 @@ function generateId(): string {
    MAIN COMPONENT
    ═══════════════════════════════════════════ */
 export default function QuickWork() {
+  const { user } = useAuth();
+
   /* ─── State ─── */
   const [activeFilter, setActiveFilter] = React.useState<FilterCategory>('All');
   const [activeTab, setActiveTab] = React.useState<ActiveTab>('available');
@@ -112,10 +121,15 @@ export default function QuickWork() {
   /* ─── Derived state from localStorage ─── */
   const appliedIds = React.useMemo(() => getQuickworkApplications(), [refreshKey]);
   const myGigs = React.useMemo(() => getMyGigs(), [refreshKey]);
+  const postedGigs = React.useMemo(() => getPostedGigs(), [refreshKey]);
+
+  /* All gigs = seeded catalogue + whatever clients have posted through the
+     app, newest first, so a startup's own posting shows up immediately. */
+  const allGigs = React.useMemo(() => [...postedGigs, ...QUICKWORK_GIGS], [postedGigs]);
 
   /* ─── Filtered gigs ─── */
   const filteredGigs = React.useMemo(() => {
-    let gigs = QUICKWORK_GIGS;
+    let gigs = allGigs;
 
     if (activeFilter !== 'All') {
       gigs = gigs.filter((g) => g.category === activeFilter);
@@ -133,7 +147,7 @@ export default function QuickWork() {
     }
 
     return gigs;
-  }, [activeFilter, searchQuery]);
+  }, [allGigs, activeFilter, searchQuery]);
 
   /* ─── Derived gig lists for tabs ─── */
   const availableGigs = React.useMemo(
@@ -142,8 +156,8 @@ export default function QuickWork() {
   );
 
   const appliedGigs = React.useMemo(
-    () => QUICKWORK_GIGS.filter((g) => appliedIds.includes(g.id)),
-    [appliedIds]
+    () => allGigs.filter((g) => appliedIds.includes(g.id)),
+    [allGigs, appliedIds]
   );
 
   const completedGigIds = React.useMemo(
@@ -157,8 +171,8 @@ export default function QuickWork() {
   );
 
   const completedGigs = React.useMemo(
-    () => QUICKWORK_GIGS.filter((g) => completedGigIds.includes(g.id)),
-    [completedGigIds]
+    () => allGigs.filter((g) => completedGigIds.includes(g.id)),
+    [allGigs, completedGigIds]
   );
 
   /* ─── Actions ─── */
@@ -186,7 +200,7 @@ export default function QuickWork() {
     setIsApplyModalOpen(false);
     setSelectedGig(null);
     setRefreshKey((k) => k + 1);
-    showToast(`Application submitted for "${selectedGig.title}"!`);
+    showToast(`Applied to "${selectedGig.title}" — +5 WRI Reliability`);
   }, [selectedGig, showToast]);
 
   const handleMarkComplete = React.useCallback(
@@ -194,7 +208,7 @@ export default function QuickWork() {
       updateGigStatus(gigId, 'completed');
       awardWriPoints('quickwork-completed');
       setRefreshKey((k) => k + 1);
-      showToast('Gig marked as complete! Request a review from your client.');
+      showToast('Gig complete — +20 WRI Reliability. Request a review from your client.');
     },
     [showToast]
   );
@@ -216,6 +230,38 @@ export default function QuickWork() {
     },
     [showToast]
   );
+
+  /* ─── Post a Gig (QuickWork Client) ─── */
+  const [postForm, setPostForm] = React.useState({
+    title: '',
+    description: '',
+    category: 'Design',
+    skills: '',
+    budget: '',
+    duration: '',
+    location: 'Remote',
+  });
+
+  const handlePostGig = React.useCallback(() => {
+    if (!postForm.title.trim() || !postForm.description.trim() || !postForm.budget.trim() || !postForm.duration.trim()) {
+      showToast('Fill in the title, description, budget, and time needed.', 'error');
+      return;
+    }
+    postGig({
+      title: postForm.title.trim(),
+      description: postForm.description.trim(),
+      category: postForm.category,
+      skills: postForm.skills.split(',').map((s) => s.trim()).filter(Boolean),
+      budget: postForm.budget.trim(),
+      duration: postForm.duration.trim(),
+      location: postForm.location.trim() || 'Remote',
+      employer: user?.name || user?.firstName || 'Your organisation',
+    });
+    setPostForm({ title: '', description: '', category: 'Design', skills: '', budget: '', duration: '', location: 'Remote' });
+    setRefreshKey((k) => k + 1);
+    showToast('Gig posted! It’s live in Available Gigs now.');
+    setActiveTab('available');
+  }, [postForm, user, showToast]);
 
   /* ─── Stats ─── */
   const stats = React.useMemo(
@@ -249,14 +295,44 @@ export default function QuickWork() {
               QuickWork™
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight font-display">
-              Project-based <span className="gradient-text">opportunities.</span>
+              Capable and available.
               <br />
-              Immediate income.
+              <span className="gradient-text">Not idle.</span>
             </h1>
             <p className="text-base sm:text-lg text-[#A0A0A0] max-w-xl mx-auto leading-relaxed font-body">
-              Pick up quick gigs that match your skills. Complete them in 2–14 days, get paid, 
-              and build your reputation with client reviews.
+              No one with a working mind and a working body should have to wait around for a formal job offer.
+              Lend 3 hours, 2 days, or 2 months — get paid, build your reputation, and grow your WRI™ with every gig.
             </p>
+          </motion.div>
+
+          {/* Why QuickWork — the cultural framing, not just a gig list */}
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.19, 1, 0.22, 1] }}
+          >
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+              <Timer size={18} className="text-[#C6FF34] mb-2" />
+              <p className="text-sm font-semibold text-white font-display mb-0.5">Your time, your terms</p>
+              <p className="text-xs text-[#888888] leading-relaxed font-body">
+                Hours, days, or months — work in whatever block fits your life right now.
+              </p>
+            </div>
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+              <Rocket size={18} className="text-[#7E3BED] mb-2" />
+              <p className="text-sm font-semibold text-white font-display mb-0.5">Built for startups too</p>
+              <p className="text-xs text-[#888888] leading-relaxed font-body">
+                Need expertise for a week, not a headcount? Hire directly — no long hiring cycle.
+              </p>
+            </div>
+            <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+              <ShieldCheck size={18} className="text-[#C6FF34] mb-2" />
+              <p className="text-sm font-semibold text-white font-display mb-0.5">Every gig counts</p>
+              <p className="text-xs text-[#888888] leading-relaxed font-body">
+                Applying, delivering, and getting reviewed all build your WRI™ Reliability score.
+              </p>
+            </div>
           </motion.div>
 
           {/* Stats */}
@@ -331,6 +407,19 @@ export default function QuickWork() {
               </button>
             );
           })}
+
+          {/* Post a Gig — pinned apart from the others; it's the client/startup side, not a talent tab */}
+          <button
+            onClick={() => setActiveTab('post')}
+            className={`ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 font-body border ${
+              activeTab === 'post'
+                ? 'bg-[#7E3BED] text-white border-[#7E3BED]'
+                : 'bg-[#7E3BED]/[0.08] border-[#7E3BED]/30 text-[#A070F0] hover:bg-[#7E3BED]/[0.15]'
+            }`}
+          >
+            <PlusCircle size={16} />
+            Post a Gig
+          </button>
         </motion.div>
 
         {/* ─── Available Gigs Tab ─── */}
@@ -436,7 +525,7 @@ export default function QuickWork() {
                       In Progress
                     </h3>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {QUICKWORK_GIGS.filter((g) => inProgressGigIds.includes(g.id)).map(
+                      {allGigs.filter((g) => inProgressGigIds.includes(g.id)).map(
                         (gig, index) => (
                           <GigCard
                             key={gig.id}
@@ -504,6 +593,124 @@ export default function QuickWork() {
                 description="Complete your first gig to see it here. Each completed gig builds your portfolio and unlocks new opportunities."
               />
             )}
+          </motion.div>
+        )}
+
+        {/* ─── Post a Gig Tab ─── */}
+        {activeTab === 'post' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-2xl"
+          >
+            <div className="mb-6 p-4 bg-[#7E3BED]/[0.08] border border-[#7E3BED]/20 rounded-xl flex items-start gap-3">
+              <Rocket size={18} className="text-[#A070F0] shrink-0 mt-0.5" />
+              <p className="text-sm text-[#D0C0F5] leading-relaxed font-body">
+                Need short-term expertise? Post the work — hours, days, or weeks — and Zambia's
+                capable, available talent will apply. No formal hire required to get real work done.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                  Gig Title <span className="text-[#C6FF34]">*</span>
+                </label>
+                <StableInput
+                  value={postForm.title}
+                  onValueChange={(v) => setPostForm((f) => ({ ...f, title: v }))}
+                  placeholder="e.g., Redesign our landing page hero section"
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-[#666666] focus:outline-none focus:border-[#C6FF34]/40 transition-colors font-body"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                  Description <span className="text-[#C6FF34]">*</span>
+                </label>
+                <StableTextarea
+                  value={postForm.description}
+                  onValueChange={(v) => setPostForm((f) => ({ ...f, description: v }))}
+                  placeholder="What needs to get done? Be specific about scope, deliverables, and what a great applicant looks like."
+                  rows={4}
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-[#666666] focus:outline-none focus:border-[#C6FF34]/40 resize-none transition-colors font-body"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                    Category
+                  </label>
+                  <StableSelect
+                    value={postForm.category}
+                    onValueChange={(v) => setPostForm((f) => ({ ...f, category: v }))}
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white focus:outline-none focus:border-[#C6FF34]/40 transition-colors font-body appearance-none"
+                  >
+                    {CATEGORIES.filter((c) => c !== 'All').map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </StableSelect>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                    Location
+                  </label>
+                  <StableInput
+                    value={postForm.location}
+                    onValueChange={(v) => setPostForm((f) => ({ ...f, location: v }))}
+                    placeholder="Remote / Lusaka / Ndola..."
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-[#666666] focus:outline-none focus:border-[#C6FF34]/40 transition-colors font-body"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                    Budget <span className="text-[#C6FF34]">*</span>
+                  </label>
+                  <StableInput
+                    value={postForm.budget}
+                    onValueChange={(v) => setPostForm((f) => ({ ...f, budget: v }))}
+                    placeholder="e.g., ZMW 3,000"
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-[#666666] focus:outline-none focus:border-[#C6FF34]/40 transition-colors font-body"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                    Time Needed <span className="text-[#C6FF34]">*</span>
+                  </label>
+                  <StableInput
+                    value={postForm.duration}
+                    onValueChange={(v) => setPostForm((f) => ({ ...f, duration: v }))}
+                    placeholder="e.g., 3 hours / 2 days / 2 weeks"
+                    className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-[#666666] focus:outline-none focus:border-[#C6FF34]/40 transition-colors font-body"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[#666666] uppercase tracking-wider mb-2 block font-body">
+                  Skills Needed
+                </label>
+                <StableInput
+                  value={postForm.skills}
+                  onValueChange={(v) => setPostForm((f) => ({ ...f, skills: v }))}
+                  placeholder="Comma-separated, e.g., Figma, UI Design, Prototyping"
+                  className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-[#666666] focus:outline-none focus:border-[#C6FF34]/40 transition-colors font-body"
+                />
+              </div>
+
+              <button
+                onClick={handlePostGig}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-[#7E3BED] text-white rounded-xl text-sm font-semibold hover:bg-[#8E4CFD] transition-all font-body"
+              >
+                <PlusCircle size={16} />
+                Post Gig
+              </button>
+            </div>
           </motion.div>
         )}
       </section>

@@ -1,5 +1,14 @@
 # Security Audit
 
+> **⚠️ PARTIALLY STALE (as of 2026-07-30).** The `employer.ts`/`application.ts`/`notification.ts`/
+> `upload.ts` bugs below are still present and accurate — verified again in this pass. What's
+> stale is the framing that they're low-risk "because the backend never runs": the backend runs
+> for real now (Postgres/Supabase, deployed), but these four route files are deliberately excluded
+> from the registered router and enforced by a test (`server/router.test.ts`) that fails if that
+> changes. They're dangerous *if registered*, not dangerous today. Also: auth transport is real
+> Bearer-token-in-localStorage, not the `httpOnly` cookie `docs/AUTHENTICATION_ARCHITECTURE.md`
+> specifies — an undocumented deviation worth a decision. See `docs/BACKEND_READINESS_REVIEW.md`.
+
 Consolidates the pre-existing `SECURITY_AUDIT_REPORT.md` (client-auth findings, verified still accurate) with new findings from this audit's code reading and diagnostic runs. All findings below were confirmed by reading the actual code, not inferred from filenames.
 
 ## Carried forward from the pre-existing `SECURITY_AUDIT_REPORT.md` (verified still true)

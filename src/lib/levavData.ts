@@ -88,6 +88,10 @@ export interface QuickWorkGig {
   completed?: boolean;
   reviewed?: boolean;
   myRating?: number;
+  /** True for gigs posted by a client/startup through the app, as opposed
+   *  to the seeded catalogue — lets the UI show "New" instead of a rating
+   *  history that doesn't exist yet. */
+  isClientPosted?: boolean;
 }
 
 export interface ImpactOpportunity {
@@ -99,6 +103,47 @@ export interface ImpactOpportunity {
   hoursRequired: number;
   skills: string[];
   logo: string;
+  isOrgPosted?: boolean;
+  commitment?: string;
+  status?: 'open' | 'closed';
+  postedAt?: string;
+}
+
+export interface ImpactApplicant {
+  id: string;
+  opportunityId: string;
+  applicantUserId: string;
+  applicantName: string;
+  message: string;
+  hoursCommitted: number;
+  status: 'pending' | 'accepted' | 'declined' | 'completed';
+  appliedAt: string;
+}
+
+export type FeedMood = 'milestone' | 'launch' | 'learning' | 'community' | 'idea' | 'quickwin';
+
+export interface FeedComment {
+  id: string;
+  authorId: string;
+  authorName: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface FeedPost {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorInitials: string;
+  authorMeta: string; // role · city, e.g. "Product Designer · Lusaka"
+  verified?: boolean;
+  body: string;
+  moodIcon?: FeedMood; // an icon key resolved to a lucide icon in the UI — no image uploads
+  tag?: string;
+  likedBy: string[];
+  comments: FeedComment[];
+  createdAt: string;
+  isSeed?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -516,7 +561,7 @@ export const LEARN_COURSES: LearnCourse[] = [
       { id: 'wd-l9', title: 'Project: Build a Portfolio Site', duration: '45 min', type: 'project', completed: false, content: 'Build and deploy your own portfolio website from scratch.' },
       { id: 'wd-l10', title: 'Mobile-First Development', duration: '30 min', type: 'video', completed: false, content: 'Designing and building websites that work perfectly on mobile devices.' },
       { id: 'wd-l11', title: 'Performance Optimization', duration: '35 min', type: 'article', completed: false, content: 'Making your web app fast. Lazy loading, code splitting, and caching strategies.' },
-      { id: 'wd-l12', title: 'Getting Your First Dev Job', duration: '30 min', type: 'video', completed: false, false: false, content: 'Interview preparation, portfolio reviews, and job search strategies for African developers.' },
+      { id: 'wd-l12', title: 'Getting Your First Dev Job', duration: '30 min', type: 'video', completed: false, content: 'Interview preparation, portfolio reviews, and job search strategies for African developers.' },
     ],
   },
 ];
@@ -590,6 +635,59 @@ export const IMPACT_OPPORTUNITIES: ImpactOpportunity[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
+// FEED — professional community feed
+// ═══════════════════════════════════════════════════════════════
+
+export const FEED_POSTS: FeedPost[] = [
+  {
+    id: 'feed-1', authorId: 'seed-grace', authorName: 'Grace Lungu', authorInitials: 'GL',
+    authorMeta: 'Product Designer · Lusaka', verified: true,
+    body: 'Day 21 of Levav 28™: shipped my first full case study. The mock-office brief pushed me harder than any tutorial ever has. Grateful for the cohort that kept me accountable.',
+    tag: 'Levav 28™ milestone', moodIcon: 'milestone',
+    likedBy: ['seed-kofi', 'seed-amara'], comments: [
+      { id: 'c-1', authorId: 'seed-kofi', authorName: 'Kofi Mensah', body: 'This is excellent work, Grace. The layout system alone shows real range.', createdAt: '2026-07-25T09:00:00.000Z' },
+    ], createdAt: '2026-07-24T14:00:00.000Z', isSeed: true,
+  },
+  {
+    id: 'feed-2', authorId: 'seed-kofi', authorName: 'Kofi Mensah', authorInitials: 'KM',
+    authorMeta: 'Engineering Team Lead · Accra', verified: true,
+    body: 'We hired two engineers through Levav last quarter. The difference: we saw real work evidence before the first interview. No more resumes that say everything and prove nothing.',
+    tag: 'Hiring insight',
+    likedBy: ['seed-grace', 'seed-amara', 'seed-thandiwe'], comments: [], createdAt: '2026-07-23T11:30:00.000Z', isSeed: true,
+  },
+  {
+    id: 'feed-3', authorId: 'seed-amara', authorName: 'Amara Okafor', authorInitials: 'AO',
+    authorMeta: 'Founder, Riverbend Studio · Lagos', verified: true,
+    body: 'Posted a QuickWork gig on a Tuesday morning. Had three qualified applicants by lunch. This is what hiring for short-term expertise should feel like — no agencies, no three-week back-and-forth.',
+    tag: 'QuickWork™ win', moodIcon: 'quickwin',
+    likedBy: ['seed-kofi'], comments: [], createdAt: '2026-07-22T08:15:00.000Z', isSeed: true,
+  },
+  {
+    id: 'feed-4', authorId: 'seed-thandiwe', authorName: 'Thandiwe Banda', authorInitials: 'TB',
+    authorMeta: 'Volunteer Coordinator, Teach For Zambia · Lusaka',
+    body: 'Six new tutors joined us this month through Levav Impact. Watching a first-year computer science student explain fractions to a room of ten-year-olds with this much patience — that\'s leadership too.',
+    tag: 'Community', moodIcon: 'learning',
+    likedBy: ['seed-grace', 'seed-kofi', 'seed-amara'], comments: [
+      { id: 'c-2', authorId: 'seed-grace', authorName: 'Grace Lungu', body: 'This made my morning. Thank you for the work you do.', createdAt: '2026-07-21T16:00:00.000Z' },
+    ], createdAt: '2026-07-20T13:45:00.000Z', isSeed: true,
+  },
+  {
+    id: 'feed-5', authorId: 'seed-chidi', authorName: 'Chidi Eze', authorInitials: 'CE',
+    authorMeta: 'Backend Engineer · Nairobi',
+    body: 'Capable and available, not idle — took that QuickWork line personally. Picked up a 3-day API integration gig between contracts instead of waiting around. Got paid, got a review, and my WRI Reliability score is the highest it\'s ever been.',
+    tag: 'QuickWork™ win',
+    likedBy: ['seed-amara', 'seed-thandiwe'], comments: [], createdAt: '2026-07-19T10:20:00.000Z', isSeed: true,
+  },
+  {
+    id: 'feed-6', authorId: 'seed-fatima', authorName: 'Fatima Diallo', authorInitials: 'FD',
+    authorMeta: 'Data Analyst · Dakar', verified: true,
+    body: 'Reminder for anyone building in public: your Levav ID isn\'t a resume, it\'s a record of what you\'ve actually done. Every gig, every course, every volunteer hour compounds. Show up today.',
+    tag: 'Motivation', moodIcon: 'community',
+    likedBy: ['seed-grace', 'seed-chidi', 'seed-kofi', 'seed-amara'], comments: [], createdAt: '2026-07-18T07:00:00.000Z', isSeed: true,
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
 // LOCALSTORAGE HELPERS
 // ═══════════════════════════════════════════════════════════════
 
@@ -599,6 +697,11 @@ const LS_KEYS = {
   learnProgress: 'learn_progress',
   quickworkApplications: 'quickwork_applications',
   quickworkMyGigs: 'quickwork_my_gigs',
+  quickworkPostedGigs: 'quickwork_posted_gigs',
+  impactPostedOpportunities: 'impact_posted_opportunities',
+  impactApplicants: 'impact_applicants',
+  feedPosts: 'feed_posts',
+  feedFollowing: 'feed_following',
   wriScore: 'wri_score',
   contentStudio: 'content_studio',
 };
@@ -699,6 +802,233 @@ export function updateGigStatus(gigId: string, status: 'applied' | 'in-progress'
   localStorage.setItem(LS_KEYS.quickworkMyGigs, JSON.stringify(gigs));
 }
 
+// ─── QuickWork Client: post a gig ───
+// Client-side/localStorage for now, matching the rest of the prototype —
+// this is the QuickWork Client half of brief §11 ("post verified gigs,
+// invite talent, manage delivery"). Verification/payment stays out of
+// scope until the real backend milestone; this makes the *posting* flow
+// real so a startup can actually list short-term work today.
+export function getPostedGigs(): QuickWorkGig[] {
+  return safeJSONParse<QuickWorkGig[]>(LS_KEYS.quickworkPostedGigs, []);
+}
+
+export function postGig(input: {
+  title: string;
+  description: string;
+  category: string;
+  skills: string[];
+  budget: string;
+  duration: string;
+  location: string;
+  employer: string;
+}): QuickWorkGig {
+  const gig: QuickWorkGig = {
+    id: `qw-user-${Date.now()}`,
+    title: input.title,
+    description: input.description,
+    category: input.category,
+    skills: input.skills,
+    budget: input.budget,
+    duration: input.duration,
+    location: input.location,
+    employer: input.employer,
+    employerRating: 0,
+    postedAt: 'Just now',
+    deadline: '',
+    applicants: 0,
+    status: 'open',
+    isClientPosted: true,
+  };
+  const posted = getPostedGigs();
+  posted.unshift(gig);
+  localStorage.setItem(LS_KEYS.quickworkPostedGigs, JSON.stringify(posted));
+  return gig;
+}
+
+// ─── Levav Impact: organization-posted opportunities ───
+// Same client-side/localStorage pattern as postGig — makes the *posting*
+// side of Impact real (an NGO can list an opportunity and manage
+// applicants today) without waiting on the real backend/verified-NGO
+// milestone described in docs/CHAMPION_NGO_REVENUE_SHARE.md.
+export function getPostedOpportunities(): ImpactOpportunity[] {
+  return safeJSONParse<ImpactOpportunity[]>(LS_KEYS.impactPostedOpportunities, []);
+}
+
+export function postOpportunity(input: {
+  organization: string;
+  type: string;
+  location: string;
+  description: string;
+  hoursRequired: number;
+  skills: string[];
+  commitment: string;
+}): ImpactOpportunity {
+  const opportunity: ImpactOpportunity = {
+    id: `imp-user-${Date.now()}`,
+    organization: input.organization,
+    type: input.type,
+    location: input.location,
+    description: input.description,
+    hoursRequired: input.hoursRequired,
+    skills: input.skills,
+    logo: '🤝',
+    isOrgPosted: true,
+    commitment: input.commitment,
+    status: 'open',
+    postedAt: 'Just now',
+  };
+  const posted = getPostedOpportunities();
+  posted.unshift(opportunity);
+  localStorage.setItem(LS_KEYS.impactPostedOpportunities, JSON.stringify(posted));
+  return opportunity;
+}
+
+export function toggleOpportunityStatus(opportunityId: string) {
+  const posted = getPostedOpportunities();
+  const opportunity = posted.find((o) => o.id === opportunityId);
+  if (opportunity) {
+    opportunity.status = opportunity.status === 'closed' ? 'open' : 'closed';
+    localStorage.setItem(LS_KEYS.impactPostedOpportunities, JSON.stringify(posted));
+  }
+}
+
+export function getImpactApplicants(): ImpactApplicant[] {
+  return safeJSONParse<ImpactApplicant[]>(LS_KEYS.impactApplicants, []);
+}
+
+export function applyToOpportunity(input: {
+  opportunityId: string;
+  applicantUserId: string;
+  applicantName: string;
+  message: string;
+  hoursCommitted: number;
+}): ImpactApplicant {
+  const applicant: ImpactApplicant = {
+    id: `imp-app-${Date.now()}`,
+    opportunityId: input.opportunityId,
+    applicantUserId: input.applicantUserId,
+    applicantName: input.applicantName,
+    message: input.message,
+    hoursCommitted: input.hoursCommitted,
+    status: 'pending',
+    appliedAt: new Date().toISOString(),
+  };
+  const applicants = getImpactApplicants();
+  applicants.unshift(applicant);
+  localStorage.setItem(LS_KEYS.impactApplicants, JSON.stringify(applicants));
+  return applicant;
+}
+
+export function updateApplicantStatus(applicantId: string, status: ImpactApplicant['status']) {
+  const applicants = getImpactApplicants();
+  const applicant = applicants.find((a) => a.id === applicantId);
+  if (applicant) {
+    applicant.status = status;
+    localStorage.setItem(LS_KEYS.impactApplicants, JSON.stringify(applicants));
+  }
+}
+
+// ─── Feed: posts, likes, comments, follows ───
+// Same client-side/localStorage pattern as the rest of this prototype.
+// User-created posts persist alongside the seed catalogue so the feed
+// feels populated from day one without pretending seed authors are real.
+export function getUserPosts(): FeedPost[] {
+  return safeJSONParse<FeedPost[]>(LS_KEYS.feedPosts, []);
+}
+
+export function createPost(input: {
+  authorId: string;
+  authorName: string;
+  body: string;
+  moodIcon?: FeedMood;
+  tag?: string;
+}): FeedPost {
+  const initials = input.authorName
+    .split(' ')
+    .map((p) => p.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || '?';
+  const post: FeedPost = {
+    id: `feed-user-${Date.now()}`,
+    authorId: input.authorId,
+    authorName: input.authorName,
+    authorInitials: initials,
+    authorMeta: 'Levav member',
+    body: input.body,
+    moodIcon: input.moodIcon,
+    tag: input.tag,
+    likedBy: [],
+    comments: [],
+    createdAt: new Date().toISOString(),
+  };
+  const posts = getUserPosts();
+  posts.unshift(post);
+  localStorage.setItem(LS_KEYS.feedPosts, JSON.stringify(posts));
+  return post;
+}
+
+export function toggleLike(postId: string, userId: string) {
+  const userPosts = getUserPosts();
+  const target = userPosts.find((p) => p.id === postId);
+  if (target) {
+    target.likedBy = target.likedBy.includes(userId)
+      ? target.likedBy.filter((id) => id !== userId)
+      : [...target.likedBy, userId];
+    localStorage.setItem(LS_KEYS.feedPosts, JSON.stringify(userPosts));
+    return target;
+  }
+  // Seed posts are read-only data, so their like state is tracked
+  // separately, keyed by post id, rather than mutating the constant.
+  const seedLikes = safeJSONParse<Record<string, string[]>>(LS_KEYS.feedPosts + '_seed_likes', {});
+  const current = seedLikes[postId] || FEED_POSTS.find((p) => p.id === postId)?.likedBy || [];
+  seedLikes[postId] = current.includes(userId) ? current.filter((id) => id !== userId) : [...current, userId];
+  localStorage.setItem(LS_KEYS.feedPosts + '_seed_likes', JSON.stringify(seedLikes));
+  return null;
+}
+
+export function getSeedLikeOverrides(): Record<string, string[]> {
+  return safeJSONParse<Record<string, string[]>>(LS_KEYS.feedPosts + '_seed_likes', {});
+}
+
+export function addComment(postId: string, comment: { authorId: string; authorName: string; body: string }) {
+  const newComment: FeedComment = {
+    id: `comment-${Date.now()}`,
+    authorId: comment.authorId,
+    authorName: comment.authorName,
+    body: comment.body,
+    createdAt: new Date().toISOString(),
+  };
+  const userPosts = getUserPosts();
+  const target = userPosts.find((p) => p.id === postId);
+  if (target) {
+    target.comments.push(newComment);
+    localStorage.setItem(LS_KEYS.feedPosts, JSON.stringify(userPosts));
+    return newComment;
+  }
+  const seedComments = safeJSONParse<Record<string, FeedComment[]>>(LS_KEYS.feedPosts + '_seed_comments', {});
+  seedComments[postId] = [...(seedComments[postId] || []), newComment];
+  localStorage.setItem(LS_KEYS.feedPosts + '_seed_comments', JSON.stringify(seedComments));
+  return newComment;
+}
+
+export function getSeedCommentOverrides(): Record<string, FeedComment[]> {
+  return safeJSONParse<Record<string, FeedComment[]>>(LS_KEYS.feedPosts + '_seed_comments', {});
+}
+
+export function getFollowing(): string[] {
+  return safeJSONParse<string[]>(LS_KEYS.feedFollowing, []);
+}
+
+export function toggleFollow(authorId: string) {
+  const following = getFollowing();
+  const next = following.includes(authorId)
+    ? following.filter((id) => id !== authorId)
+    : [...following, authorId];
+  localStorage.setItem(LS_KEYS.feedFollowing, JSON.stringify(next));
+  return next;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // WRI SCORING ENGINE
 // ═══════════════════════════════════════════════════════════════
@@ -738,6 +1068,7 @@ export const WRI_SCORING_RULES: Record<string, { dimension: WriDimension; points
   'impact-volunteer': { dimension: 'leadership', points: 15, description: 'Volunteered at Levav Impact partner' },
   'impact-hours-4': { dimension: 'leadership', points: 10, description: 'Completed 4+ volunteer hours' },
   'profile-complete': { dimension: 'growth', points: 10, description: 'Completed Levav ID profile' },
+  'feed-first-post': { dimension: 'communication', points: 10, description: 'Shared your first update on the feed' },
 };
 
 /** Award WRI points for a specific achievement */

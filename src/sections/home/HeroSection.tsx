@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, type Variants } from 'framer-motion';
 import { Link } from 'react-router';
 import { ArrowRight, ChevronDown, Users, Globe, CheckCircle, Layers } from 'lucide-react';
 
@@ -21,14 +21,14 @@ const heroStats = [
   { value: '150+', label: 'Categories', Icon: Layers },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: { staggerChildren: 0.1 },
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
@@ -102,12 +102,10 @@ export default function HeroSection() {
                 ease: 'easeInOut',
               }}
             >
-              <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl px-6 py-4 min-w-[160px] text-center">
-                <stat.Icon
-                  size={18}
-                  className="mx-auto mb-2 text-[#C6FF34]"
-                  strokeWidth={1.5}
-                />
+              <div className="glass rounded-2xl px-6 py-4 min-w-[160px] text-center">
+                <div className="w-10 h-10 rounded-xl bg-[#C6FF34]/10 border border-[#C6FF34]/20 flex items-center justify-center mx-auto mb-2.5">
+                  <stat.Icon size={20} className="text-[#C6FF34]" strokeWidth={2} />
+                </div>
                 <div className="text-2xl font-bold gradient-text font-display">
                   {stat.value}
                 </div>
@@ -160,10 +158,10 @@ export default function HeroSection() {
           variants={itemVariants}
         >
           <Link
-            to="/onboarding"
-            className="btn-lime inline-flex items-center gap-2 text-sm font-medium"
+            to="/auth?mode=signup"
+            className="btn-lime inline-flex items-center gap-2 text-sm font-medium px-8 py-3"
           >
-            Start Your Levav 28&trade; Journey
+            Create a Free Account
             <ArrowRight size={16} />
           </Link>
           <Link
@@ -174,21 +172,27 @@ export default function HeroSection() {
           </Link>
         </motion.div>
 
+        {/* Free-account reassurance */}
+        <motion.p
+          className="text-xs text-white/40 -mt-8 mb-12 font-body"
+          variants={itemVariants}
+        >
+          Free for individuals. Jobs, QuickWork&trade;, Levav 28&trade;, courses, and community — one account.
+        </motion.p>
+
         {/* Mobile stats */}
         <div className="lg:hidden grid grid-cols-2 gap-3 max-w-sm mx-auto">
           {heroStats.map((stat, i) => (
             <motion.div
               key={stat.label}
-              className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl px-4 py-3 text-center"
+              className="glass rounded-2xl px-4 py-3 text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
             >
-              <stat.Icon
-                size={14}
-                className="mx-auto mb-1 text-[#C6FF34]"
-                strokeWidth={1.5}
-              />
+              <div className="w-8 h-8 rounded-lg bg-[#C6FF34]/10 border border-[#C6FF34]/20 flex items-center justify-center mx-auto mb-1.5">
+                <stat.Icon size={16} className="text-[#C6FF34]" strokeWidth={2} />
+              </div>
               <div className="text-xl font-bold gradient-text font-display">
                 {stat.value}
               </div>

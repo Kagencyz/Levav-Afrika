@@ -105,9 +105,10 @@ export default function EcosystemSection() {
                     style={{
                       backgroundColor: `${item.color}15`,
                       color: item.color,
+                      border: `1px solid ${item.color}30`,
                     }}
                   >
-                    <item.icon size={22} strokeWidth={1.5} />
+                    <item.icon size={24} strokeWidth={2} />
                   </div>
 
                   <div className="flex-1 min-w-0">

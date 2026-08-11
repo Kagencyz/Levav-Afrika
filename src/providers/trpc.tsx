@@ -2,9 +2,10 @@ import { useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-import superjson from '@/lib/superjson-stub';
+import superjson from 'superjson';
+import type { AppRouter } from '@api/router';
 
-export const trpc = createTRPCReact<any>();
+export const trpc = createTRPCReact<AppRouter>();
 
 export function TRPCProvider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -24,14 +25,16 @@ export function TRPCProvider({ children }: { children: ReactNode }) {
       links: [
         httpBatchLink({
           url: '/api/trpc',
-          fetch: (url, options) =>
-            fetch(url, {
-              ...options,
-              credentials: 'include',
-            }),
+          transformer: superjson,
+          // Auth is an httpOnly cookie now, not a header the client attaches
+          // itself — 'include' ensures it's sent even if the browser's
+          // same-origin default credentials mode were ever insufficient
+          // (e.g. a cross-subdomain preview deployment).
+          fetch(url, options) {
+            return fetch(url, { ...options, credentials: 'include' });
+          },
         }),
       ],
-      transformer: superjson,
     })
   );
 

@@ -7,22 +7,14 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-/** Validate that a token is a properly formatted demo token */
-function isValidToken(token: string | null): boolean {
-  return !!token && token.startsWith('demo_token_') && token.length > 'demo_token_'.length;
-}
-
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  // Direct localStorage check as primary auth source (static deployment has no backend)
-  // SECURITY FIX: Validate token format, not just existence — prevents bypass with
-  // localStorage.setItem('auth_token', 'x') or any arbitrary string
-  const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-  const hasLocalAuth = isValidToken(token);
-
+  // Auth is an httpOnly cookie now — there's nothing in localStorage to
+  // read as a client-side shortcut, and there shouldn't be: the previous
+  // design's ability to read/spoof a token client-side was itself a real
+  // bypass risk. trpc.auth.me (via useAuth) is the sole source of truth.
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Show loading spinner while auth state is being determined
-  if (isLoading && !hasLocalAuth) {
+  if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <motion.div
@@ -37,13 +29,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // SECURITY FIX: Always check isAuthenticated from useAuth (which validates token format
-  // AND user object shape). Do NOT render children solely based on localStorage token.
-  if (!isAuthenticated && !hasLocalAuth) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Final gate: useAuth's isAuthenticated is the authoritative check
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }

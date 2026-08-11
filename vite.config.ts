@@ -28,6 +28,13 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['server/**/*.test.ts', 'db/**/*.test.ts'],
+    include: ['server/**/*.test.ts', 'db/**/*.test.ts', 'src/**/*.test.ts'],
+    // Server modules validate env at import time; give tests a valid shape.
+    env: {
+      NODE_ENV: 'test',
+      DATABASE_URL: 'postgres://test:test@localhost:5432/test',
+      CORS_ORIGIN: 'http://localhost:5173',
+      JWT_SECRET: 'vitest-only-secret-not-used-anywhere-real',
+    },
   },
 });

@@ -17,9 +17,9 @@ export default function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/[0.06] md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-white/[0.08] md:hidden"
     >
-      <div className="flex items-center justify-around py-2 pb-5">
+      <div className="flex items-center justify-around pt-2 bottom-nav-safe-pad">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -31,8 +31,19 @@ export default function MobileBottomNav() {
             <Link
               key={item.to}
               to={item.to}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl active:scale-95 transition-transform"
+              className="relative flex flex-col items-center justify-center gap-0.5 w-14 h-12 rounded-2xl active:scale-95 transition-transform touch-manipulation"
             >
+              {isActive && (
+                <motion.div
+                  layoutId="bottom-nav-indicator"
+                  className="absolute inset-0.5 rounded-2xl bg-[#C6FF34]/[0.12] border border-[#C6FF34]/20"
+                  transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 35,
+                  }}
+                />
+              )}
               <motion.div
                 whileTap={{ scale: 0.85 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
@@ -52,17 +63,6 @@ export default function MobileBottomNav() {
                 >
                   {item.label}
                 </span>
-                {isActive && (
-                  <motion.div
-                    layoutId="bottom-nav-indicator"
-                    className="absolute -bottom-1 w-1 h-1 bg-[#C6FF34] rounded-full"
-                    transition={{
-                      type: 'spring',
-                      stiffness: 500,
-                      damping: 35,
-                    }}
-                  />
-                )}
               </motion.div>
             </Link>
           );

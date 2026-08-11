@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { eq, like, and, count } from 'drizzle-orm';
-import { router, publicProcedure, authedProcedure, adminProcedure } from '../trpc';
-import { db } from '../../db/connection';
-import { talents } from '../../db/schema';
+import { router, publicProcedure, authedProcedure, adminProcedure } from '../trpc.js';
+import { db } from '../../db/connection.js';
+import { talents } from '../../db/schema.js';
 
 export const talentRouter = router({
   list: publicProcedure

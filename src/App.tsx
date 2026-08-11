@@ -1,5 +1,4 @@
 import { HashRouter, Routes, Route, useLocation } from 'react-router';
-import { AnimatePresence, motion } from 'framer-motion';
 import { TRPCProvider } from '@/providers/trpc';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
@@ -9,12 +8,14 @@ import Employers from '@/pages/Employers';
 import Opportunities from '@/pages/Opportunities';
 import JobDetail from '@/pages/JobDetail';
 import Impact from '@/pages/Impact';
+import Feed from '@/pages/Feed';
 import Learn from '@/pages/Learn';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import Onboarding from '@/pages/Onboarding';
+import Welcome from '@/pages/Welcome';
 import ProfileCreate from '@/pages/ProfileCreate';
 import JobApply from '@/pages/JobApply';
 import Messages from '@/pages/Messages';
@@ -39,19 +40,21 @@ import ChampionApply from '@/pages/ChampionApply';
 import NotFound from '@/pages/NotFound';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
+// Route transitions used to be wrapped in a top-level AnimatePresence
+// (mode="wait") keyed on location.pathname, unmounting/remounting this
+// entire ~40-route tree (Layout, Navbar, Footer included) on every
+// navigation, gated on an exit animation finishing first. Under perfectly
+// normal click pacing — not just rapid-fire — that exit/enter handshake
+// could desync: the URL updates but AnimatePresence never mounts the new
+// page, leaving the previous page stuck on screen until a manual reload.
+// Removed outright rather than retimed; a page-transition fade isn't worth
+// users hitting a stuck app. See git history if a lighter, non-blocking
+// per-page fade is wanted later (CSS animation on mount, no exit gating).
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-      >
-        <Routes location={location}>
+    <Routes location={location}>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/talent" element={<TalentDirectory />} />
@@ -61,10 +64,12 @@ function AnimatedRoutes() {
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/impact" element={<Impact />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/profile/create" element={<ProfileCreate />} />
             <Route path="/apply/:jobId" element={<JobApply />} />
@@ -172,13 +177,11 @@ function AnimatedRoutes() {
               }
             />
           </Route>
-          {/* Standalone pages without Layout (Navbar/Footer) */}
-          <Route path="/shader-demo" element={<ShaderDemo />} />
-          {/* Catch-all 404 route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+      {/* Standalone pages without Layout (Navbar/Footer) */}
+      <Route path="/shader-demo" element={<ShaderDemo />} />
+      {/* Catch-all 404 route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

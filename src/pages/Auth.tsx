@@ -1,13 +1,13 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router';
 import { Eye, EyeOff, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { sanitizeInput, isValidEmail } from '@/lib/safeJSON';
-import { StableInput, StableTextarea, StableSelect } from '@/components/StableInputs';
+import { StableInput } from '@/components/StableInputs';
 import { logWithCurrentUser } from '@/lib/auditService';
-import GlassCard from '@/components/GlassCard';
 import { trpc } from '@/providers/trpc';
+import GlassCard from '@/components/GlassCard';
 
 /** Rate limit: max attempts before cooldown */
 const MAX_ATTEMPTS = 5;
@@ -25,10 +25,14 @@ const MAX_NAME_LENGTH = 100;
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const registerMutation = trpc.auth.register.useMutation();
-  const loginMutation = trpc.auth.login.useMutation();
   const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
+
+  // Keep mode in sync when a nav link changes ?mode= while already mounted.
+  useEffect(() => {
+    const urlMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
+    setMode(urlMode);
+  }, [searchParams]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,8 +43,11 @@ export default function Auth() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'talent',
   });
+
+  const utils = trpc.useUtils();
+  const registerMutation = trpc.auth.register.useMutation();
+  const loginMutation = trpc.auth.login.useMutation();
 
   // SECURITY FIX: Rate limiting state
   const attemptCountRef = useRef(0);
@@ -127,7 +134,7 @@ export default function Auth() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
@@ -149,70 +156,59 @@ export default function Auth() {
     // Increment attempt counter for rate limiting
     attemptCountRef.current += 1;
 
-    const sanitizedEmail = formData.email.trim().toLowerCase();
-    const password = formData.password;
-
     setIsLoading(true);
 
-    if (mode === 'signup') {
-      const fullName = sanitizeInput(`${formData.firstName} ${formData.lastName}`.trim());
+    const email = formData.email.trim().toLowerCase();
 
-      registerMutation.mutate(
-        {
-          email: sanitizedEmail,
-          password,
-          name: fullName || sanitizedEmail.split('@')[0],
-        },
-        {
-          onSuccess: ({ token, user }) => {
-            localStorage.setItem('auth_token', token);
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-
-            setIsLoading(false);
-            attemptCountRef.current = 0;
-            logWithCurrentUser('register', 'Authentication', 'success', `Registered as ${formData.role}`);
-            toast.success('Account created!');
-
-            if (formData.role === 'employer') {
-              navigate('/employers');
-            } else {
-              navigate('/onboarding');
-            }
-          },
-          onError: (error) => {
-            setIsLoading(false);
-            toast.error(error instanceof Error ? error.message : 'Registration failed');
-          },
-        }
-      );
-
-      return;
-    }
-
-    loginMutation.mutate(
-      {
-        email: sanitizedEmail,
-        password,
-      },
-      {
-        onSuccess: ({ token, user }) => {
-          localStorage.setItem('auth_token', token);
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(user));
-
-          setIsLoading(false);
-          attemptCountRef.current = 0;
-          logWithCurrentUser('login', 'Authentication', 'success');
-          toast.success('Welcome back!');
-          navigate('/dashboard');
-        },
-        onError: (error) => {
-          setIsLoading(false);
-          toast.error(error instanceof Error ? error.message : 'Login failed');
-        },
+    try {
+      if (mode === 'signup') {
+        const name = sanitizeInput(
+          `${formData.firstName} ${formData.lastName}`.trim()
+        );
+        await registerMutation.mutateAsync({
+          email,
+          password: formData.password,
+          name,
+        });
+        // No token to store — the server set it as an httpOnly cookie.
+        await utils.auth.me.fetch().catch(() => null);
+        await utils.auth.me.invalidate();
+        attemptCountRef.current = 0;
+        logWithCurrentUser('register', 'Authentication', 'success');
+        toast.success('Account created!');
+        // Preference selection next (upgrade brief §3); a goal carried from
+        // a landing-page path card rides along to pre-select itself.
+        const goal = searchParams.get('goal');
+        navigate(goal ? `/welcome?goal=${encodeURIComponent(goal)}` : '/welcome');
+      } else {
+        await loginMutation.mutateAsync({
+          email,
+          password: formData.password,
+        });
+        // No token to store — the server set it as an httpOnly cookie.
+        await utils.auth.me.fetch().catch(() => null);
+        await utils.auth.me.invalidate();
+        attemptCountRef.current = 0;
+        logWithCurrentUser('login', 'Authentication', 'success');
+        toast.success('Welcome back!');
+        navigate('/dashboard');
       }
-    );
+    } catch (err) {
+      const rawMessage = err instanceof Error ? err.message : '';
+      // Only ever surface known, safe, user-facing messages from the server.
+      // Anything else (network failures, browser/library internals, an
+      // unexpected server error) must never be shown verbatim — it can leak
+      // implementation details and is rarely meaningful to the user.
+      if (/email already registered/i.test(rawMessage)) {
+        setErrors({ email: 'This email is already registered — try signing in.' });
+      } else if (/invalid email or password/i.test(rawMessage)) {
+        setErrors({ password: 'Invalid email or password.' });
+      } else {
+        toast.error('Something went wrong. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleMode = () => {
@@ -341,6 +337,9 @@ export default function Auth() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-red-400 text-xs mt-1.5">{errors.password}</p>
+                )}
               </div>
 
               {mode === 'signup' && (
@@ -376,35 +375,11 @@ export default function Auth() {
               )}
 
               {mode === 'signup' && (
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    I am a
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: 'talent' })}
-                      className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all ${
-                        formData.role === 'talent'
-                          ? 'border-[#C6FF34]/50 bg-[#C6FF34]/10 text-[#C6FF34]'
-                          : 'border-white/[0.06] text-[#A0A0A0] hover:border-white/[0.12]'
-                      }`}
-                    >
-                      Talent
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: 'employer' })}
-                      className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all ${
-                        formData.role === 'employer'
-                          ? 'border-[#C6FF34]/50 bg-[#C6FF34]/10 text-[#C6FF34]'
-                          : 'border-white/[0.06] text-[#A0A0A0] hover:border-white/[0.12]'
-                      }`}
-                    >
-                      Employer
-                    </button>
-                  </div>
-                </div>
+                <p className="text-xs text-white/40 leading-relaxed">
+                  One free account for everything — you&apos;ll choose what you
+                  want to do (find work, hire, develop, volunteer...) right
+                  after this step.
+                </p>
               )}
 
               {/* Rate limit warning */}

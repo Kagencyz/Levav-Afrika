@@ -1,5 +1,12 @@
 # Current State
 
+> **⚠️ STALE on backend claims (as of 2026-07-30).** The "Backend server (`api/boot.ts`)" row
+> below and any statement that the backend "has never run" describe the pre-`bcfeb83` generation.
+> The backend has since been rebuilt on Postgres/Supabase under `server/`, deployed as a real
+> Vercel serverless function, with real auth/onboarding wired and tested end-to-end. See
+> `docs/BACKEND_READINESS_REVIEW.md` for current, verified ground truth. The frontend-focused
+> sections of this document (page-by-page mock/real status) are unaffected and still accurate.
+
 The authoritative, verified snapshot of what works, what's mocked, and what's broken. Every claim here was confirmed by reading code or running a command — nothing is inferred from a file existing. Six statuses are used, and are kept distinct on purpose (don't collapse them):
 
 - **Working** — functions correctly as intended, verified by reading the implementation and/or running it. Includes static content that needs no backend, and client-only logic that genuinely does what it claims (e.g., a real algorithm), not just backend-verified features — because right now, nothing in this app is backend-verified (the backend has never run).

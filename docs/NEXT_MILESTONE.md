@@ -1,5 +1,11 @@
 # Next Milestone (Accepted — implementation not yet started)
 
+> **⚠️ STALE (as of 2026-07-30).** This milestone's implementation checkpoint (§9) has since been
+> passed — commits `bcfeb83` and `9d85318` provisioned the real Supabase database, applied
+> migrations, and wired real auth/onboarding. The "implementation not yet started" framing below
+> no longer applies. See `docs/BACKEND_READINESS_REVIEW.md` for current, verified ground truth,
+> and `docs/DECISIONS.md` for what is and isn't logged about how that implementation happened.
+
 **Status:** Planning approved, with amendments, on 2026-07-23. No application code has been modified, no database infrastructure has been provisioned, no migrations have been generated, and nothing has been pushed. **A separate implementation-approval checkpoint is still required before any code is written** — see §9's checkpoints. This document, `docs/adr/001-database-platform.md`, `docs/AUTHENTICATION_ARCHITECTURE.md`, and `docs/DOMAIN_MODEL.md` are the complete, approved planning package.
 
 **Amendments incorporated from approval:**
