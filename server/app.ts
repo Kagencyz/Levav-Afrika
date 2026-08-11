@@ -20,7 +20,11 @@ app.use('*', cors({
 }));
 
 // Health check
-const healthResponse = () => ({ status: 'ok' as const, time: new Date().toISOString() });
+const healthResponse = () => ({
+  status: 'ok' as const,
+  time: new Date().toISOString(),
+  authProviderHost: new URL(env.SUPABASE_URL).hostname,
+});
 app.get('/health', (c) => c.json(healthResponse()));
 // Vercel preserves the original /api path when rewriting to api/index.
 app.get('/api/health', (c) => c.json(healthResponse()));
