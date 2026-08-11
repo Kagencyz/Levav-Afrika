@@ -54,11 +54,37 @@ export const authRouter = router({
     .mutation(async ({ input, ctx }) => {
       const supabase = createSupabaseAuthClient();
       const email = input.email.trim().toLowerCase();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password: input.password,
-        options: { data: { name: input.name } },
-      });
+      const startedAt = Date.now();
+      console.log(JSON.stringify({ level: 'info', message: 'Supabase signup started' }));
+
+      let signupResult;
+      try {
+        signupResult = await supabase.auth.signUp({
+          email,
+          password: input.password,
+          options: { data: { name: input.name } },
+        });
+      } catch (error) {
+        console.error(JSON.stringify({
+          level: 'error',
+          message: 'Supabase signup request failed',
+          error: error instanceof Error ? error.message : String(error),
+          durationMs: Date.now() - startedAt,
+        }));
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Authentication service is unavailable',
+        });
+      }
+
+      const { data, error } = signupResult;
+      console.log(JSON.stringify({
+        level: error ? 'warning' : 'info',
+        message: 'Supabase signup completed',
+        durationMs: Date.now() - startedAt,
+        status: error?.status,
+        code: error?.code,
+      }));
 
       if (error || !data.user) {
         console.error('[auth.register] Supabase sign-up failed', {
@@ -95,10 +121,36 @@ export const authRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const supabase = createSupabaseAuthClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: input.email.trim().toLowerCase(),
-        password: input.password,
-      });
+      const startedAt = Date.now();
+      console.log(JSON.stringify({ level: 'info', message: 'Supabase login started' }));
+
+      let loginResult;
+      try {
+        loginResult = await supabase.auth.signInWithPassword({
+          email: input.email.trim().toLowerCase(),
+          password: input.password,
+        });
+      } catch (error) {
+        console.error(JSON.stringify({
+          level: 'error',
+          message: 'Supabase login request failed',
+          error: error instanceof Error ? error.message : String(error),
+          durationMs: Date.now() - startedAt,
+        }));
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Authentication service is unavailable',
+        });
+      }
+
+      const { data, error } = loginResult;
+      console.log(JSON.stringify({
+        level: error ? 'warning' : 'info',
+        message: 'Supabase login completed',
+        durationMs: Date.now() - startedAt,
+        status: error?.status,
+        code: error?.code,
+      }));
 
       if (error || !data.user || !data.session) {
         console.warn('[auth.login] Supabase sign-in rejected', {
