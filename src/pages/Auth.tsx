@@ -7,6 +7,7 @@ import { sanitizeInput, isValidEmail } from '@/lib/safeJSON';
 import { StableInput, StableTextarea, StableSelect } from '@/components/StableInputs';
 import { logWithCurrentUser } from '@/lib/auditService';
 import GlassCard from '@/components/GlassCard';
+import { trpc } from '@/providers/trpc';
 
 /** Rate limit: max attempts before cooldown */
 const MAX_ATTEMPTS = 5;
@@ -24,6 +25,8 @@ const MAX_NAME_LENGTH = 100;
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const registerMutation = trpc.auth.register.useMutation();
+  const loginMutation = trpc.auth.login.useMutation();
   const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
   const [showPassword, setShowPassword] = useState(false);
@@ -146,50 +149,70 @@ export default function Auth() {
     // Increment attempt counter for rate limiting
     attemptCountRef.current += 1;
 
+    const sanitizedEmail = formData.email.trim().toLowerCase();
+    const password = formData.password;
+
     setIsLoading(true);
 
-    // CLIENT-SIDE ONLY (no backend in static deployment)
-    const sanitizedFirstName = sanitizeInput(formData.firstName);
-    const sanitizedLastName = sanitizeInput(formData.lastName);
-    const sanitizedEmail = formData.email.trim().toLowerCase();
+    if (mode === 'signup') {
+      const fullName = sanitizeInput(`${formData.firstName} ${formData.lastName}`.trim());
 
-    const userData = {
-      id: Math.floor(Math.random() * 100000),
-      name:
-        mode === 'signup'
-          ? sanitizeInput(`${formData.firstName} ${formData.lastName}`.trim())
-          : sanitizedEmail.split('@')[0],
-      email: sanitizedEmail,
-      firstName: sanitizedFirstName || sanitizedEmail.split('@')[0],
-      lastName: sanitizedLastName || '',
-      role: formData.role || 'talent',
-      avatar: null,
-    };
+      registerMutation.mutate(
+        {
+          email: sanitizedEmail,
+          password,
+          name: fullName || sanitizedEmail.split('@')[0],
+        },
+        {
+          onSuccess: ({ token, user }) => {
+            localStorage.setItem('auth_token', token);
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
 
-    // Store auth data in localStorage
-    localStorage.setItem('auth_token', 'demo_token_' + Date.now());
-    localStorage.setItem('token', 'demo_token_' + Date.now());
-    localStorage.setItem('user', JSON.stringify(userData));
+            setIsLoading(false);
+            attemptCountRef.current = 0;
+            logWithCurrentUser('register', 'Authentication', 'success', `Registered as ${formData.role}`);
+            toast.success('Account created!');
 
-    // Show success and navigate
-    setTimeout(() => {
-      setIsLoading(false);
-      // Reset rate limit on successful auth
-      attemptCountRef.current = 0;
-      if (mode === 'signup') {
-        logWithCurrentUser('register', 'Authentication', 'success', `Registered as ${formData.role}`);
-        toast.success('Account created!');
-        if (formData.role === 'employer') {
-          navigate('/employers');
-        } else {
-          navigate('/onboarding');
+            if (formData.role === 'employer') {
+              navigate('/employers');
+            } else {
+              navigate('/onboarding');
+            }
+          },
+          onError: (error) => {
+            setIsLoading(false);
+            toast.error(error instanceof Error ? error.message : 'Registration failed');
+          },
         }
-      } else {
-        logWithCurrentUser('login', 'Authentication', 'success');
-        toast.success('Welcome back!');
-        navigate('/dashboard');
+      );
+
+      return;
+    }
+
+    loginMutation.mutate(
+      {
+        email: sanitizedEmail,
+        password,
+      },
+      {
+        onSuccess: ({ token, user }) => {
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+
+          setIsLoading(false);
+          attemptCountRef.current = 0;
+          logWithCurrentUser('login', 'Authentication', 'success');
+          toast.success('Welcome back!');
+          navigate('/dashboard');
+        },
+        onError: (error) => {
+          setIsLoading(false);
+          toast.error(error instanceof Error ? error.message : 'Login failed');
+        },
       }
-    }, 400);
+    );
   };
 
   const toggleMode = () => {

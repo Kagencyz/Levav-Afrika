@@ -5,8 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1784809037830,
-      "tag": "0000_round_jetstream",
+      "when": 1784897413368,
+      "tag": "0000_levav_app_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784897732829,
+      "tag": "0001_bouncy_jamie_braddock",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784897889488,
+      "tag": "0002_auth_profile_sync",
       "breakpoints": true
     }
   ]

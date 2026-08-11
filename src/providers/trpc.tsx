@@ -24,12 +24,11 @@ export function TRPCProvider({ children }: { children: ReactNode }) {
       links: [
         httpBatchLink({
           url: '/api/trpc',
-          headers() {
-            const token = localStorage.getItem('auth_token');
-            return token
-              ? { Authorization: `Bearer ${token}` }
-              : {};
-          },
+          fetch: (url, options) =>
+            fetch(url, {
+              ...options,
+              credentials: 'include',
+            }),
         }),
       ],
       transformer: superjson,

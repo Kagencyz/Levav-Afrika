@@ -4,12 +4,14 @@ import { cors } from 'hono/cors';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { appRouter } from './router';
 import { createContext } from './context';
+import { AUTH_COOKIE_NAME, buildAuthCookie, clearAuthCookie } from './lib/jwt';
 
 export const app = new Hono();
 
 // CORS — scoped to configured origins, never '*'
 app.use('*', cors({
   origin: env.CORS_ORIGINS,
+  credentials: true,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -20,12 +22,46 @@ app.get('/health', (c) => c.json({ status: 'ok', time: new Date().toISOString() 
 // tRPC handler
 app.all('/api/trpc/*', async (c) => {
   const req = c.req.raw;
-  return fetchRequestHandler({
+  const response = await fetchRequestHandler({
     endpoint: '/api/trpc',
     req,
     router: appRouter,
     createContext: async () => createContext(req),
   });
+
+  const path = new URL(req.url).pathname;
+  const isAuthResult = path.includes('/auth.register') || path.includes('/auth.login') || path.includes('/auth.logout');
+
+  if (isAuthResult) {
+    const clone = response.clone();
+    const body = await clone.json().catch(() => null) as Record<string, any> | null;
+    const token = body?.result?.data?.token;
+
+    if (typeof token === 'string' && token.length > 0) {
+      const headers = new Headers(response.headers);
+      const cookieValue = buildAuthCookie(token);
+      headers.append('Set-Cookie', cookieValue);
+
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    }
+
+    if (path.includes('/auth.logout')) {
+      const headers = new Headers(response.headers);
+      headers.append('Set-Cookie', clearAuthCookie());
+
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    }
+  }
+
+  return response;
 });
 
 // SPA fallback — serve dist/index.html for non-API routes when this app is

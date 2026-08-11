@@ -1,12 +1,17 @@
-import { verifyToken } from './lib/jwt';
+import { AUTH_COOKIE_NAME, verifyToken } from './lib/jwt';
 
 export async function createContext(req: Request) {
-  const auth = req.headers.get('authorization');
+  const cookieHeader = req.headers.get('cookie') || '';
+  const cookies = cookieHeader.split(';').map((part) => part.trim());
+  const authCookie = cookies.find((entry) => entry.startsWith(`${AUTH_COOKIE_NAME}=`));
+
   let user = null;
-  if (auth?.startsWith('Bearer ')) {
-    const token = auth.slice(7);
+
+  if (authCookie) {
+    const token = decodeURIComponent(authCookie.slice(AUTH_COOKIE_NAME.length + 1));
     user = await verifyToken(token);
   }
+
   return { user };
 }
 

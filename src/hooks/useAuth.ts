@@ -32,6 +32,7 @@ function isValidUser(user: unknown): user is User {
 
 export function useAuth() {
   const utils = trpc.useUtils();
+  const logoutMutation = trpc.auth.logout.useMutation();
   const { data: serverUser, isLoading: serverLoading } = trpc.auth.me.useQuery(undefined, {
     retry: false,
     refetchOnWindowFocus: false,
@@ -54,21 +55,26 @@ export function useAuth() {
   const logout = useCallback(() => {
     // Log the logout event before clearing auth state
     logWithCurrentUser('logout', 'Authentication', 'info');
-    // SECURITY FIX: Clear ALL auth-related localStorage keys
-    const keysToRemove = [
-      'token',
-      'auth_token',
-      'user',
-      'onboarding_data',
-      'talent_profiles',
-      'employer_profiles',
-      'employer_data',
-      'profile_data',
-    ];
-    keysToRemove.forEach((key) => localStorage.removeItem(key));
-    utils.invalidate();
-    window.location.reload();
-  }, [utils]);
+
+    logoutMutation.mutate(undefined, {
+      onSettled: () => {
+        // SECURITY FIX: Clear ALL auth-related localStorage keys
+        const keysToRemove = [
+          'token',
+          'auth_token',
+          'user',
+          'onboarding_data',
+          'talent_profiles',
+          'employer_profiles',
+          'employer_data',
+          'profile_data',
+        ];
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+        utils.invalidate();
+        window.location.reload();
+      },
+    });
+  }, [logoutMutation, utils]);
 
   return {
     user: user as User | undefined,

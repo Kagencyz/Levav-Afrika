@@ -109,6 +109,10 @@ export const authRouter = router({
       };
     }),
 
+  logout: publicProcedure.mutation(async () => {
+    return { ok: true };
+  }),
+
   me: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.user) {
       return null;
