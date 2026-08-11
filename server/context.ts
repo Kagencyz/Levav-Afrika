@@ -1,6 +1,4 @@
-import { verifyToken } from './lib/jwt.js';
-
-export const AUTH_COOKIE_NAME = 'auth_token';
+import { AUTH_COOKIE_NAME, verifyToken } from './lib/jwt.js';
 
 function parseCookies(header: string | null): Record<string, string> {
   const out: Record<string, string> = {};

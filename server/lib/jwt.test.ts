@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signToken, verifyToken } from './jwt';
+import { AUTH_COOKIE_NAME, buildAuthCookie, signToken, verifyToken } from './jwt';
 
 const payload = {
   userId: '5d61b6a6-97a4-4f0e-8a3b-000000000001',
@@ -25,5 +25,11 @@ describe('jwt', () => {
   it('rejects garbage input', async () => {
     expect(await verifyToken('not-a-token')).toBeNull();
     expect(await verifyToken('')).toBeNull();
+  });
+
+  it('uses one hardened cookie name for setting and clearing sessions', () => {
+    expect(buildAuthCookie('token')).toContain(`${AUTH_COOKIE_NAME}=token`);
+    expect(buildAuthCookie(null)).toContain(`${AUTH_COOKIE_NAME}=`);
+    expect(buildAuthCookie(null)).toContain('Max-Age=0');
   });
 });
