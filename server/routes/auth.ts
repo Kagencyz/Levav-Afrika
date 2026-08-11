@@ -88,7 +88,9 @@ export const authRouter = router({
         });
         throw new TRPCError({
           code: error?.status === 429 ? 'TOO_MANY_REQUESTS' : 'BAD_REQUEST',
-          message: 'Unable to create account',
+          message: error?.status === 429
+            ? 'Confirmation email limit reached. Please wait an hour and try again.'
+            : 'Unable to create account',
         });
       }
 

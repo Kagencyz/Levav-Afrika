@@ -210,6 +210,8 @@ export default function Auth() {
         setErrors({ email: 'This email is already registered — try signing in.' });
       } else if (/invalid email or password/i.test(rawMessage)) {
         setErrors({ password: 'Invalid email or password.' });
+      } else if (/confirmation email limit reached/i.test(rawMessage)) {
+        toast.error('Confirmation email limit reached. Please wait an hour and try again.');
       } else {
         toast.error('Something went wrong. Please try again.');
       }
