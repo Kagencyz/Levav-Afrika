@@ -1,5 +1,7 @@
 import { handle } from '@hono/node-server/vercel';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import { app } from '../server/app.js';
+import { restoreVercelRawBody } from '../server/lib/vercelRequest.js';
 
 // The ONLY public file under api/ — this is deliberate. Vercel's Node.js
 // runtime treats every file directly under api/ (at any depth) as its own
@@ -15,4 +17,12 @@ import { app } from '../server/app.js';
 // functions actually receive a raw (IncomingMessage, ServerResponse) pair,
 // which crashed every request with "this.raw.headers.get is not a
 // function". @hono/node-server/vercel's handle() does the real conversion.
-export default handle(app);
+const honoHandler = handle(app);
+
+export default function handler(
+  request: IncomingMessage & { body?: unknown; rawBody?: unknown },
+  response: ServerResponse
+) {
+  restoreVercelRawBody(request);
+  return honoHandler(request, response);
+}
