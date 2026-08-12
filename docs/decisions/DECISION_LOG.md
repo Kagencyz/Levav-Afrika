@@ -20,6 +20,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0010 | Nominated written work samples may become evidence; publishing never does | **PROPOSED** | 2026-08-12 |
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 | PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
+| PDR-0013 | What is New editorial scope | APPROVED | 2026-08-12 |
 
 ---
 
@@ -207,6 +208,26 @@ It cannot be implemented before the Evidence Graph (Sprint 2), the WRI engine (S
 **Consequences.** Overall WRI is computed only across measured dimensions, and always reports how many of the ten those are. A profile with two measured dimensions does not score 20% of a person. Employer-facing surfaces show coverage with the same prominence as the estimate. No sort or filter may rank an unmeasured dimension as though it were low.
 
 **Rejected alternative.** Rendering zero with an explanatory tooltip. The number is read; the tooltip is not.
+
+## PDR-0013 — What is New editorial scope
+
+**State:** APPROVED · **Decided by:** product owner, 2026-08-12 · **Requirements:** FEED-005, COMP-003, AI-007, DATA-001…004, LANG-001/003 · **Specified in:** `FEED_AND_NETWORK_SPEC.md` §8
+
+**Context.** FEED-005 permits a curated What is New layer but does not say what it covers. Open decision 6 in the Feed spec escalated it. The product owner set the scope: workforce, best practice, personal growth, AI news for organisations, HR and management conversations, and leadership — and asked that it be built into a place people go to daily.
+
+**Decision.** Eleven sections, defined in the spec. Six from the product owner, four added on my recommendation, plus Levav's own updates.
+
+The four added: **Africa business context** (labour law, compliance, payroll and regulatory change affecting employers), **sector spotlights** mapped to the WP-0101 career families, **opportunity notices** (scholarships, grants, bursaries, funded training), and **building an organisation** (practical SME operations).
+
+**Why those four.** Sector spotlights and Africa business context are what no general professional network serves. A mining supervisor in Kitwe and an SME owner facing a payroll rule change have nowhere good to go, and serving them well is both the differentiator and consistent with what Levav is for. Opportunity notices are disproportionately valued in this market. Building an organisation serves the QuickWork client side, which otherwise has no editorial presence.
+
+**The quality bar is the decision, not the category list.** Categories are easy to name and easy to fill badly. Every card must be specific, actionable or decision-relevant, sourced or grounded, and honest about uncertainty.
+
+Two sections carry named hazards. **Professional growth** is where a workforce publication degenerates into aphorism — the Language System §2.2 prohibition on empty inspiration is binding, and a card that could be printed on a poster does not ship. **AI and technology** carries the opposite failure: hype, displacement prediction without evidence, and vendor material reprinted as insight.
+
+**The long-term differentiator is deliberately deferred.** Once Sprint 9 delivers governed aggregate Workforce Intelligence, Levav can publish workforce insight from its own data that no other publisher holds. That is the real answer to "go-to place". It is gated on DATA-001…004 — aggregate only, cohort thresholds enforced, no individual record inferable — and publishing a Levav-derived statistic before those controls exist is prohibited. Getting that wrong once would cost the credibility the entire product rests on.
+
+**Still escalated (§49).** Scope is settled; **editorial ownership is not.** Who holds responsibility, which publishers Levav sources from, and what republication rights it has all need a named human owner before a single card ships. Curation is an editorial position with reputational and legal consequences, and no agent may assume it.
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 

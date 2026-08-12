@@ -113,16 +113,65 @@ Enforced structurally, not by policy:
 - No follower count, reaction count or post count appears on any employer-facing surface, or on any screen showing a readiness value.
 - **PDR-0010** (nominated written work samples as evidence) remains **PROPOSED** and is decided at Sprint 8. Until it is approved, no feed content becomes evidence by any route. If it is approved, the mechanism is nomination and rubric assessment — never publishing, and never engagement.
 
-## 8. What is New and sourced news (FEED-005)
+## 8. What is New — editorial specification (FEED-005)
 
-Levav product updates · verified organisation news · employer announcements · workforce and career insights · curated external professional news.
+**Editorial scope approved by the product owner, 2026-08-12. Recorded as PDR-0013.**
 
-**Rules for external news, without exception:**
+The ambition is that What is New becomes the surface a working professional in Zambia opens each morning — not a widget in the corner of a feed. That is achievable, because nobody is currently doing it well for this audience, and because Levav eventually holds workforce data nobody else has (§8.4).
 
-- Publisher name and a link to the original are shown on every card.
+### 8.1 Sections
+
+| Section | What belongs in it | What must not |
+|---|---|---|
+| **Workforce and labour market** | Hiring patterns, sector demand, skills employers are actually asking for, wage and employment reporting from valid sources | Any figure Levav cannot source. COMP-003 forbids fabricated benchmarks and it applies here |
+| **How the work is done** | Practical craft by function — finance, operations, marketing, engineering, teaching, clinical, trades. Concrete method, not theory | Listicles. "Ten habits of" is not craft |
+| **Professional growth** | Career decisions, skill building, moving between roles and sectors, what a transition actually requires | Motivational content. See §8.2 — this section carries the highest risk of becoming a slogan farm |
+| **AI and technology at work** | What AI actually changes about specific roles, practical adoption in organisations, what it costs, what fails | Hype, prediction, "AI will replace X" without evidence, vendor marketing reprinted as insight |
+| **People and management** | Managing teams, difficult conversations, performance, hiring and onboarding practice, retention | Generic management platitude. If it would apply equally to any organisation on earth, it is not useful |
+| **Leadership** | Decision-making under constraint, accountability, developing others, leading through change | Personality-cult profiles and success mythology |
+| **Africa business context** *(added)* | Labour law and regulatory change, compliance affecting employers, business registration, tax and payroll change, market entry | Political commentary. Levav reports what affects work, not who should govern |
+| **Sector spotlights** *(added)* | Mining, agriculture, construction, health, education, logistics, trade, hospitality — mapped to the WP-0101 career families | Nothing. This is the section that makes Levav relevant to people who do not work in offices, and it should be as good as the white-collar sections |
+| **Opportunity notices** *(added)* | Scholarships, grants, bursaries, training programmes, certifications, funded development | Anything requiring payment to access an opportunity. Any unverified provider |
+| **Building an organisation** *(added)* | Practical SME and startup operations — hiring the first employee, contracts, cash flow, structuring work | Founder mythology |
+| **From Levav** | Product updates, verified organisation news, employer announcements | Marketing dressed as news |
+
+The four added sections are my recommendation for what makes this a destination rather than a feature. **Sector spotlights** and **Africa business context** are the ones no general professional network serves — a mining supervisor in Kitwe and an SME owner navigating a payroll rule change have nowhere good to go, and serving them well is both differentiating and consistent with the product's purpose.
+
+### 8.2 Editorial standard
+
+Categories are easy; the quality bar is what makes a destination. Every card must satisfy all four:
+
+1. **Specific.** It concerns a named role, sector, situation or change. "Improve your communication" fails. "What a monthly report should contain when your manager only reads the first page" passes.
+2. **Actionable or decision-relevant.** The reader can do something differently, or decide something better. Awareness alone is not enough.
+3. **Sourced or grounded.** Either an attributed external source, or Levav's own governed aggregate (§8.4). Never an unsourced assertion presented as fact.
+4. **Honest about uncertainty.** Where something is contested or early, the card says so. Confident wrongness is the fastest way to lose a professional audience.
+
+**Professional growth carries a specific hazard.** It is the section that most easily degenerates into aphorism, and the Language System §2.2 prohibition on empty inspiration is binding on it. If a card could be printed on a poster, it does not ship.
+
+**AI and technology carries the opposite hazard.** Hype. No card may predict job displacement without evidence, reprint vendor material as insight, or treat a product launch as a workforce event.
+
+### 8.3 Making it a place people return to
+
+- **Relevance by career context.** Sections are ordered by the member's career family, seniority and declared interests from onboarding, not by engagement.
+- **A predictable rhythm.** A dependable publishing cadence beats volume. People return to what is reliably there.
+- **Save and read later**, with saved items available in `/saved`.
+- **Offline reading** (AFR-002/004): a saved card's summary and attribution are readable without a connection. The original always requires the network, and the interface says so rather than failing silently.
+- **An optional digest** — email or in-app, member-controlled frequency, never opt-out-by-default (LANG-003, AFR-006).
+- **No streaks, no unread badges pressuring return, no "you missed" language.** A destination earns the visit.
+
+### 8.4 The long-term differentiator
+
+Once Sprint 9 delivers governed aggregate Workforce Intelligence, Levav can publish workforce insight **from its own data** — readiness patterns, skills gaps and demand by sector and geography that no other publisher has.
+
+That is the real answer to "go-to place", and it is deliberately not available yet. It is gated on DATA-001 … DATA-004: aggregate only, minimum cohort thresholds enforced, no individual record inferable. **Publishing a Levav-derived statistic before those controls exist is prohibited**, and doing it carelessly once would cost the credibility the whole product depends on.
+
+### 8.5 Rules for external news, without exception
+
+- Publisher name and a link to the original on every card.
 - No card without a source. No aggregated-without-attribution content.
 - **AI summaries state that they are summaries, name the publisher, and never assert a fact not in the source** (AI-007). An AI-written news card with no source is prohibited outright.
 - Levav never republishes an article's substance in a way that substitutes for reading the original.
+- Republication rights are respected. Where a publisher's terms do not permit summary, Levav links without summarising.
 
 ## 9. Performance and Africa-first behaviour (FEED-007, AFR-001 … 004)
 
@@ -178,7 +227,7 @@ Reports on safety-critical content are prioritised (Sprint 10). Reporting a post
 | 3 | Whether "For you" is default or Following is | Recommend **Following** as default. A member who has chosen who to follow should see them; an algorithmic default in a professional evidence product invites exactly the engagement optimisation §7 forbids |
 | 4 | PDR-0010 — nominated work samples as evidence | **Decided at Sprint 8.** Until then, no feed content becomes evidence |
 | 5 | Whether followers are shown as a count at all | Recommend showing on the profile only, never on cards. A count on every card is a status display, and status displays drive the behaviour we are trying to keep out |
-| 6 | External news curation source and editorial responsibility | **§49 human decision.** Curating news is an editorial position with reputational consequences, and it needs a human owner before a single card ships |
+| 6 | External news **sourcing and editorial ownership** | Scope is now decided (§8, PDR-0013). What remains a **§49 human decision** is who holds editorial responsibility, which publishers Levav sources from, and what republication rights it has. Curation is an editorial position with reputational and legal consequences; it needs a named human owner before a single card ships |
 
 ## 13. Dependencies
 

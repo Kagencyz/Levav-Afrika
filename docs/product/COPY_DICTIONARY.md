@@ -560,7 +560,24 @@ Extends §7. Governed by `FEED_AND_NETWORK_SPEC.md`.
 |---|---|
 | `whatsnew.title` | What is New |
 | `whatsnew.section.levav` | From Levav |
-| `whatsnew.section.workforce` | Workforce and careers |
+| `whatsnew.section.workforce` | Workforce and labour market |
+| `whatsnew.section.craft` | How the work is done |
+| `whatsnew.section.growth` | Professional growth |
+| `whatsnew.section.ai` | AI and technology at work |
+| `whatsnew.section.people` | People and management |
+| `whatsnew.section.leadership` | Leadership |
+| `whatsnew.section.context` | Africa business context |
+| `whatsnew.section.sectors` | Sector spotlights |
+| `whatsnew.section.opportunities` | Scholarships, grants and training |
+| `whatsnew.section.building` | Building an organisation |
+| `whatsnew.empty` | Nothing published in this section yet. |
+| `whatsnew.save` | Save to read later |
+| `whatsnew.saved` | Saved |
+| `whatsnew.offline.available` | Saved for offline reading. The full article needs a connection. |
+| `whatsnew.offline.original` | You are offline. The summary is available; the original opens when you reconnect. |
+| `whatsnew.digest.title` | Get a digest |
+| `whatsnew.digest.body` | A summary of what is new in your field, as often as you want it. You choose the frequency and can stop at any time. |
+| `whatsnew.uncertain` | This is early or contested. Read the source before acting on it. |
 | `whatsnew.source` | Source: {publisher} |
 | `whatsnew.source.action` | Read the original |
 | `whatsnew.ai.label` | Summary drafted by Levav AI from the linked article. Read the original for the full account. |
