@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, useLocation } from 'react-router';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router';
 import { TRPCProvider } from '@/providers/trpc';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
@@ -186,11 +186,17 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  // Preserve old bookmarked hash URLs while moving the public site to clean
+  // browser paths. Vercel's SPA rewrite serves index.html for direct visits.
+  if (window.location.hash.startsWith('#/')) {
+    window.history.replaceState(null, '', window.location.hash.slice(1));
+  }
+
   return (
     <TRPCProvider>
-      <HashRouter>
+      <BrowserRouter>
         <AnimatedRoutes />
-      </HashRouter>
+      </BrowserRouter>
     </TRPCProvider>
   );
 }
