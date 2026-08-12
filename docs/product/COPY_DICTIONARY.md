@@ -330,6 +330,58 @@ Copy for security surfaces that exist in the interface but are not yet implement
 
 **Prohibited across these surfaces:** any verified badge or verified language (nothing is verified until Sprint 2), any completeness percentage or profile-strength score (a score is a readiness signal in disguise — PDR-0001), "unlock", and any claim that a complete profile improves employment outcomes.
 
+## 13. Sprint 2 — evidence, disputes, Privacy and Evidence Centre
+
+### Evidence framing (WP-0204)
+
+| Key | Value |
+|---|---|
+| `evidence.centre.title` | Your evidence |
+| `evidence.centre.subtitle` | Everything Levav holds about your work, where it came from, and who can see it. |
+| `evidence.empty.title` | Levav holds no evidence about you yet |
+| `evidence.empty.body` | Evidence appears here as you do work — simulations, assignments and verified contributions. Nothing has been recorded so far. |
+| `evidence.level.e0` | Self-declared |
+| `evidence.level.e1` | From a Levav Learn assessment |
+| `evidence.level.e2` | From a Levav 28 scenario |
+| `evidence.level.e3` | Verified real work |
+| `evidence.level.e4` | Confirmed outcome |
+| `evidence.provenance.recorded` | Recorded {recordedAt}. The work happened {occurredAt}. |
+| `evidence.provenance.actor` | Recorded by {actor}, who was your {relationship}. |
+| `evidence.provenance.system` | Recorded automatically by Levav. |
+| `evidence.eligibility.none` | This does not affect your readiness. It is a record of what you told Levav, not an observation of your work. |
+| `evidence.eligibility.some` | This can inform: {dimensions}. |
+| `evidence.status.withdrawn` | Withdrawn. Kept as history and no longer counted. |
+| `evidence.status.superseded` | Replaced by a later record. Kept as history. |
+| `evidence.status.disputed` | Disputed. Not counting while this is unresolved. |
+| `evidence.export.action` | Export my evidence |
+| `evidence.export.notice` | The file contains your personal data. Store it somewhere you control. |
+| `evidence.access.unavailable.title` | Levav is not recording who views your readiness data yet |
+| `evidence.access.unavailable.body` | Access logging is not in place. No record is being kept of who has viewed protected readiness data, and none exists for any earlier period. Treat the absence of records here as "not measured", never as "nobody has looked". |
+
+### Disputes (WP-0203)
+
+| Key | Value |
+|---|---|
+| `dispute.action` | This record is not accurate |
+| `dispute.title` | Dispute this record |
+| `dispute.body` | Tell us what is wrong. The record stops counting towards your readiness as soon as you submit this. |
+| `dispute.visibility.notice` | {actor} will be able to see that you disputed this, and what you wrote. |
+| `dispute.category.didnothappen` | This work did not happen |
+| `dispute.category.inaccurate` | Some details are wrong |
+| `dispute.category.unfair` | The description of my work is unfair |
+| `dispute.category.wrongperson` | This is not about me |
+| `dispute.category.other` | Something else |
+| `dispute.statement.label` | What is wrong with this record? |
+| `dispute.submitted.title` | Your dispute has been recorded |
+| `dispute.submitted.body` | This record has stopped counting towards your readiness. It has not been deleted, and neither has your dispute. |
+| `dispute.pending.notice` | Levav does not yet have a review process for disputes. This record will stay uncounted until one exists. We will not guess at a resolution. |
+| `dispute.notdisputable` | This record cannot be disputed. It has already been disputed, withdrawn or replaced. |
+| `dispute.resolved.upheld` | Reviewed and kept. This record counts again. |
+| `dispute.resolved.corrected` | Corrected. The original is kept as history and the corrected record counts instead. |
+| `dispute.resolved.withdrawn` | Withdrawn by {actor}. Kept as history and no longer counted. |
+
+**Prohibited across these surfaces:** "no access recorded", "no disputes found", any resolution timeline Levav cannot honour, any implication that disputing harms the member's standing, and any display of rubric content, anchors or weights (SEC-011).
+
 ## 10. Strings that must be deleted
 
 Present in the codebase today and prohibited from this point. Codex removes them as it touches each surface, and never reintroduces the pattern.

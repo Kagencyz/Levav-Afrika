@@ -82,6 +82,25 @@ These conflict with approved product direction and must not be carried forward:
 | WP-0002 | Real verification gates and CI | §47.1, ENG-003, CODEX-005 | READY_FOR_BUILD |
 | WP-0003 | Remove client-side WRI scoring | WRI-001/003/004, EVD-001, FEED-008, IMPACT-002, LEARN-002 | READY_FOR_BUILD |
 | WP-0004 | Copy architecture foundation | LANG-002/003/004/005, AFR-008 | READY_FOR_BUILD |
+| WP-0101 | Career taxonomy | ONB-002, GRAPH-001/003, DATA-MODEL-001 | READY_FOR_BUILD |
+| WP-0102 | Intelligent onboarding | ONB-001/002/003, AUTH-001, LANG-002/003 | READY_FOR_BUILD |
+| WP-0103 | Professional profile | PROF-001/002/003, AUTH-003, DATA-MODEL-003, SEC-004 | READY_FOR_BUILD |
+| WP-0104 | Secure account email change | PROF-004, AUTH-001, SEC-006/008/010 | READY_FOR_BUILD |
+| WP-0105 | Personal Home on real services | ONB-003, AUTH-001 | Scoped, **not issued** — awaits WP-0103 |
+| WP-0106 | Organisation membership and verification | AUTH-002, EMP-001 | Scoped, **not issued** — awaits WP-0103 |
+| WP-0201 | Evidence node storage, lifecycle, visibility | EVD-001…004, DATA-MODEL-001/003, AUTH-003, SEC-004 | READY_FOR_BUILD |
+| WP-0202 | Event pipeline and sole ingestion writer | EVENT-001/002, DATA-MODEL-002, API-006 | READY_FOR_BUILD |
+| WP-0203 | Dispute workflow | TRUST-002, EVD-002, WRI-GOV-001, SEC-010 | READY_FOR_BUILD |
+| WP-0204 | Privacy and Evidence Centre | PRIV-001, AUTH-003, SEC-010, AFR-001/010 | READY_FOR_BUILD |
+
+### Product contracts issued
+
+| Contract | Governs | Gates |
+|---|---|---|
+| `specs/product-contracts/EVIDENCE_GRAPH_CONTRACT_v1.md` | Evidence node shape, levels, immutability, visibility, event pipeline | Sprint 2, and Sprint 3 via §43 |
+| `specs/product-contracts/WRI_SCIENTIFIC_SPEC_v1.md` | Ten dimensions, BARS, confidence, snapshots, validation, fairness | Sprint 3 |
+
+Nine of ten BARS rubrics remain to be authored in `specs/rubrics/` before any Levav 28 evidence-producing task ships (Sprint 4).
 
 ## Requirements blocked on human decision (Master PRD §49)
 
