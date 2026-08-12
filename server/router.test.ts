@@ -13,6 +13,7 @@ const ALLOWED_PROCEDURES = [
   'auth.login',
   'auth.logout',
   'auth.me',
+  'dashboard.summary',
   'onboarding.complete',
   'onboarding.get',
   'talent.createOwnProfile',
