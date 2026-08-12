@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { Instagram, Twitter, Linkedin, ArrowRight } from 'lucide-react';
 
 const ecosystemLinks = [
-  { label: 'Levav 28\u2122', href: '/onboarding' },
-  { label: 'QuickWork\u2122', href: '/opportunities' },
+  { label: 'Levav 28\u2122', href: '/levav28' },
+  { label: 'QuickWork\u2122', href: '/quickwork' },
   { label: 'Levav ID\u2122', href: '/talent' },
   { label: 'WRI\u2122', href: '/dashboard' },
   { label: 'Levav Impact\u2122', href: '/impact' },
@@ -15,7 +15,7 @@ const companyLinks = [
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'Employers', href: '/employers' },
-  { label: 'Champions', href: '/champions' },
+  { label: 'Champions', href: '/champion-apply' },
 ];
 
 export default function Footer() {
