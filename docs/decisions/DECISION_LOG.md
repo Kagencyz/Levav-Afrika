@@ -1,0 +1,106 @@
+# Product Decision Record Log
+
+**Owner:** Claude (Product Command). Codex must not edit this file (Master PRD §41).
+
+An approved PDR is authority level 2 — it amends the Master PRD. Anything not recorded here is not a decision; it is an assumption, and Codex must return `BLOCKED_PRODUCT_DECISION` rather than invent one (CODEX-006).
+
+**States:** PROPOSED · APPROVED · REJECTED · SUPERSEDED · **ESCALATED** (needs a human owner per Master PRD §49).
+
+| ID | Title | State | Date |
+|---|---|---|---|
+| PDR-0001 | WRI is server-derived from evidence only | APPROVED | 2026-08-12 |
+| PDR-0002 | The ten PRD dimensions are canonical; the six-dimension prototype set is retired | APPROVED | 2026-08-12 |
+| PDR-0003 | "Assignment" is the canonical QuickWork unit; "gig" is prohibited | APPROVED | 2026-08-12 |
+| PDR-0004 | Levav 28 prototype content is retired, not migrated | APPROVED | 2026-08-12 |
+| PDR-0005 | Frontend typecheck becomes a required gate with a bounded debt allowance | APPROVED | 2026-08-12 |
+| PDR-0006 | Unreachable routers are deleted, not preserved | APPROVED | 2026-08-12 |
+| PDR-0007 | Day 15 evidence-sufficiency threshold | **ESCALATED** | 2026-08-12 |
+| PDR-0008 | QuickWork payment, escrow and dispute model | **ESCALATED** | 2026-08-12 |
+
+---
+
+## PDR-0001 — WRI is server-derived from evidence only
+
+**State:** APPROVED · **Requirements:** WRI-001…005, EVD-001, EVENT-001, FEED-008, IMPACT-002, LEARN-002, §48
+
+**Context.** `src/lib/levavData.ts` exports `awardWriPoints(key)`, called directly from UI actions, mutating a `localStorage` object. Rules include `feed-first-post` (+10 communication), `quickwork-applied` (+5 reliability) and `impact-volunteer` (+15 leadership).
+
+**Decision.** No client code may compute, award or persist a WRI value. WRI exists only as a server-side snapshot derived from evidence records through the controlled event pipeline. The client renders what the server returns and nothing else.
+
+Consequences, decided explicitly:
+
+1. Existing `localStorage` WRI values are **discarded, not migrated**. They have no provenance and cannot be reconstructed as evidence. There is no legitimate way to carry them forward.
+2. Until the Sprint 3 engine exists, WRI surfaces render `wri.confidence.none.*` — an honest empty state, not a zero and not a placeholder number.
+3. This is not reversible by convenience. Reintroducing client-side scoring requires a superseding PDR.
+
+**Rejected alternative.** Keeping the client engine "temporarily so the UI has something to show". A number with no evidence behind it is precisely the failure mode the Master PRD is built to prevent, and shipping one teaches users to trust it.
+
+**Implemented by:** WP-0003.
+
+## PDR-0002 — The ten PRD dimensions are canonical
+
+**State:** APPROVED · **Requirements:** WRI-001, LANG-002
+
+**Context.** The code uses six dimensions — `technical, communication, reliability, leadership, creativity, growth`. `technical` and `creativity` are not PRD constructs; six of the PRD's ten are absent.
+
+**Decision.** The canonical set is the Master PRD §12.1 ten, with the display names fixed in `COPY_DICTIONARY.md` §3. The six-dimension set is retired with no mapping table — a partial mapping would imply the old values carry meaning into the new model. They do not.
+
+**Note for Sprint 3.** Coefficients and scale remain **provisional and versioned** (WRI-004). This PDR fixes the *constructs*, not their weights. Weights are PDR-0007-adjacent and remain a §49 human decision.
+
+## PDR-0003 — "Assignment" is the canonical QuickWork unit
+
+**State:** APPROVED · **Requirements:** QW-003, LANG-002, §48
+
+**Context.** `gig` appears 157 times against `QuickWork` 65. The domain type is `QuickWorkGig`.
+
+**Decision.** The unit of QuickWork is an **assignment**. "Gig" is prohibited in user-facing copy, code identifiers, database column names, event names and analytics keys. Vocabulary that pervasive shapes the schema, and the Master PRD explicitly forbids a gig board.
+
+**Application.** Not a rename sweep in Sprint 0 — the code is being replaced anyway. It binds on every QuickWork packet from Sprint 5, and immediately on all new code.
+
+## PDR-0004 — Levav 28 prototype content is retired, not migrated
+
+**State:** APPROVED · **Requirements:** L28-001…009
+
+**Context.** `LEVAV28_DAYS` is a 33-day motivational programme (`CONFRONT` phases, daily quotes, reflection prompts). The PRD specifies a 28-day adaptive work simulation with personas, modalities and rubrics.
+
+**Decision.** The existing content is retired. It is not a seed for Scenario Studio, not a fallback, and not a "lite mode". Scenario content is authored against the scenario schema in Sprint 4 under `specs/scenarios/`.
+
+**Rejected alternative.** Wrapping the existing days as "development mode" content under L28-003. The development/assessment split is about *scored vs unscored evidence tasks*, not about keeping motivational content that no longer matches the product.
+
+## PDR-0005 — Frontend typecheck becomes a required gate
+
+**State:** APPROVED · **Requirements:** §47.1, ENG-003
+
+**Context.** `npm run typecheck` covers only `tsconfig.server.json` and exits 0 while the frontend carries 156 errors. `npm run build` inherits the blind spot.
+
+**Decision.** `typecheck` must cover both projects. Because 156 pre-existing errors cannot be fixed inside Sprint 0 without touching most of the frontend:
+
+- `npm run typecheck` runs both configs and **reports** both.
+- A committed baseline file records the known frontend errors. CI fails on any error **not** in the baseline, and on any packet that increases the count.
+- The baseline shrinks as each surface is rebuilt. It is never increased. Removing the baseline mechanism entirely is the Sprint 10 target.
+
+**Rejected alternatives.** (a) Leave the gate as-is — it lies. (b) Fix all 156 in Sprint 0 — that is a frontend rewrite disguised as housekeeping, and §48 forbids blind rewrites.
+
+**Implemented by:** WP-0002.
+
+## PDR-0006 — Unreachable routers are deleted
+
+**State:** APPROVED · **Requirements:** ENG-005, SEC-004, §48
+
+**Context.** Eight routers (`employer`, `job`, `application`, `message`, `notification`, `review`, `upload`, `wri`) are written, unregistered, guarded by `server/router.test.ts`, reference dropped tables, and carry known authorisation defects.
+
+**Decision.** Delete them. They will be rebuilt against the Evidence Graph and entitlement model, and nothing in them survives that rebuild. The allowlist guard in `server/router.test.ts` is **kept** — it is a good control and continues to protect the registration surface.
+
+**Why deletion rather than retention.** Code that looks 90% finished is an invitation. `employer.ts` reads `ctx.user.id` where the context provides `userId`; `upload.getPresignedUrl` has no authorisation check. Git history preserves them for reference.
+
+## PDR-0007 — Day 15 evidence-sufficiency threshold
+
+**State:** **ESCALATED to human owner** (Master PRD §49) · **Requirements:** L28-005
+
+Levav 28 Day 15 must gate on evidence sufficiency rather than calendar completion. The threshold — how many observations, across how many dimensions, at what measurement quality — is a launch policy decision, not an agent decision. Claude will prepare options with trade-offs before Sprint 4. **Neither agent may set this value as permanent policy.** Sprint 4 implements it as a configurable, versioned parameter with a provisional default that is clearly labelled provisional.
+
+## PDR-0008 — QuickWork payment, escrow and dispute model
+
+**State:** **ESCALATED to human owner** (Master PRD §49) · **Requirements:** QW-008
+
+Funding model, escrow provider, milestone release conditions, partial completion, revision limits, cancellation, refunds, chargebacks and platform fee are all §49 decisions requiring human approval. Sprint 5 builds the **assignment lifecycle and payment state model** without committing to a provider, so that the commercial decision plugs in through an adapter (API-004). `src/pages/MilestonePayments.tsx` and `ContractWorkspace.tsx` stay deferred until this is resolved.

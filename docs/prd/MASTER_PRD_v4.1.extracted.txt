@@ -1,0 +1,2255 @@
+
+===== PAGE 1 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+AFRICA'S WORKFORCE INTELLIGENCE ECOSYSTEM
+LEVAV
+MASTER PRODUCT REQUIREMENTS
+AND DUAL-AGENT EXECUTION SPECIFICATION
+Version 4.1 | August 2026
+Authoritative product, scientific, data, AI, engineering and delivery contract
+Build edition: Claude Product Command + Codex Engineering Command
+Confidential
+CLAUDE: PRODUCT COMMAND CODEX: ENGINEERING COMMAND
+Owns product meaning, work packets, WRI and Levav 28 
+specifications, decisions, review and acceptance. Read-only 
+over production code.
+Owns all executable implementation, database changes, APIs, 
+UI, tests, build, deployment and runtime debugging.
+Core thesis: Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from 
+outcomes.
+
+===== PAGE 2 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 2
+Document Map
+• Sections 1-7: authority, thesis, African problem, protected systems, product principles, language system and scope.
+• Sections 8-12: identity, onboarding, Levav ID, Evidence Graph and WRI science.
+• Section 13: Levav 28 adaptive workforce simulation and development environment.
+• Sections 14-17: QuickWork, employed talent, Employer Intelligence and post-hire validation.
+• Sections 18-30: opportunities, compensation, contribution, Learn, Champions, feed, Workforce Graph, data, monetisation, AI, 
+trust and Africa-first infrastructure.
+• Sections 31-39: current technology direction, data and API architecture, observability, metrics and product moat.
+• Sections 40-50: Claude and Codex operating model, file ownership, handoffs, build sequence, Definition of Done and start 
+instructions.
+• Section 51: final product thesis.
+1. Document Authority
+This document is the single governing specification for the next stage of Levav.
+It consolidates and supersedes the implementation authority of:
+• Levav Final Master Product Requirements Document v3.0.
+• Levav Master Product Requirements, System Architecture and Dual-Agent Execution Blueprint v3.3.
+• Earlier product briefs, codebase audit notes and implementation assumptions where they conflict with this document.
+The v3.0 product depth is preserved. The v3.3 execution discipline is preserved. The agent split is changed to match the 
+strengths required for the build.
+The authority order is:
+1. This Master PRD v4.1 defines what Levav must become and the product rules that cannot be changed casually.
+2. Approved Product Decision Records define later product decisions that explicitly amend this PRD.
+3. The current repository and verified runtime define what exists today.
+4. Implementation State documents report what is working, partial, mocked, broken or deferred.
+5. Agent-specific instructions define how Claude and Codex operate. They do not override product requirements.
+When documentation conflicts with running code, the agents must distinguish desired state from current state. They must 
+not rewrite working systems simply because an older document described a different stack.
+1.1 Mandatory audit vocabulary
+Every existing feature or subsystem must be classified before major modification:
+• KEEP: It already satisfies the requirement.
+• ENHANCE: It works but needs stronger UX, data, intelligence, quality, security or performance.
+• MODIFY: It exists but behaves differently from the approved requirement.
+• COMPLETE: It is partially implemented.
+• BUILD: It is missing.
+• REMOVE: It conflicts with the approved product direction.
+• DEFER: It is valid but outside the active release.
+1.2 Non-negotiable preservation rule
+Working authentication, organisation membership, database foundations, deployment configuration and security controls 
+must be preserved unless a verified defect requires change.
+No agent may replace a working architecture merely to match an example from an older PRD.
+
+===== PAGE 3 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 3
+2. Executive Product Thesis
+Levav is an African workforce intelligence platform that develops, measures and verifies workforce readiness.
+Levav is not primarily a job board, social network, assessment website, learning marketplace or gig platform. Those 
+surfaces exist to support one connected workforce intelligence system.
+The governing principle is Person over Credential.
+Qualifications remain useful. They are not enough. Levav must understand what a person can demonstrate, how that 
+person behaves in real work contexts, how capability changes over time, what evidence supports each conclusion, and 
+what happens after opportunity is given.
+The product loop is:
+Talent Identity -> Levav 28 -> Observed Behaviour -> Evidence Graph -> WRI -> Development -> Opportunity -> Verified 
+Outcome -> Employer Intelligence -> Workforce Intelligence -> Better Levav 28 and WRI.
+A feature is core only if it does at least one of these things:
+• Develops readiness.
+• Proves readiness.
+• Creates or improves meaningful opportunity.
+• Reduces employer uncertainty.
+• Creates verified evidence.
+• Improves workforce decisions.
+• Learns from real outcomes.
+3. The African Problem Levav Must Solve
+3.1 Talent problem
+Millions of young Africans enter the labour market while the supply of formal wage employment remains far smaller than 
+the number of people seeking it.
+The product must respond to two separate problems:
+• A shortage of formal opportunities.
+• A readiness and evidence gap that makes employers uncertain about who can perform well.
+Levav must not teach a graduate to sit still until a perfect permanent vacancy appears.
+It should help people remain economically and professionally active. A person should be able to develop capability, 
+demonstrate it, offer productive capacity, build verified evidence and become more visible for the right opportunities.
+3.2 Startup and SME problem
+Many startups and growing organisations need work completed before they can afford full-time payroll.
+They may need five hours of bookkeeping, two weeks of customer research, a three-month marketing coordinator, a 
+fractional finance lead, a landing page, a reconciliation exercise, field data collection or operational support.
+Levav must make this demand usable. QuickWork turns work that is too small, too early, too irregular or too specialised 
+for a permanent hire into structured opportunity.
+3.3 Employer problem
+CVs and interviews can hide whether a candidate can think, prioritise, communicate, learn, collaborate and execute.
+Levav replaces hiring by guesswork with evidence-first decision support.
+3.4 Workforce institution problem
+Traditional labour data can show participation, qualifications and employment status without showing demonstrated 
+readiness, capability gaps, evidence quality or development trajectory.
+
+===== PAGE 4 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 4
+Levav should eventually provide privacy-protected aggregate workforce intelligence for governments, labour institutions, 
+development organisations and research partners.
+4. Product Promise by Stakeholder
+Talent and professionals
+Become ready. Prove readiness. Build evidence. Stay active. Become visible for suitable opportunities. Understand your 
+development trajectory.
+Startups and SMEs
+Access verified productive capacity without taking unnecessary permanent payroll risk. Define work clearly. Find relevant 
+people. Get work completed. Build a trusted history with talent.
+Employers
+Reduce hiring uncertainty. See the person beyond the CV. Understand Role Fit, WRI, evidence confidence and relevant 
+outcomes. Make better interviews and better hires.
+Employed professionals
+Understand current-role readiness, next-role readiness, strengths, development gaps and trajectory without surrendering 
+ownership of personal career data to an employer.
+Governments and workforce institutions
+Understand readiness, gaps and workforce patterns through governed aggregate intelligence rather than private 
+individual surveillance.
+5. Protected Core Systems
+The following systems are protected product architecture. They should be built as connected parts of one ecosystem.
+5.1 Personal Identity and Levav ID
+One persistent person-owned identity. A person can activate multiple eligible workspaces without creating separate 
+identities.
+5.2 Levav 28
+A personalised, adaptive workforce simulation and development environment that creates controlled evidence of 
+demonstrated behaviour.
+5.3 Evidence Graph
+The factual backbone of Levav. Every meaningful readiness claim should be traceable to evidence, provenance, context, 
+time and verification.
+5.4 Workforce Readiness Index
+A versioned interpretation of workforce readiness from evidence. WRI includes dimensions, confidence, evidence 
+coverage and trajectory. It is not a personality score and is not a guarantee of employment success.
+5.5 Levav Workforce Graph
+A structured relationship model connecting people, roles, industries, skills, behaviours, evidence, learning, opportunities, 
+organisations, compensation and outcomes.
+5.6 QuickWork
+The immediate capacity activation and verified real-world work engine.
+
+===== PAGE 5 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 5
+5.7 Employer Intelligence
+The commercial decision-support layer for identifying and evaluating relevant talent and reducing hiring uncertainty.
+5.8 Workforce Intelligence
+The aggregate, privacy-protected intelligence layer for workforce planning and labour insight.
+5.9 Levav Impact
+A verified contribution and social-impact system connecting people, organisations, service, skills, outcomes and 
+evidence without disguising unpaid labour as employment.
+5.10 Professional Feed and Network
+The professional activity and discovery layer for people, organisations, evidence, opportunities, learning, contribution and 
+trusted workforce news. It must feel alive without turning popularity into readiness.
+6. Product Principles
+The following rules apply across every feature:
+• Person over Credential.
+• Evidence over claims.
+• Development before ranking.
+• Readiness is multi-dimensional.
+• Score and confidence are separate.
+• WRI and Role Fit are separate.
+• Real-world evidence should increasingly validate or challenge simulated readiness.
+• AI assists interpretation, simulation and workflow. AI does not become unreviewable truth.
+• One person can have several legitimate work contexts without duplicate identities.
+• Employer intelligence must be explainable and entitlement-controlled.
+• Institutional analytics are aggregate by default.
+• Paid visibility never overrides genuine relevance.
+• Build for African work realities while maintaining global professional standards.
+• Measure commitment without building surveillance.
+• Low bandwidth is a first-class product condition.
+• Mobile is a first-class product condition.
+• Every protected score must be auditable internally.
+• Every material AI decision path must be versioned and testable.
+6.1 Product Language and UX Writing System
+Levav must sound like one product from the public landing page to the deepest authenticated workflow. Language is part 
+of the product system, not decoration added at the end.
+LANG-001: One canonical product voice applies across every user-facing surface.
+The voice must be clear, human, intelligent, confident and practical. It should respect African professional realities 
+without using charity language, deficit framing, empty inspiration or exaggerated promises.
+The same language standard applies to:
+• Landing pages and campaign pages.
+• Signup, onboarding and account recovery.
+• Talent and employer dashboards.
+• Levav 28 instructions, coaching and feedback.
+• QuickWork briefs, assignments, reviews and disputes.
+
+===== PAGE 6 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 6
+• WRI explanations, evidence states and confidence language.
+• Feed, profiles, organisation pages and notifications.
+• Levav Impact, Learn and Champions.
+• Emails, SMS, alerts, empty states, error states and support copy.
+• AI-generated summaries and assistants.
+LANG-002: Canonical product terms must remain consistent.
+Names such as Levav 28, QuickWork, Levav ID, Workforce Readiness Index, Evidence Confidence, Role Readiness, 
+Role Fit, Evidence Graph, Levav Impact and Employer Intelligence must not drift into competing labels across different 
+screens.
+LANG-003: UX copy must be concise and action-oriented.
+Acceptance criteria:
+• Use sentence case for interface labels unless a brand name requires otherwise.
+• Buttons describe the action the user is taking.
+• Empty states explain what the user can do next.
+• Error messages explain the problem and the next safe action.
+• Scientific and AI outputs communicate uncertainty plainly and never overclaim.
+• Avoid generic AI phrases, corporate filler and unnecessary jargon.
+LANG-004: User-facing strings must be governable.
+Codex should avoid scattering important product copy through components. Shared labels, product terminology and 
+reusable UX messages should use an intentional copy architecture that can support future localisation and African 
+languages.
+LANG-005: Claude owns the language specification. Codex owns faithful implementation.
+Claude may refine approved wording, terminology and voice rules. Codex must not silently rewrite product meaning 
+while implementing screens.
+7. Release Scope
+7.1 Core release
+The active product programme includes:
+• Personal identity and Levav ID.
+• Organisation membership and verification.
+• Career taxonomy and intelligent onboarding.
+• Professional profile and Personal Home.
+• Levav 28.
+• Evidence Graph.
+• Versioned WRI.
+• Employed-talent readiness journeys.
+• QuickWork.
+• Jobs and opportunity matching.
+• Employer verification, search, subscriptions and hiring pipeline.
+• Hire Confidence and post-hire Quality of Hire.
+• Volunteer and Impact evidence.
+• Levav Learn.
+• Champions.
+• Professional feed and activity layer.
+• Compensation Intelligence foundations.
+• Workforce Graph foundations.
+
+===== PAGE 7 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 7
+• Workforce Intelligence foundations.
+• Admin, trust, moderation, privacy, audit and observability.
+7.2 Deferred until justified
+The following items must not distract the active build:
+• A separate startup incubator product.
+• A broad SkillSpace blue-collar marketplace as a separate major surface.
+• A broad public API marketplace.
+• Deep enterprise SSO without a launch-client requirement.
+• Unsupported cross-border salary coverage.
+• Predictive labour forecasting before sufficient historical data exists.
+• Specialised assessment engines outside the core WRI model before the baseline system is validated.
+• Institutional data licensing before governance maturity.
+8. Identity, Roles and Workspaces
+AUTH-001: One individual has one persistent personal identity.
+Acceptance criteria:
+• Role switching cannot reset evidence, history or WRI.
+• Talent capability is not represented by a duplicate account.
+• Organisation access is membership-based.
+• Organisation permissions are enforced server-side.
+• A person may legitimately be talent, an organisation member, a client, a champion or an employed professional through 
+related capabilities.
+AUTH-002: Role and entitlement are separate concepts.
+Acceptance criteria:
+• Employer membership does not automatically unlock protected WRI.
+• Subscription entitlement controls premium Employer Intelligence.
+• Institutional access is separately contracted and scoped.
+• Admin access is privileged and auditable.
+AUTH-003: Personal evidence remains person-centred.
+Acceptance criteria:
+• Employment by an organisation does not grant that organisation blanket access to the person's private Levav data.
+• Sponsored development uses explicit permission scopes.
+• Evidence visibility is controlled independently from evidence existence.
+9. Intelligent Onboarding and Personalisation
+Onboarding must progressively understand the person. It must not feel like a long generic registration form.
+The system should collect, confirm and progressively enrich:
+• Goals.
+• Current status.
+• Career family.
+• Current role.
+• Target role.
+• Seniority.
+
+===== PAGE 8 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 8
+• Industry.
+• Work environment.
+• Work history and CV.
+• Skills, certifications, projects and references.
+• Development goals.
+• Opportunity preferences.
+• Location and work mode.
+• Compensation expectations where appropriate.
+• QuickWork capacity where desired.
+ONB-001: AI may infer profile structure, but the user confirms authoritative use.
+Acceptance criteria:
+• No silent career classification.
+• Extracted CV fields are editable before confirmation.
+• Inferences are visibly distinguishable from confirmed facts.
+• Confirmed profile context informs simulations, matching and recommendations.
+ONB-002: Career taxonomy must represent broad African economic sectors.
+Acceptance criteria:
+• The taxonomy supports technology, finance, accounting, agriculture, mining, healthcare, education, engineering, 
+construction, hospitality, retail, sales, public administration, logistics, operations, creative work and other extensible sectors.
+• Taxonomy values are admin-managed and versioned.
+• Local job titles can map to canonical roles without erasing local language or context.
+ONB-003: First-run value must appear early.
+Acceptance criteria:
+• The user can see an immediate next action after onboarding.
+• A new user should understand why Levav 28 matters.
+• A user interested in QuickWork should be able to declare capacity without completing irrelevant setup.
+• Provisional states are clear when evidence is still weak.
+10. Professional Profile and Levav ID
+The profile is a professional evidence surface, not a decorated CV.
+It may include:
+• Professional photo and cover.
+• Headline and current role.
+• About.
+• Experience and education.
+• Skills.
+• Projects and featured work.
+• Certifications.
+• Volunteer service.
+• Verified employment evidence.
+• Verified QuickWork history.
+• Recommendations and structured reviews.
+• Posts and professional activity.
+• Selected badges and verified evidence.
+• WRI visibility according to policy.
+
+===== PAGE 9 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 9
+PROF-001: Claims and verified evidence must look different.
+Acceptance criteria:
+• Verified items show source and verification status.
+• Self-declared items are never visually presented as verified.
+• Public profiles do not expose protected WRI by default.
+PROF-002: Levav ID must become a durable professional identity anchor.
+Acceptance criteria:
+• The identity remains stable through role changes.
+• Evidence links back to the same person.
+• Public sharing exposes only approved fields.
+• Employer and institutional access follows policy rather than public URL availability.
+PROF-003: A member can actively maintain a modern professional profile.
+Acceptance criteria:
+• Edit profile photo and professional cover or background image.
+• Edit headline, about, location, current role, experience, education, skills, projects, links and approved visibility settings.
+• Feature selected work, verified evidence, Impact contributions and posts.
+• Profile updates propagate consistently to the feed and other permitted surfaces.
+PROF-004: Account identity settings support secure email change.
+Acceptance criteria:
+• Email change requires re-authentication or equivalent secure verification.
+• The new address must be verified before becoming authoritative.
+• Existing evidence, WRI history, organisation membership and Levav ID remain attached to the same person.
+• Email is an account credential and contact field, not a new identity.
+11. Evidence Graph
+The Evidence Graph is the factual backbone of Levav.
+11.1 Evidence levels
+E0 Self-Declared Evidence:
+• CV claims.
+• Profile statements.
+• Declared skills.
+• Unverified projects.
+E1 Learning Evidence:
+• Structured course completion.
+• Learning assessments.
+• Module outputs where measurement quality is sufficient.
+E2 Controlled Simulation Evidence:
+• Levav 28 scenario performance.
+• Structured, versioned simulation tasks.
+• Controlled behavioural observations.
+E3 Verified Real-World Work Evidence:
+• QuickWork completion.
+• Verified projects.
+• Verified employment outputs.
+
+===== PAGE 10 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 10
+• Structured volunteer placements.
+• Verified supervisor reviews.
+E4 Longitudinal Outcome Evidence:
+• Probation outcomes.
+• Retention.
+• Rehire.
+• Repeat engagement.
+• Time-to-productivity.
+• Performance reviews.
+• Promotions.
+EVD-001: Every evidence node records provenance.
+Required fields include:
+• Subject.
+• Source.
+• Evidence level.
+• Evidence type.
+• Verifier and relationship context where applicable.
+• Time.
+• Work context.
+• Eligible WRI dimensions.
+• Visibility.
+• Status.
+• Model or rubric version where generated through an instrument.
+EVD-002: Evidence cannot be silently overwritten.
+Acceptance criteria:
+• Amendments preserve audit history.
+• Disputes preserve the original record and resolution state.
+• WRI recalculation is triggered through the controlled evidence pipeline.
+EVD-003: Evidence quality is contextual.
+Evidence strength may consider:
+• Verification strength.
+• Verifier trust.
+• Recency.
+• Duration.
+• Complexity.
+• Repeated pattern.
+• Independence of sources.
+• Context relevance.
+• Measurement reliability.
+One review must not dominate a long evidence history.
+EVD-004: Factual observations and evaluations remain distinct.
+Examples of factual fields:
+• Check-in time.
+• Submission time.
+• Deadline compliance.
+• Verified hours.
+
+===== PAGE 11 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 11
+• Completion state.
+• Repeat engagement.
+Examples of evaluation fields:
+• Communication rating.
+• Initiative rating.
+• Quality judgement.
+• Written feedback.
+The WRI engine may weight these differently.
+12. Workforce Readiness Index Scientific Methodology
+WRI is a versioned interpretation layer over evidence.
+It is not a personality score, intelligence score, social popularity score or guaranteed predictor of employment success.
+12.1 Core dimensions
+1. Critical Thinking: Analyses information, tests assumptions, evaluates alternatives and reaches reasoned conclusions.
+2. Problem Solving: Defines problems, identifies causes, develops options, implements solutions and evaluates results.
+3. Initiative and Ownership: Identifies useful work, acts appropriately, accepts responsibility and follows through.
+4. Reliability and Execution: Fulfils commitments, manages deadlines, communicates delays and delivers.
+5. Communication: Listens, asks useful questions and communicates clearly in relevant professional contexts.
+6. Collaboration and Teamwork: Coordinates with others, manages disagreement and supports group outcomes.
+7. Adaptability and Learning Agility: Responds to change, feedback and unfamiliar situations and improves over time.
+8. Professional Discipline: Demonstrates preparation, time management, documentation, quality control and conduct.
+9. Leadership Readiness: Demonstrates decision judgement, delegation, accountability, conflict handling and development of 
+others at an appropriate level.
+10. Contribution and Service Orientation: Creates verified value through contribution, support, service or mentorship beyond 
+narrow self-interest.
+12.2 Required WRI outputs
+WRI-001: Store and present the following separately:
+• Overall WRI estimate.
+• Dimension profile.
+• Evidence confidence.
+• Evidence coverage.
+• Readiness trajectory.
+• Role Readiness where a target role exists.
+WRI-002: WRI and Role Fit are separate.
+A person may have strong general workforce readiness and weak fit for one role. Role Fit uses role requirements, 
+relevant evidence, skills and Workforce Graph context. WRI describes demonstrated general readiness.
+WRI-003: Confidence is separate from performance.
+A high score with weak evidence must look different from a high score supported by diverse, recent evidence.
+Confidence may increase while a score falls if stronger new evidence reveals a weakness.
+Confidence inputs may include:
+• Observation count.
+• Evidence diversity.
+• Independent sources.
+• E3 and E4 coverage.
+
+===== PAGE 12 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 12
+• Recency.
+• Duration.
+• Cross-context agreement.
+• Measurement quality.
+WRI-004: Scoring coefficients remain configurable and versioned.
+Acceptance criteria:
+• Pilot weights are labelled provisional.
+• No coefficient becomes permanent product truth without validation.
+• Every snapshot stores model version, evidence window and timestamp.
+• Historical snapshots never silently mutate after a model change.
+• Role-specific weighting belongs in Role Readiness, not hidden changes to historical WRI.
+WRI-005: Behaviourally Anchored Rating Scales are required where human or AI ratings are used.
+Acceptance criteria:
+• Anchors describe observable behaviour rather than vague adjectives.
+• Rubric versions are recorded.
+• AI evaluation uses structured outputs tied to the rubric.
+• Low-confidence evaluation can trigger human review or a follow-up task.
+12.3 Scientific validation programme
+WRI must be treated as an evolving measurement system.
+Required validation questions include:
+• Content validity: Do tasks represent real work behaviour for the role and level?
+• Construct validity: Does a dimension measure the intended behaviour rather than unrelated factors?
+• Criterion validity: Does the measure relate to meaningful outcomes such as completion, rehire, probation, performance or 
+retention?
+• Test-retest reliability: Are estimates reasonably stable when underlying capability has not changed?
+• Inter-rater reliability: Do qualified raters reach similar conclusions from the same evidence?
+• Scenario equivalence: Are alternate scenarios comparable in difficulty and construct coverage?
+• Fairness: Are outcomes systematically disadvantaging groups without job-related justification?
+• Calibration: Do readiness levels correspond to observed outcomes over time?
+12.4 Scientific governance
+WRI model changes require governed approval.
+The governance structure should include product leadership and qualified expertise in industrial-organisational 
+psychology, psychometrics, data science, labour economics, HR, data protection and relevant sector domains.
+WRI-GOV-001:
+• Construct definitions are documented.
+• Major scoring changes are versioned.
+• Historical cohort tests run before release.
+• Fairness analysis is part of model release review.
+• Users have a dispute and review route for evidence that materially affects readiness conclusions.
+13. Levav 28: Adaptive Workforce Simulation and Development Environment
+Levav 28 must become one of Levav's defining product experiences.
+It should feel like entering a workplace, not answering a questionnaire.
+
+===== PAGE 13 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 13
+The first 28-day journey establishes a meaningful baseline. Readiness continues evolving after Day 28.
+13.1 Experience model
+A user enters a persistent simulated work environment containing relevant elements such as:
+• A manager.
+• Colleagues.
+• Clients or customers.
+• Direct reports for leadership contexts.
+• Projects.
+• Deadlines.
+• Messages.
+• Documents.
+• Data.
+• Meetings or calendar pressure.
+• New information.
+• Scope changes.
+• Feedback.
+• Mistakes and recovery opportunities.
+The simulated workplace should remember relevant journey context. Personas must behave consistently within the 
+journey.
+13.2 Personalisation contexts
+Levav 28 must adapt to:
+• Career family.
+• Role.
+• Industry.
+• Seniority.
+• Current status.
+• Development goals.
+• Prior evidence.
+• Difficulty progression.
+Required user contexts include:
+• Graduate or unemployed professional.
+• Employed professional.
+• Senior management.
+• Freelancer.
+• Self-employed person.
+• Student.
+• Volunteer.
+A Senior Accountant must not receive the same scenario as a graduate accountant. A senior leader should encounter 
+delegation, strategy, conflict, ethics, resource allocation and executive communication contexts.
+13.3 28-day architecture
+Phase 1, Days 1-5: Baseline and Work Habits.
+• Workplace onboarding and role context.
+• Ambiguous brief and clarifying questions.
+• In-basket prioritisation.
+• Professional communication.
+• Feedback intake and reflection.
+
+===== PAGE 14 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 14
+Phase 2, Days 6-10: Reasoning and Execution.
+• Root cause analysis.
+• Conflicting information.
+• Resource allocation.
+• Solution design.
+• Logic and data interpretation.
+Phase 3, Days 11-15: Complexity and Collaboration.
+• Cross-functional coordination.
+• Difficult stakeholder handling.
+• Ethics and professional integrity.
+• Delegation where seniority supports it.
+• Evidence sufficiency checkpoint.
+Phase 4, Days 16-21: Pressure and Adaptability.
+• Scope change.
+• Crisis communication.
+• Mistake ownership and recovery.
+• High-volume delivery under time pressure.
+• Negotiation and trade-offs.
+• Process improvement.
+Phase 5, Days 22-27: Integrated Workplace Performance.
+• Multi-day capstone work.
+• Data analysis.
+• Stakeholder alignment.
+• Written proposal or work output.
+• Execution planning.
+• Presentation or defence where appropriate.
+• Self-assessment against demonstrated evidence.
+Phase 6, Day 28: Baseline Readiness Report and Next Plan.
+• WRI dimension profile.
+• Confidence.
+• Evidence coverage.
+• Strengths.
+• Development priorities.
+• Trajectory.
+• Recommended next actions.
+• Suitable QuickWork, jobs, Learn, volunteering or further simulations.
+13.4 Simulation modalities
+L28-001: The engine must support several work modalities rather than one chat pattern.
+Target modalities include:
+• Simulated inbox prioritisation.
+• Manager and colleague chat.
+• Client communication.
+• Document review.
+• Data table interpretation.
+• Brief writing.
+• Project planning.
+
+===== PAGE 15 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 15
+• Decision selection with reasoning.
+• File or deliverable submission.
+• Presentation or spoken response in later supported releases.
+The release may phase modalities, but the domain model must not assume every scenario is plain chat.
+13.5 Adaptive simulation
+L28-002: Scenario difficulty and follow-up can adapt within governed limits.
+Acceptance criteria:
+• Adaptation is constrained by scenario schema and rubric coverage.
+• A mid-task change can test adaptability without becoming arbitrary.
+• The engine may introduce new stakeholder information, deadline changes, resource constraints or conflicting evidence.
+• Scenario branches remain traceable to a published scenario version.
+• Adaptation must not make two candidates incomparable without recording difficulty and scenario metadata.
+13.6 Assessment mode and development mode
+L28-003: Levav 28 blends assessment and development without confusing them.
+Acceptance criteria:
+• Not every activity affects WRI.
+• Coaching tasks may give explicit guidance without producing scored evidence.
+• Evidence-producing tasks declare eligible dimensions internally.
+• Practice attempts are distinguishable from protected evidence attempts.
+• Users can learn from feedback without being trapped by one weak performance forever.
+13.7 Persistent workplace personas
+L28-004:
+• Manager, colleague, client and direct-report personas have role context.
+• Persona state is isolated per user journey.
+• Hidden rubrics never appear in user-facing prompts.
+• Personas stay consistent with role, relationship, previous conversation and scenario facts.
+• Persona responses may challenge the user without manufacturing facts that invalidate the assessment.
+13.8 Evidence sufficiency checkpoint
+L28-005: Day 15 opportunity expansion depends on evidence sufficiency, not calendar completion alone.
+Acceptance criteria:
+• The threshold is configurable.
+• Click-through behaviour cannot unlock artificial readiness.
+• Evidence quantity, construct coverage and quality are considered.
+• A user below threshold receives targeted development tasks rather than a punitive dead end.
+13.9 Day 28 report
+L28-006:
+• The report separates score, confidence and evidence coverage.
+• It explains major strengths and development areas in plain language.
+• It identifies what evidence is missing.
+• It recommends a next path rather than presenting Day 28 as graduation from readiness development.
+• The journey remains historically available.
+
+===== PAGE 16 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 16
+13.10 Scenario authoring and quality control
+L28-007: Levav requires an internal Scenario Studio or equivalent governed authoring workflow.
+The system should eventually allow authorised product and subject-matter teams to:
+• Define role and industry context.
+• Define seniority.
+• Select WRI dimensions.
+• Define scenario facts.
+• Define personas.
+• Define difficulty.
+• Define behavioural anchors.
+• Define branch constraints.
+• Define expected evidence artefacts.
+• Run scenario QA.
+• Version and publish.
+• Retire or replace weak scenarios.
+Generated scenarios are drafts until validated against the scenario schema and review process.
+13.11 Integrity
+L28-008: Protected evidence attempts must reduce easy answer injection without creating invasive 
+surveillance.
+Acceptance criteria:
+• Paste and drag/drop can be restricted where appropriate.
+• Timing and revisions may be recorded with consent and policy.
+• Suspicious AI-like output is a risk signal only.
+• No WRI penalty is based solely on an AI detector.
+• Follow-up reasoning, alternate scenarios or review can resolve uncertainty.
+• Network instability must not be confused with poor work discipline.
+13.12 Low-bandwidth Levav 28
+L28-009:
+• Core text scenarios remain usable on weak connections.
+• Non-proctored drafts can autosave locally and reconcile safely where appropriate.
+• Media-heavy tasks have alternatives when the construct does not require media.
+• Resumable state prevents loss of legitimate work.
+14. QuickWork: Capacity Activation and Real-World Evidence
+QuickWork is not a side-gig board.
+It is Levav's immediate economic activation and E3 evidence engine.
+It is designed for two realities:
+• Talent may have useful capacity while waiting for or between formal roles.
+• Startups and organisations may need capability before they can justify a permanent hire.
+QuickWork should help build a culture of active productive capacity without devaluing professional identity.
+14.1 Engagement types
+QuickWork should support:
+• Micro-task.
+
+===== PAGE 17 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 17
+• Hourly capacity.
+• Fixed project.
+• Short contract.
+• Fractional role.
+• Recurring support.
+• Outcome-based assignment.
+Examples can include finance, administration, customer support, operations, marketing, design, technology, research, 
+data, sales support, project coordination and other verified categories.
+14.2 Capacity Profile
+QW-001: Talent can list exact productive capacity.
+Acceptance criteria:
+• Hours available today where useful.
+• Hours per day, week or month.
+• Specific days and time windows.
+• Start and end dates.
+• Remote, hybrid or on-site.
+• Minimum and maximum engagement.
+• Rates or pricing model.
+• Work categories accepted.
+• Location where relevant.
+• Capacity can be paused or updated without deleting history.
+14.3 AI Work Scoper
+QW-002: QuickWork should help a client convert a vague need into a clear assignment.
+The AI Work Scoper may assist with:
+• Clarifying the desired outcome.
+• Defining deliverables.
+• Suggesting milestones.
+• Identifying skills or role type.
+• Estimating effort bands where supported.
+• Identifying dependencies.
+• Identifying what evidence can prove completion.
+• Highlighting missing information.
+• Producing a structured scope for client confirmation.
+The AI may not invent a market price when valid rate data is unavailable.
+14.4 Assignment lifecycle
+QW-003: Core states are:
+Draft -> Pending Verification -> Open -> Matched -> Funded or Confirmed -> Active -> Submitted -> Client Review -> 
+Completed.
+Exception states include:
+• Disputed.
+• Cancelled.
+• Expired where appropriate.
+Every transition must be authorised, timestamped and auditable.
+
+===== PAGE 18 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 18
+14.5 Matching
+QW-004: Matching must combine work need with real capacity.
+Signals may include:
+• Role and skill relevance.
+• Relevant WRI dimensions.
+• Evidence confidence.
+• Similar verified work.
+• Availability.
+• Location and work mode.
+• Rate compatibility.
+• Reliability history.
+• Client and talent eligibility.
+Paid promotion must not override genuine fit.
+14.6 Work behaviour evidence
+QW-005: Capture factual work behaviour without surveillance.
+Possible factual fields include:
+• Agreed start time.
+• Relevant check-in or session attendance.
+• Hours committed and verified.
+• Deadline and submission time.
+• Completion status.
+• Rework level.
+• Delay communication.
+• Repeat engagement.
+Remote verification may use session attendance, assignment check-in, system activity or client confirmation.
+Physical work may use client confirmation, QR check-in or consented location-assisted verification where appropriate.
+Continuous invasive tracking is not required.
+14.7 Structured closeout review
+QW-006: Client review should measure relevant observable work behaviour.
+Available review areas include:
+• Punctuality.
+• Reliability.
+• Quality.
+• Completion.
+• Timeliness.
+• Communication.
+• Initiative.
+• Problem solving.
+• Critical thinking.
+• Adaptability.
+• Teamwork where relevant.
+• Ownership.
+• Professional conduct.
+• Response to feedback.
+• Resourcefulness.
+
+===== PAGE 19 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 19
+• Rehire willingness.
+• Recommendation willingness.
+The review form should adapt to the work type so clients are not forced to rate irrelevant dimensions.
+14.8 Verified work artefacts
+QW-007: Clients and talent may attach approved evidence.
+Supported evidence may include:
+• Photos of completed work.
+• Screenshots.
+• Documents.
+• Reports.
+• Designs.
+• Approved outputs.
+• Links.
+• Before-and-after evidence where appropriate.
+Every artefact has rights and visibility controls.
+14.9 Commercial protection
+QW-008: Payment and dispute rules must exist before commercial launch.
+Required decisions include:
+• Funding or commitment model.
+• Escrow or equivalent protection where applicable.
+• Milestones.
+• Release conditions.
+• Partial completion.
+• Revision limits.
+• Client non-response.
+• Talent abandonment.
+• Cancellation.
+• Refund rules.
+• Dispute workflow.
+• Chargeback handling.
+• Platform fees.
+• Transaction states.
+14.10 Client reputation
+QW-009: Clients build reputation as well as talent.
+Signals may include:
+• Payment reliability.
+• Review turnaround.
+• Dispute rate.
+• Repeat hires.
+• Assignment clarity.
+• Verified organisation status.
+14.11 Opportunity progression
+QW-010: QuickWork should support progression from small work into deeper opportunity without forcing 
+it.
+
+===== PAGE 20 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 20
+Possible pathways include:
+• Repeat assignment.
+• Recurring capacity.
+• Short contract.
+• Fractional role.
+• Formal hiring pipeline.
+A successful QuickWork relationship may become evidence for a larger role decision.
+15. Employed Talent Journey
+Employed users must not be treated as entry-level job seekers.
+EMP-TAL-001: Current Role Readiness answers how strongly current evidence supports effective 
+performance at the user's present level.
+EMP-TAL-002: Next Role Readiness answers what evidence supports a target role or career level.
+EMP-TAL-003: Development Trajectory shows which dimensions are improving, stable or weakening.
+EMP-TAL-004: Verified Employment Evidence may include role confirmation, supervisor verification, 
+project completion, promotions, leadership responsibility, performance review or approved work output.
+Acceptance criteria:
+• Confidential employer information is not required to prove work.
+• Employer verification requires user consent.
+• The person's Levav identity remains person-owned.
+16. Employer Intelligence
+Employers do not primarily pay Levav for profile access.
+They pay to reduce hiring uncertainty.
+16.1 Employer onboarding
+EMP-001:
+1. A representative uses a personal identity.
+2. The representative creates an organisation or requests membership.
+3. Organisation details are verified through available authoritative sources or a manual process.
+4. The employer defines industry, locations, size, hiring markets and goals.
+5. The employer creates a Talent Search Profile.
+6. Natural language requirements may be converted into structured criteria for confirmation.
+7. A verified free employer sees a limited relevant preview with protected WRI locked.
+8. Subscription unlocks entitled intelligence.
+16.2 Talent Search Profile
+EMP-002: Employer search begins with the person the organisation actually needs.
+Search criteria may include:
+• Role.
+• Seniority.
+• Industry.
+• Location.
+• Work mode.
+
+===== PAGE 21 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 21
+• Skills.
+• Relevant experience.
+• Availability.
+• WRI dimensions where lawful and legitimate.
+• Evidence confidence.
+Employers may weight legitimate job-related dimensions such as critical thinking, initiative, reliability, communication, 
+leadership or teamwork.
+Protected characteristics are excluded from employment ranking.
+16.3 Explainable matching
+EMP-003: Every recommended candidate must have an explainable reason for appearing.
+The employer should be able to see:
+• Role Fit.
+• Relevant skills and experience.
+• Relevant WRI dimensions according to entitlement.
+• Evidence confidence.
+• Evidence gaps.
+• Availability where applicable.
+The system must not present one opaque magic score as the entire hiring decision.
+16.4 Employer paywall
+EMP-004: Access states include:
+Public:
+• Public professional information.
+• No protected WRI.
+Verified Employer Free:
+• Organisation profile.
+• Talent Search Profile.
+• Limited relevant talent preview.
+• WRI locked.
+Subscribed Employer:
+• Advanced search.
+• Entitled WRI depth.
+• Evidence context.
+• Candidate comparison.
+• Saved pools.
+• Messaging and hiring intelligence.
+Enterprise:
+• Seats.
+• Deeper analytics.
+• Compensation Intelligence where data supports it.
+• Quality of Hire.
+• Workforce analytics.
+• Contracted integrations.
+Every protected WRI view requires server-side entitlement checks and an audit event.
+
+===== PAGE 22 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 22
+16.5 AI Job Design Assistant
+EMP-005: The assistant may analyse a proposed role before publication.
+It can:
+• Identify unclear or conflicting responsibilities.
+• Convert free text into structured role requirements.
+• Flag unrealistic combinations of seniority, experience, skills or salary only where valid evidence supports the observation.
+• Suggest clearer outcomes and success measures.
+The employer confirms changes.
+16.6 Interview Intelligence
+EMP-006: Interview guidance uses evidence gaps rather than generic questions.
+Acceptance criteria:
+• Highlight strong evidence.
+• Highlight uncertain areas.
+• Suggest role-relevant questions tied to evidence gaps.
+• Never recommend automatic rejection solely because of WRI.
+17. Hiring Intelligence and Post-Hire Validation
+HIRE-001: Pre-hire output is Hire Confidence or Predicted Fit, not guaranteed ROI.
+It may use:
+• Role Fit.
+• Relevant WRI dimensions.
+• Evidence confidence.
+• Evidence coverage.
+• Trajectory.
+• Relevant verified outcomes.
+Major contributing factors and limitations must be explainable.
+HIRE-002: Post-hire Quality of Hire uses employer-confirmed outcomes.
+Possible inputs include:
+• Probation outcome.
+• Retention.
+• Time-to-productivity.
+• Performance.
+• Manager feedback.
+• Promotion or expanded responsibility later.
+Predicted Fit can then be compared with observed outcome.
+HIRE-003: Employer outcome participation should return value.
+Employers who contribute lawful post-hire outcomes may receive:
+• Calibration reports.
+• Quality of Hire analytics.
+• Better internal benchmarks.
+• Plan-based incentives.
+HIRE-004: Hiring ROI is calculated only when sufficient employer financial inputs exist.
+The formula and assumptions are visible. The result is labelled as an estimate unless inputs are confirmed.
+
+===== PAGE 23 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 23
+18. Jobs and Opportunity Matching
+Jobs remain an opportunity surface within the readiness system.
+JOB-001:
+• Jobs map to role taxonomy.
+• Job requirements map to skills and legitimate WRI dimensions.
+• Candidates can understand major matching reasons.
+• Applications retain the evidence snapshot relevant at the time of decision where lawful.
+• Employer pipeline state is auditable.
+JOB-002: Opportunity matching should use evidence rather than keyword matching alone.
+JOB-003: A job application must not erase QuickWork, Levav 28 or other verified evidence. The system 
+should combine relevant signals.
+19. Levav Compensation Intelligence
+AI may interpret compensation data. It may not invent numerical benchmarks.
+COMP-001: Numerical benchmarks require valid data such as:
+• Levav-observed market data.
+• Employer-reported data with governance.
+• Licensed datasets.
+• Valid public or partner datasets.
+COMP-002: Every benchmark exposes context:
+• Role mapping.
+• Geography.
+• Observation period.
+• Coverage indicator where available.
+• Data source category.
+• Confidence.
+COMP-003: Insufficient data is an acceptable product state.
+The system may return:
+• A broader benchmark.
+• A low-confidence result.
+• Insufficient data.
+It must never fabricate a salary range.
+Potential capabilities include:
+• Market range.
+• Median and percentile bands where valid.
+• Salary bands.
+• City or country comparison where supported.
+• Evidence-based scarcity premiums.
+• Offer guidance.
+• Internal equity with authorised employer data.
+• QuickWork rate intelligence.
+• Simpler talent-facing market context.
+
+===== PAGE 24 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 24
+20. Levav Impact: Verified Contribution and Social Impact
+Levav Impact is a first-class contribution system. It allows people to use real capability in verified service contexts, allows 
+organisations to mobilise skilled contributors, and turns legitimate contribution into a visible record of work, service and 
+outcomes.
+It must never turn volunteering into disguised unpaid employment. Contribution is distinct from employment, and the user 
+must understand which pathway they are entering.
+20.1 Impact opportunities
+IMPACT-001: Verified organisations can publish structured Impact opportunities.
+Supported opportunity types may include:
+• Skilled volunteering.
+• Community projects.
+• Mentorship and professional service.
+• Pro bono professional assignments.
+• Time-bound campaigns and field initiatives.
+• Organisational service placements with defined outputs.
+Required fields include cause or purpose, skills, location or work mode, duration, expected outputs, supervisor, 
+safety/context information and whether any costs or stipends are covered.
+20.2 Verified contribution record
+IMPACT-002: Completed service can create a verified contribution record.
+Acceptance criteria:
+• Organisation confirms role, dates, hours or duration, outputs and completion.
+• Relevant artefacts may be attached under visibility and rights controls.
+• The contributor can dispute inaccurate records.
+• Verified Impact appears on the professional profile when the user permits it.
+• Only behaviourally relevant, sufficiently verified observations may contribute to eligible WRI dimensions.
+• Impact participation alone never creates an automatic WRI increase.
+20.3 Organisation Impact workspace
+IMPACT-003: Verified organisations can manage contribution programmes and outcomes.
+The workspace may include opportunity creation, applicants or invited contributors, placement status, supervisor 
+verification, outputs, completion, contribution hours, approved outcome measures and reporting.
+20.4 Impact identity and discovery
+IMPACT-004: Impact should strengthen professional identity without becoming a vanity leaderboard.
+Users may feature causes, verified service, selected outcomes, testimonials and contribution stories. Organisations may 
+publish verified Impact updates into the professional feed. Popularity metrics must not substitute for verified contribution.
+20.5 Impact measurement guardrails
+IMPACT-005: Levav distinguishes activity, output and outcome.
+Hours served are activity. A completed deliverable is an output. A claimed change in a community or beneficiary group is 
+an outcome only when the organisation has a legitimate measurement basis. The platform must not manufacture social-
+impact claims.
+Impact success metrics may include verified placements, completion, repeat participation, outputs delivered, verified 
+contribution hours, skills deployed and organisation-confirmed outcomes where measurement quality is sufficient.
+
+===== PAGE 25 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 25
+21. Levav Learn
+Learn exists to close evidence-backed development gaps.
+LEARN-001: Courses may be free, paid, sponsored or employer-funded.
+LEARN-002: Course completion alone does not automatically increase WRI.
+Learning can contribute evidence only when the assessment evidence is valid for an eligible dimension.
+LEARN-003: Recommendations explain why learning is relevant.
+LEARN-004: Learning effectiveness should be measured where possible through pre/post evidence or 
+relevant WRI changes, without claiming causality beyond the data.
+22. Champions
+Champions are verified high-value contributors, not a generic influencer badge.
+CHAMP-001: Entry can occur through invitation, nomination or application.
+CHAMP-002: Verification may consider:
+• Professional credibility.
+• Verified portfolio.
+• Expertise.
+• Learning contribution.
+• Supported causes or community contribution.
+Champion status must not inflate WRI or search ranking merely because the badge exists.
+23. Professional Feed and Network
+The feed must feel active, useful and professional. It is the daily discovery layer of Levav, connecting identity, work, 
+evidence, learning, organisations, Impact, opportunities and relevant workforce information.
+It is not a vanity social network and social popularity is never a readiness score.
+23.1 Personal and organisation presence
+FEED-001: Every eligible member can maintain a recognisable professional presence.
+Acceptance criteria:
+• Profile photo and professional cover or background image.
+• Headline, current role, location, about and selected expertise.
+• Featured work, selected evidence, Impact contributions and pinned or featured posts.
+• Edit-profile controls connect to the canonical professional profile rather than creating a duplicate social identity.
+• Verified organisations have organisation pages and can publish updates under controlled membership permissions.
+23.2 Publishing
+FEED-002: Members and authorised organisations can create useful professional posts.
+Supported post types should include:
+• Text updates.
+• Images and compressed media.
+• Project and portfolio updates.
+• Documents or approved links where safe.
+• Verified QuickWork completion or work evidence cards where visibility permits.
+
+===== PAGE 26 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 26
+• Levav 28 milestones that reveal no protected rubrics or scores.
+• Learn achievements and useful professional knowledge.
+• Levav Impact stories and verified contribution updates.
+• Employer, organisation and opportunity announcements.
+Users should be able to edit or delete their own posts subject to audit and evidence-preservation rules where a post has 
+been used as a verified artefact.
+23.3 Engagement and network
+FEED-003: Support follow, relevant reactions, comments, replies, save, share or repost where appropriate, 
+reporting and notification controls.
+Mentions and topic tags may support discovery. Anti-spam, blocking, muting and reporting controls are required before 
+broad public growth.
+23.4 Feed discovery
+FEED-004: The feed should provide useful discovery without rewarding noise.
+Candidate feed views may include Following, For You, Opportunities, Learning, Impact and organisation updates. 
+Personalisation may use declared interests, career context, follows, location, skills and permitted activity signals.
+WRI, protected assessment data and hidden employer intelligence must not be exposed or used as public social-ranking 
+signals.
+23.5 News and What is New
+FEED-005: Levav can surface a trusted What is New layer.
+This may include Levav product updates, employer announcements, verified organisation news, workforce and career 
+insights, and curated external professional news where sourcing is clear. External news must retain source attribution 
+and link to the original publisher. AI summaries must not invent facts.
+23.6 Trust and verified context
+FEED-006: Verified context should be visible where useful.
+A post may display that a work item, organisation, achievement or Impact contribution is verified, but the interface must 
+distinguish a verified source from a claim that the entire post is objectively true.
+23.7 Feed quality and low-bandwidth behaviour
+FEED-007: The feed is mobile-first, fast and usable on constrained networks.
+Acceptance criteria:
+• Lazy-load media and prioritise text.
+• Compress images and use responsive sizes.
+• Provide low-data behaviour and graceful media failure.
+• Use pagination or controlled infinite loading that does not trap the user or consume unnecessary data.
+• Preserve compose drafts through ordinary connection interruptions where practical.
+23.8 Feed integrity
+FEED-008: Popularity is not readiness.
+Likes, reactions, follower counts, posting frequency and viral reach must never directly increase WRI, Role Fit or 
+employer ranking. Sponsored content, if introduced, must be clearly labelled and cannot override employment relevance.
+24. Levav Workforce Graph
+AI should operate over structured workforce context rather than inventing Levav's ontology dynamically.
+Core node families include:
+
+===== PAGE 27 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 27
+• Person.
+• Role.
+• Skill.
+• Behaviour or WRI dimension.
+• Organisation.
+• Opportunity.
+• Learning.
+• Evidence.
+• Outcome.
+• Compensation context.
+Core relationships include:
+• Person to roles, skills, evidence, organisations, learning, opportunities and outcomes.
+• Role to industry, seniority, skills, behaviours and compensation.
+• Skill to roles, learning, evidence and adjacent skills.
+• WRI dimension to evidence types, scenarios and role relevance.
+• Organisation to roles, opportunities and hiring outcomes.
+• Opportunity to role, skills, location, capacity, compensation and evidence generated.
+• Learning to skills, roles, WRI gaps and outcomes.
+• Evidence to source, verifier, dimensions, recency and confidence.
+• Outcome to hire, completion, rehire, retention, performance and promotion.
+GRAPH-001: Taxonomy changes are versioned.
+GRAPH-002: Matching explanations can trace major graph signals.
+GRAPH-003: AI can propose mappings, but authoritative ontology changes require validation.
+25. Workforce Intelligence and Institutional Data
+Workforce Intelligence is aggregate and privacy-protected by default.
+Potential insight families include:
+• Readiness bands by sector, geography or career family where cohort thresholds permit.
+• Skills and capability gaps.
+• Development patterns from Levav 28 and Learn.
+• Time-to-opportunity and transition patterns.
+• Employer demand.
+• Work mode patterns.
+• Volunteer and contribution patterns.
+• QuickWork capacity, demand, completion and repeat engagement.
+• Compensation coverage where valid data exists.
+DATA-001: Institutional products do not provide default access to individual WRI records.
+DATA-002: Minimum cohort thresholds suppress re-identifiable groups.
+DATA-003: Exports are purpose-bound, time-bound and audited.
+DATA-004: Every institutional dataset has governance metadata including:
+• Owner.
+• Purpose.
+• Lawful basis or contract.
+• Fields.
+• Cohort rules.
+
+===== PAGE 28 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 28
+• Retention.
+• Expiry.
+• Access scope.
+26. Monetisation Architecture
+Levav's revenue model must reinforce product value without corrupting evidence or matching.
+Potential revenue lines include:
+• Employer subscriptions.
+• Enterprise employer plans.
+• QuickWork transaction or service fees.
+• Talent Premium.
+• Levav Learn.
+• Sponsored development cohorts.
+• Institutional analytics.
+• Future scoped enterprise integrations.
+MON-001: Paid talent features cannot override role relevance.
+MON-002: Employer plans control entitlement, not WRI scoring.
+MON-003: Institutional payment never buys private individual behavioural data.
+MON-004: Commercial features must expose clear value. Do not add paywalls that block the user's core 
+ability to build readiness evidence.
+27. Trust, Fraud and Evidence Integrity
+The system must assume that evidence can be manipulated and design for trust without becoming hostile to users.
+Trust controls may include:
+• Identity verification.
+• Duplicate-account detection.
+• Employer and organisation verification.
+• Suspicious reciprocal review detection.
+• Collusion signals.
+• Fake QuickWork assignment detection.
+• Reviewer trust scoring.
+• Portfolio plagiarism or duplicated evidence detection where feasible.
+• Uploaded evidence integrity checks.
+• Payment risk controls.
+• Manual review queue.
+TRUST-001: Reviewer trust influences evidence confidence rather than becoming a public popularity 
+score.
+Reviewer trust may consider:
+• Verified relationship context.
+• History of completed reviews.
+• Consistency with objective assignment data.
+• Dispute history.
+• Suspicious reciprocal behaviour.
+TRUST-002: Disputes are first-class workflow states.
+
+===== PAGE 29 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 29
+• Evidence can be quarantined.
+• Resolution is logged.
+• Recalculation occurs through controlled events.
+• User appeal does not erase audit history.
+28. AI Architecture
+AI is a product capability layer, not the source of truth for Levav's evidence system.
+AI-001: Provider abstraction.
+The system should avoid hard-wiring critical product logic to one model provider where a reasonable abstraction is 
+possible.
+AI-002: Structured outputs.
+Critical AI functions should return validated structured outputs rather than uncontrolled prose when the result feeds 
+product logic.
+AI-003: Version prompts and evaluation logic.
+Record relevant versions for:
+• Scenario generation.
+• Persona instructions.
+• Response evaluation.
+• Employer search parsing.
+• Job design analysis.
+• Interview guidance.
+• Recommendation reasoning.
+AI-004: Human confirmation where authority matters.
+User or employer confirmation is required before AI inference becomes authoritative for profile, job requirements or other 
+declared facts.
+AI-005: Evaluation and regression testing.
+Maintain test sets for important AI capabilities. New prompt or model versions should be evaluated against expected 
+behaviour before broad release.
+AI-006: Model monitoring.
+Track:
+• Latency.
+• Failure rate.
+• Structured output validity.
+• Cost.
+• Scenario failure patterns.
+• Evaluation disagreement where human review exists.
+• Drift in WRI-related evaluation.
+AI-007: Graceful fallback.
+AI failure must not corrupt evidence or silently produce fabricated facts.
+AI-008: Guardrails by capability.
+CV extraction:
+• User confirmation.
+Career profiling:
+• Explain inference and allow correction.
+
+===== PAGE 30 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 30
+Scenario generation:
+• Constrained by role, industry, level, competency and scenario schema.
+Workplace personas:
+• Role-bound context and isolated journey state.
+Response evaluation:
+• Rubric-based, versioned and confidence-aware.
+Employer search parsing:
+• Convert natural language into structured filters for confirmation.
+Salary assistant:
+• Interpret valid data, never invent benchmarks.
+Recommendations:
+• Use structured Workforce Graph context and explain major signals.
+Integrity detection:
+• Risk signal only.
+Institutional summaries:
+• Use authorised aggregate datasets only.
+29. Security, Privacy and User Trust
+SEC-001: Encrypt data in transit and at rest through the selected managed infrastructure.
+SEC-002: Secrets stay server-side in managed secret storage.
+SEC-003: Organisation data uses tenant-aware authorisation.
+SEC-004: Protected readiness data uses server-side field and entitlement controls.
+SEC-005: Log protected WRI views, exports, privileged admin changes and institutional access.
+SEC-006: Privileged administration requires stronger authentication, including MFA where supported.
+SEC-007: Uploaded evidence is scanned and file types are restricted.
+SEC-008: Sensitive endpoints are rate-limited.
+SEC-009: Raw assessment telemetry retention is separated from durable evidence retention.
+SEC-010: Support lawful correction, export and deletion workflows.
+SEC-011: Hidden scoring rubrics and internal weights are never exposed to employers.
+SEC-012: Identifiable behavioural data is not sold as an institutional data product.
+29.1 Privacy and Evidence Centre
+PRIV-001: Every user should have a Privacy and Evidence Centre.
+It should show:
+• What evidence Levav holds.
+• What is self-declared and what is verified.
+• Who verified evidence.
+• Which evidence can affect WRI.
+• Public, employer-visible and private visibility.
+• Protected WRI access history where policy permits.
+• Dispute options.
+• Consent and revocation controls where applicable.
+
+===== PAGE 31 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 31
+30. African Infrastructure Requirements
+AFR-001: Mobile-first responsive design.
+AFR-002: Low-data mode for feed and profile media.
+AFR-003: Image compression and resumable uploads.
+AFR-004: Graceful poor-network states.
+AFR-005: Offline draft capability for safe non-proctored Levav 28 tasks.
+AFR-006: Email or SMS fallback for high-value notifications where supported and justified.
+AFR-007: Local currency, timezone and locale support.
+AFR-008: Architecture ready for additional African languages.
+AFR-009: Device and network limitations must not be mistaken for low readiness.
+AFR-010: Accessibility is part of the product quality bar.
+31. Current Technology Direction and Migration Rules
+The current repository is the implementation source of truth for stack choices.
+As of this PRD edition, the active direction includes:
+• React 19.
+• Vite 6.
+• TypeScript 5.9.
+• React Router.
+• TanStack Query.
+• Tailwind CSS.
+• shadcn/ui and Radix primitives.
+• framer-motion.
+• Hono backend services.
+• tRPC.
+• Drizzle ORM.
+• PostgreSQL and Supabase infrastructure.
+• Supabase-linked identity and row-level security foundations in the current data model.
+• Vitest automated tests.
+• Vercel deployment.
+ENG-001: Do not migrate to Next.js, Prisma or a second UI framework merely because an older design 
+example used it.
+ENG-002: Preserve the working authentication and organisation foundations.
+ENG-003: Before changing a major subsystem, Codex verifies the current code and runtime rather than 
+trusting stale documentation.
+ENG-004: The product specification defines behaviour. Folder examples do not override the real repository 
+structure.
+ENG-005: Mock and localStorage surfaces must be connected incrementally to real services. Do not 
+perform a blind rewrite of the entire app.
+
+===== PAGE 32 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 32
+32. Backend Service Boundaries
+The following are logical service responsibilities. Codex may implement them within the existing architecture without 
+forcing microservices.
+• Identity: auth, sessions, verification, access and organisation membership.
+• Profile: career profile, CV extraction, skills and visibility.
+• Organisation: organisation pages, membership and verification.
+• Levav 28: journeys, scenarios, personas, attempts and feedback.
+• Evidence: evidence nodes, verification, disputes and provenance.
+• WRI: dimensions, scoring, confidence, snapshots and model versions.
+• Workforce Graph: taxonomy and relationships.
+• Matching: talent-role and opportunity relevance with explainability.
+• QuickWork: capacity, listings, matching, assignments, evidence and reviews.
+• Jobs: jobs, applications and pipeline.
+• Employer Intelligence: search profiles, pools, comparisons and Hire Confidence.
+• Compensation: role mapping, data adapters, benchmarks and confidence.
+• Impact: volunteer opportunities, placements and verification.
+• Learn: courses, enrolment, entitlements and progress.
+• Social: posts, follows, comments, saves and reports.
+• Messaging: threads, requests, context and anti-spam.
+• Billing: plans, subscriptions, invoices, entitlements and payment adapters.
+• Data Platform: events, aggregates and institutional products.
+• Trust: moderation, fraud, disputes, risk and audit.
+• Notifications: in-app, email or push orchestration and preferences.
+33. Core Data Model
+The data model should support at least these conceptual entities as the relevant modules are implemented:
+• User.
+• ProfessionalProfile.
+• Organisation.
+• OrganisationMembership.
+• CareerTaxonomy.
+• Levav28Journey.
+• Scenario.
+• ScenarioAttempt.
+• Evidence.
+• WRIDimension.
+• WRISnapshot.
+• RoleReadinessSnapshot.
+• CapacityProfile.
+• QuickWorkListing.
+• QuickWorkAssignment.
+• WorkEvidenceAsset.
+• PerformanceReview.
+• EmploymentEvidence.
+• EmployerSearchProfile.
+• TalentPool.
+
+===== PAGE 33 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 33
+• Job.
+• Application.
+• VolunteerOpportunity.
+• VolunteerPlacement.
+• Course.
+• Enrolment.
+• Subscription.
+• Entitlement.
+• HireOutcome.
+• CompensationBenchmark.
+• AuditEvent.
+DATA-MODEL-001: Database design must be derived from current schema and migration history rather 
+than pasted from the old v3.3 Prisma example.
+DATA-MODEL-002: Every evidence-producing entity must be able to emit a controlled evidence event.
+DATA-MODEL-003: Protected data visibility is represented in the data model rather than relying only on 
+client UI hiding.
+34. Event-Driven Evidence Pipeline
+Evidence-producing UI actions must not directly mutate WRI scores.
+Events should trigger controlled consumers.
+Examples include:
+• profile.confirmed -> matching and recommendations.
+• levav28.attempt.completed -> evidence, WRI and feedback.
+• quickwork.assignment.started -> attendance and audit.
+• quickwork.assignment.submitted -> evidence and client review.
+• quickwork.assignment.completed -> evidence, WRI, billing and profile.
+• quickwork.review.completed -> evidence, WRI and reputation.
+• employment.evidence.verified -> evidence, WRI and profile.
+• volunteer.placement.verified -> evidence, WRI and impact.
+• course.assessment.completed -> eligible evidence and recommendations.
+• employer.wri.viewed -> audit and privacy monitoring.
+• hire.outcome.recorded -> Quality of Hire and model evaluation.
+• evidence.disputed -> trust workflow and WRI recalculation queue.
+EVENT-001: Consumers should be idempotent for finalisation and payment-sensitive workflows.
+EVENT-002: Evidence and WRI changes remain traceable to source events.
+35. API Principles
+API-001: Protected endpoints require authenticated identity and server-side authorisation.
+API-002: Organisation endpoints require membership and tenant checks.
+API-003: Protected WRI endpoints require entitlement and visibility checks.
+API-004: Registry, payment, compensation and AI providers use adapters where practical.
+API-005: Enterprise or institutional credentials are scoped, revocable, rate-limited and audited.
+API-006: Billing, evidence finalisation and payment-sensitive actions are idempotent.
+
+===== PAGE 34 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 34
+API-007: Externally consumed schemas are versioned.
+API-008: Error responses must not leak internal scoring logic or sensitive tenant information.
+36. Required Product States
+Every major surface must be designed for real states, not only the happy path.
+Talent Home:
+• New user.
+• Provisional WRI.
+• Active Levav 28.
+• Evidence growing.
+• Opportunity-ready.
+• Employed development.
+WRI:
+• No data.
+• Provisional.
+• Medium confidence.
+• High confidence.
+• Disputed evidence.
+• Historical trajectory.
+Levav 28:
+• Day 1.
+• Active day.
+• Missed day.
+• Feedback.
+• Integrity follow-up.
+• Day 15 threshold.
+• Day 28 report.
+QuickWork Talent:
+• No capacity.
+• Capacity active.
+• Matched.
+• Active assignment.
+• Submission.
+• Review.
+• Completed.
+• Dispute.
+QuickWork Client:
+• Draft.
+• Verification.
+• Applicants or matched pool.
+• Matched.
+• Active.
+• Review due.
+• Completed.
+• Dispute.
+Employer Talent View:
+
+===== PAGE 35 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 35
+• Public.
+• WRI locked.
+• Subscribed.
+• Provisional WRI.
+• High-confidence WRI.
+• Hidden evidence.
+• Plan limit.
+Employer Search:
+• No criteria.
+• AI-parsed criteria.
+• Results.
+• Insufficient results.
+• Saved pool.
+Compensation:
+• No data.
+• Broad benchmark.
+• Confident benchmark.
+• Comparison.
+• Insufficient data.
+Organisation:
+• Unverified.
+• Verified.
+• Opportunity active.
+• Verification due.
+Institutional:
+• No contract.
+• Scoped access.
+• Cohort suppression.
+• Export requested.
+• Export expired.
+37. Observability and Model Monitoring
+OBS-001: Structured logs use correlation identifiers.
+OBS-002: Product metrics include authentication, payment, WRI recalculation, AI latency, scenario failures 
+and matching quality.
+OBS-003: WRI model versions have calibration and drift monitoring.
+OBS-004: Alert on unusual protected WRI access and institutional export activity.
+OBS-005: Manual overrides, verification changes and disputes are auditable.
+OBS-006: High-risk scoring and data changes use feature flags or controlled rollout.
+OBS-007: Critical user journeys have operational dashboards or equivalent monitoring before production 
+scale.
+38. Success Metrics
+Levav must optimise verified progression, not vanity activity.
+
+===== PAGE 36 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 36
+38.1 Primary ecosystem metric
+Primary metric: Readiness Activation Rate.
+Definition:
+The percentage of eligible active users who move from a provisional state to an evidence-sufficient opportunity-ready 
+state within a defined window, with sufficient diversity of E2 and E3 evidence for the relevant pathway.
+This avoids rewarding the system for generating many trivial evidence nodes.
+38.2 Supporting metrics
+Talent:
+• Onboarding completion.
+• Levav 28 Day 7, Day 15 and Day 28 retention.
+• Evidence growth.
+• Time-to-first verified opportunity.
+• Opportunity conversion.
+Readiness:
+• Confidence growth.
+• Dimension improvement.
+• Evidence diversity.
+• E2 to E3 calibration.
+• E3 to E4 validation.
+Employed Talent:
+• Current-role readiness engagement.
+• Next-role progress.
+• Verified employment evidence.
+• Career progression outcomes where available.
+QuickWork:
+• Capacity listed.
+• Fill rate.
+• Completion rate.
+• On-time rate.
+• Rehire rate.
+• Verified hours.
+• Earnings.
+• Conversion to recurring or larger opportunity.
+Employer:
+• Free-to-paid conversion.
+• Time-to-shortlist.
+• Search-to-contact.
+• Time-to-hire.
+• Employer retention.
+Hiring Quality:
+• Probation success.
+• Retention.
+• Time-to-productivity.
+• Prediction calibration.
+Compensation:
+
+===== PAGE 37 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 37
+• Benchmark usage.
+• Data coverage.
+• Confidence distribution.
+Learn:
+• Enrolment.
+• Completion.
+• Evidence-backed improvement where supported.
+Impact:
+• Verified placements.
+• Outputs.
+• Completion.
+• Contribution evidence.
+Institutional:
+• Data coverage.
+• Freshness.
+• Cohort validity.
+• Report usage.
+• Privacy incidents, target zero.
+Trust:
+• Disputes.
+• Fraud rate.
+• Moderation response.
+• Unauthorised access attempts.
+38.3 Secondary velocity metric
+Readiness Velocity may be reported as verified evidence progression divided by time to first verified opportunity, but it 
+must use weighted and quality-controlled evidence. Raw node count alone must never be a target.
+39. Product Differentiation and Moat
+Levav's advantage should come from the connected system rather than one isolated feature.
+The product moat is the closed loop:
+• Develop in realistic simulation.
+• Create E2 evidence.
+• Interpret evidence through versioned WRI.
+• Convert readiness into QuickWork or other opportunity.
+• Create E3 verified real-world evidence.
+• Observe post-hire and longitudinal outcomes as E4.
+• Use outcomes to improve matching, scenarios and WRI calibration.
+• Aggregate privacy-protected patterns into Workforce Intelligence.
+Important design lessons adopted from current industry practice include:
+• Use job-relevant simulations instead of abstract quizzes alone.
+• Use dynamic persona interactions and practical work artefacts.
+• Use structured skill and role context for matching.
+• Explain major matching signals.
+• Help employers structure work and roles before matching.
+• Support repeat practice and targeted development.
+
+===== PAGE 38 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 38
+• Connect flexible work to stronger career evidence.
+Levav must combine these lessons with its own evidence provenance, longitudinal readiness loop, Africa-first operating 
+conditions and capacity activation model.
+No competitor brand, proprietary workflow or copied language belongs in the product specification or user experience.
+Levav language must remain internally consistent even when product lessons are informed by external patterns.
+40. Dual-Agent Operating Model
+The project uses two primary agents with deliberately different authority.
+Claude and Codex are collaborators. They are not two engineers editing the same system.
+40.1 Claude role
+Claude is Product Command.
+Claude acts as:
+• Product Manager.
+• Programme Manager.
+• Requirements owner.
+• Product architecture reviewer.
+• Domain logic spec owner.
+• WRI scientific specification coordinator.
+• Levav 28 scenario and rubric specification owner.
+• Product language and UX writing system owner.
+• Levav Impact product specification owner.
+• Professional Feed and Network product specification owner.
+• Acceptance-test designer.
+• QA gatekeeper.
+• Decision log owner.
+• Cross-workstream coordinator.
+Claude may use subagents for research, scenario review, psychometric review, security review, accessibility review, 
+product QA and test design.
+All Claude subagents inherit Claude's write boundaries.
+Claude is primarily read-only over production code.
+Claude must inspect implementation enough to review it, but must not become a competing coding agent.
+40.2 Codex role
+Codex is Engineering Command.
+Codex acts as:
+• Lead implementation engineer.
+• Runtime owner.
+• Frontend engineer.
+• Product language implementation and copy-system engineer.
+• Feed, profile and social interaction implementation engineer.
+• Levav Impact implementation engineer.
+• Backend engineer.
+• Database and migration engineer.
+• API engineer.
+• Test engineer.
+
+===== PAGE 39 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 39
+• CI and build engineer.
+• Performance engineer.
+• Security implementation engineer.
+• Production debugging owner.
+Codex owns executable implementation.
+Codex must continue fixing a scoped work packet until the acceptance tests it controls pass or a genuine product 
+decision is required.
+40.3 Why this split exists
+The earlier v3.3 split assigned Claude executable domain code and Codex runtime code. That creates unnecessary 
+merge boundaries inside one feature.
+The v4.1 split removes that risk.
+One agent owns product meaning. One agent owns executable implementation.
+41. Non-Overlap File Ownership
+The repository should adopt explicit write ownership.
+Claude exclusive write scope
+Recommended paths:
+• CLAUDE.md.
+• docs/prd/.
+• docs/product/.
+• docs/decisions/.
+• docs/qa/.
+• docs/agent-handoffs/claude/.
+• specs/scenarios/.
+• specs/rubrics/.
+• specs/product-contracts/.
+Claude may read all repository files.
+Claude does not edit:
+• src/.
+• server/.
+• api/.
+• db/.
+• executable tests.
+• build configuration.
+• deployment configuration.
+Codex exclusive write scope
+Recommended paths:
+• AGENTS.md.
+• src/.
+• server/.
+• api/.
+• db/.
+• tests/ or existing test locations.
+• scripts/.
+
+===== PAGE 40 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 40
+• package.json and lockfile where required.
+• TypeScript, Vite and build configuration.
+• CI configuration.
+• deployment configuration.
+• docs/implementation/.
+• docs/agent-handoffs/codex/.
+Codex may read all product documents and specs.
+Codex does not edit:
+• Master PRD.
+• Product acceptance criteria.
+• WRI scientific definitions.
+• Approved scenario rubrics.
+• Product Decision Records.
+41.1 Shared control files
+A file must never have simultaneous write ownership.
+If content must move from Claude-owned specification into a Codex-owned root instruction file, Claude records the 
+approved text in a handoff. Codex applies it.
+42. Agent Handoff Protocol
+Every implementation unit begins with a Claude Work Packet.
+42.1 Claude Work Packet format
+Each packet contains:
+• Work Packet ID.
+• Related PRD requirement IDs.
+• Product problem.
+• User journey.
+• In scope.
+• Out of scope.
+• Existing behaviour to preserve.
+• Functional acceptance criteria.
+• Data and privacy requirements.
+• Expected events.
+• Required UI states.
+• Test scenarios.
+• Dependencies.
+• Open product decisions, if any.
+Status begins as READY_FOR_BUILD.
+42.2 Codex implementation report
+Codex responds with:
+• Work Packet ID.
+• Audit classification of affected existing code.
+• Implementation summary.
+• Files changed.
+• Database migration summary.
+
+===== PAGE 41 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 41
+• API changes.
+• Tests added or changed.
+• Commands run and results.
+• Security and permission checks.
+• Performance or low-bandwidth considerations.
+• Known limitations.
+• Status: READY_FOR_REVIEW or BLOCKED_PRODUCT_DECISION.
+42.3 Claude acceptance review
+Claude checks:
+• Requirement coverage.
+• Acceptance criteria.
+• Product semantics.
+• Edge states.
+• Evidence and WRI integrity.
+• Privacy and entitlement behaviour.
+• User experience.
+• Test coverage.
+• Regression risk.
+Claude returns either:
+• ACCEPTED.
+• DEFECTS_FOUND with a numbered defect list.
+• BLOCKED_PRODUCT_DECISION with a decision record.
+Codex fixes DEFECTS_FOUND and returns the same Work Packet to READY_FOR_REVIEW.
+The cycle repeats until ACCEPTED.
+43. Parallel Work Rules
+Parallelism is allowed only when workstreams are technically disjoint or their contracts are stable.
+Claude controls work packet sequencing.
+The following are prohibited:
+• Claude and Codex editing the same production file.
+• Two Codex branches modifying the same database migration chain without coordination.
+• Building WRI before the Evidence Graph contract is stable.
+• Building premium WRI UI without server-side entitlement design.
+• Building Workforce Intelligence on raw private individual data without governance controls.
+A dependency must be resolved before dependent work is accepted.
+44. Claude Subagent Model
+Claude may create specialised subagents to increase quality and speed.
+Recommended roles:
+Product research reviewer
+Checks current patterns, user needs and product gaps. Produces research notes only.
+
+===== PAGE 42 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 42
+Levav 28 scenario reviewer
+Checks realism, difficulty, role relevance, construct coverage and ambiguity.
+WRI scientific reviewer
+Checks behavioural anchors, construct definitions, scoring proposals, confidence and validation design.
+Trust and privacy reviewer
+Checks consent, evidence visibility, disputes, institutional aggregation and employer access.
+Accessibility and low-bandwidth reviewer
+Checks mobile, network degradation, media dependence, accessibility and device assumptions.
+QA acceptance reviewer
+Turns acceptance criteria into test scenarios and checks Codex implementation reports.
+Subagents do not change production source files.
+45. Codex Engineering Behaviour
+CODEX-001: Audit before edit.
+Codex reads the current implementation and classifies affected parts before coding.
+CODEX-002: Preserve working authentication.
+Do not weaken or replace auth to make a feature easier.
+CODEX-003: Implement vertical slices.
+Prefer a functioning end-to-end slice over broad disconnected scaffolding.
+CODEX-004: Test business logic.
+New WRI, matching, payment, entitlement, evidence, transition and security logic requires automated tests.
+CODEX-005: Fix until green.
+For a work packet, Codex runs the relevant tests, type checks and build. It fixes regressions within scope before 
+declaring READY_FOR_REVIEW.
+CODEX-006: No product invention by code.
+If the PRD leaves a product decision unresolved, Codex chooses the safest reversible implementation where possible 
+and records the decision needed. It does not silently invent WRI coefficients, paywall rules, compensation data or 
+evidence policy.
+CODEX-007: Keep implementation truth current.
+After accepted work, update docs/implementation/IMPLEMENTATION_STATE.md or the approved equivalent with 
+factual current state.
+46. Build Sequence
+The build should prove the closed readiness loop early.
+Sprint 0: Control Plane and Repository Truth
+Claude:
+• Publish Master PRD v4.1 in the repository.
+• Replace stale Claude instructions with the v4 role.
+• Create requirements index.
+
+===== PAGE 43 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 43
+• Create decision log structure.
+• Create QA and handoff templates.
+Codex:
+• Audit current main branch.
+• Update AGENTS.md to point to the v4 authority.
+• Verify real auth, organisation, deployment, database and test state.
+• Repair stale implementation documentation.
+• Ensure typecheck, test and build scripts reflect actual commands.
+• Add lint as a gate only after it is correctly configured.
+• Establish CI if missing.
+Exit gate:
+• Both agents agree on current implementation truth.
+• No stale document can override the Master PRD.
+• Auth remains working.
+• Typecheck, tests and build have known verified states.
+Sprint 1: Identity, Taxonomy and Personalisation
+Goal:
+• Complete the person-owned identity model around the existing auth foundation.
+• Strengthen organisation membership and verification.
+• Implement career taxonomy and intelligent onboarding.
+• Connect Personal Home and professional profile to real services.
+Exit gate:
+A new user can register, confirm identity, complete intelligent onboarding, receive a real personal profile state and enter 
+the relevant next journey without mock identity logic.
+Sprint 2: Evidence Graph Foundation
+Goal:
+• Build evidence entities, provenance, visibility, disputes and controlled event ingestion.
+• Establish E0-E4 types.
+• Separate factual observations from subjective evaluations.
+• Build Privacy and Evidence Centre foundations.
+Exit gate:
+A verified event can create an auditable evidence node and a dispute can change its processing state without deleting 
+history.
+Sprint 3: Versioned WRI Engine
+Goal:
+• Build WRI dimension definitions.
+• Configurable scoring.
+• Evidence confidence.
+• Evidence coverage.
+• Trajectory.
+• Snapshot versioning.
+• Role Readiness separation.
+• Auditability.
+Exit gate:
+
+===== PAGE 44 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 44
+Given controlled test evidence, the system produces deterministic versioned WRI snapshots and separate confidence 
+values, with traceable contributions and tests.
+Sprint 4: Levav 28 Vertical Slice
+First target:
+• Days 1-5 end to end.
+• Persistent journey state.
+• At least two scenario modalities.
+• Persona continuity.
+• Rubric-based evaluation.
+• E2 evidence creation.
+• Feedback and coaching split.
+• Poor-network state.
+Then expand to Days 6-28 after the vertical slice is accepted.
+Exit gate:
+A real user can complete a controlled Levav 28 task and create valid E2 evidence that updates WRI through the event 
+pipeline.
+Sprint 5: QuickWork Closed Loop
+Build:
+• Capacity Profile.
+• Client work scoping.
+• Listing.
+• Matching.
+• Assignment lifecycle.
+• Submission.
+• Client review.
+• Work evidence.
+• Dispute state.
+• Client reputation.
+• Payment state model.
+Exit gate:
+A startup can define work, match to eligible capacity, complete the assignment, close it out and create E3 evidence 
+without manual database manipulation.
+Sprint 6: Employer Intelligence
+Build:
+• Employer verification completion.
+• Talent Search Profile.
+• Natural-language criteria parsing and confirmation.
+• Explainable candidate search.
+• WRI entitlement.
+• Candidate comparison.
+• Saved pools.
+• Job Design Assistant.
+• Interview Intelligence.
+• Hiring pipeline.
+Exit gate:
+
+===== PAGE 45 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 45
+A verified subscribed employer can discover a relevant candidate, understand why the candidate appears, view only 
+entitled readiness data and progress the candidate through a real pipeline.
+Sprint 7: Post-Hire Outcome and E4
+Build:
+• Probation outcome capture.
+• Retention and time-to-productivity fields.
+• Quality of Hire.
+• Prediction versus outcome comparison.
+• E4 evidence ingestion.
+Exit gate:
+A real employer-confirmed outcome can create E4 evidence and enter model evaluation without rewriting historical WRI 
+snapshots.
+Sprint 8: Learn, Impact, Champions and Feed Integration
+The goal is not to build isolated content islands. Sprint 8 makes Levav feel like a living professional ecosystem while 
+preserving evidence integrity.
+Build or complete:
+• Levav Learn real services and evidence-safe achievement flows.
+• Levav Impact opportunities, placements, verification, contribution records and organisation workspace.
+• Champions verification and contribution surfaces.
+• Professional profile editing, cover/background image and featured content.
+• Secure email-change account flow that preserves one Levav identity.
+• Feed publishing, organisation posts, media, reactions, comments, follows, saves, reporting, notifications and discovery 
+views.
+• What is New and sourced workforce/news cards without fabricated AI news.
+• Consistent Levav language and copy architecture across the surfaces implemented to this point.
+Each surface must connect into:
+• Identity.
+• Evidence.
+• Recommendations.
+• Workforce Graph.
+• Visibility policy.
+• Moderation and trust.
+Exit gate:
+A member can maintain a rich professional presence, publish and engage in a real feed, participate in verified Impact, 
+receive useful discovery, and see consistent Levav language across the system. Only eligible verified evidence 
+influences WRI.
+Sprint 9: Workforce Graph, Compensation and Workforce Intelligence
+Build graph services and stronger matching first.
+Activate Compensation Intelligence only for supported data.
+Activate aggregate Workforce Intelligence only after governance and cohort rules are operational.
+Exit gate:
+Institutional insight cannot expose private individual data, and compensation never fabricates a benchmark.
+Sprint 10: Production Hardening
+Complete:
+
+===== PAGE 46 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 46
+• Admin workflows.
+• Moderation.
+• Fraud controls.
+• Disputes.
+• Audit.
+• Observability.
+• Performance.
+• Route-level code splitting.
+• Mobile QA.
+• Low-bandwidth QA.
+• Accessibility.
+• Security hardening.
+• Backup and recovery procedures where relevant.
+47. Definition of Done
+A feature is not done because it renders.
+A Work Packet is done only when:
+• Acceptance criteria are met.
+• Existing valid functionality is not regressed.
+• Server-side permission and entitlement checks are tested.
+• Database migration is documented and reversible where practical.
+• Loading, empty, error and permission states exist.
+• Mobile behaviour is verified.
+• Poor-network behaviour is considered where relevant.
+• Critical business logic has automated tests.
+• Audit and analytics events exist where required.
+• Security-sensitive paths have negative tests.
+• Admin or support workflow is documented where required.
+• Product copy does not overclaim scientific certainty.
+• AI output failure states are handled.
+• Evidence changes are auditable.
+• Protected WRI cannot be bypassed through direct URL or API calls.
+• Claude has marked the Work Packet ACCEPTED.
+47.1 Current engineering commands
+Codex must use the actual repository commands, not obsolete PRD examples.
+Current expected gates include:
+• npm run typecheck
+• npm run test
+• npm run build
+Lint becomes a required gate once a working lint script and dependencies are intentionally configured.
+48. Product and Engineering Never-Do List
+The following actions are prohibited without an explicit approved product decision:
+• Rebuild working authentication from scratch.
+
+===== PAGE 47 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 47
+• Create duplicate person identities for different workspaces.
+• Publish protected WRI publicly by default.
+• Conflate WRI with Role Fit.
+• Hide evidence confidence.
+• Hard-code provisional WRI coefficients as permanent scientific truth.
+• Let UI requests directly mutate WRI scores.
+• Penalise a user solely because an AI detector flagged a response.
+• Use protected characteristics in employment ranking.
+• Treat social engagement as readiness.
+• Let paid visibility override relevance.
+• Fabricate compensation benchmarks.
+• Sell identifiable behavioural data to institutions.
+• Turn QuickWork into an unstructured gig board.
+• Turn volunteering into disguised unpaid employment.
+• Add invasive workforce surveillance as the default.
+• Introduce a second UI framework without clear migration approval.
+• Migrate stack merely to satisfy an old architecture example.
+• Build large disconnected feature scaffolds before proving vertical slices.
+• Allow Claude and Codex to edit the same files concurrently.
+49. Launch Decisions Still Requiring Human Approval
+The following remain configuration or policy decisions. Agents may prepare options but should not silently decide them 
+as permanent policy:
+• Final WRI scale.
+• Final evidence weights.
+• Confidence thresholds.
+• Recency rules.
+• Scientific validation thresholds.
+• Day 15 Levav 28 evidence-sufficiency threshold.
+• Final scenario libraries.
+• QuickWork pricing.
+• Platform transaction fee.
+• Payment and escrow provider model.
+• Dispute rules.
+• Employer plan names and prices.
+• Employer seats and WRI depth.
+• Talent Premium price and benefits.
+• Launch payment providers.
+• Organisation registry sources.
+• Compensation data providers.
+• Supported compensation countries and cities.
+• Institutional cohort thresholds.
+• Institutional pricing and licensing.
+• Champion content rights and revenue sharing.
+
+===== PAGE 48 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 48
+50. Agent Start Instructions
+50.1 Claude first instruction
+Read this Master PRD completely before issuing work.
+Act as Levav Product Command.
+Your first job is not to code.
+Your first job is to:
+1. Audit the current repository and current implementation reports against this PRD.
+2. Create a requirement coverage matrix using KEEP, ENHANCE, MODIFY, COMPLETE, BUILD, REMOVE and DEFER.
+3. Identify stale documentation that could mislead either agent.
+4. Create the Sprint 0 Work Packets for Codex.
+5. Establish the product decision log.
+6. Establish the acceptance and QA structure.
+7. Review Codex's completed work packets against this PRD.
+8. Use subagents for research and specialist review where useful.
+9. Do not edit production code.
+10. Do not mark work accepted until evidence supports the claim.
+50.2 Codex first instruction
+Read this Master PRD completely before implementation.
+Act as Levav Engineering Command.
+Your first job is to:
+1. Inspect main and verify the current runtime before trusting old docs.
+2. Preserve the working authentication and organisation foundations.
+3. Audit current files against the first Claude Work Packet.
+4. Implement only the approved scope.
+5. Own all executable code, migrations, tests, build and deployment changes.
+6. Run typecheck, tests and build before READY_FOR_REVIEW.
+7. Fix scoped defects until the work packet passes.
+8. Update factual implementation-state documentation after accepted work.
+9. Do not change product rules or scientific methodology silently.
+10. Never edit Claude-owned product specification files.
+51. Final Product Thesis
+Levav develops, measures and verifies workforce readiness.
+For talent, it turns development and productive activity into visible, verified evidence.
+For employed professionals, it measures current-role readiness, next-role readiness and development trajectory.
+For startups, QuickWork turns flexible capacity into affordable execution and verified real-world work evidence.
+For employers, Levav reduces hiring uncertainty by showing the person beyond the CV.
+For Africa's workforce ecosystem, Levav turns privacy-protected evidence into intelligence about readiness, gaps, 
+opportunity, compensation and development.
+For contributors and mission-driven organisations, Levav Impact turns verified service and real outputs into visible 
+contribution without confusing volunteering with employment.
+
+===== PAGE 49 =====
+LEVAV  |  MASTER PRD v4.1  |  CONFIDENTIAL
+Develop readiness. Prove readiness. Convert readiness into opportunity. Learn from outcomes.
+Page 49
+For the professional community, the Feed makes Levav a place people can return to daily to publish work, discover 
+opportunities, learn, follow organisations, see trusted updates and build professional identity.
+Across every surface, Levav must use one clear product language so the experience feels coherent from the first 
+landing-page sentence to the deepest workforce-intelligence workflow.
+The product should be judged by one question:
+Does Levav help a person become more ready, prove that readiness, convert it into meaningful opportunity, and help the 
+workforce system learn from the outcome?
