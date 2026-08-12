@@ -63,8 +63,8 @@ This must be removed before Sprint 1, not carried while the real engine is built
 
 1. `grep -rn "awardWriPoints\|WRI_SCORING_RULES\|wriService\|saveWriScore\|getWriUnlockStatus" src server` returns **no results**.
 2. No module in `src/` writes any WRI value to `localStorage`, to a server, or to any store. Evidenced by the new guard test.
-3. Every surface that previously displayed a WRI number now shows the `wri.confidence.none` empty state with its next action, verbatim from the copy dictionary.
-4. No surface renders a numeric WRI, a zero, a placeholder, a locked score, or a progress indicator implying a hidden value. List every changed surface in the report.
+3. Every **authenticated** surface that previously displayed a WRI number now shows the `wri.confidence.none` empty state with its next action, verbatim from the copy dictionary.
+4. **No surface renders a numeric WRI, a zero, a placeholder, a locked score, or a progress indicator implying a hidden value — public and marketing surfaces included.** "Surface" means anything the application renders, not only signed-in product screens. List every changed surface in the report.
 5. Completing a Learn lesson, posting to the feed, applying to a QuickWork listing and applying to an Impact opportunity produce **no readiness change of any kind**. Demonstrate each of the four.
 6. `wriScore` is cleared from `localStorage` on app load, and the clearing code carries a comment naming this packet and a removal condition.
 7. `npm run typecheck` and `npm run build` pass; the frontend baseline (WP-0002) does not grow.
@@ -100,6 +100,11 @@ If an analytics event fires on WRI change, remove it. Do not add replacement eve
 | Impact apply | Application confirmation, plus `impact.wri.notice` |
 | Feed post published | Post confirmation only |
 | Employer-facing candidate views | No WRI element at all until entitlement exists (EMP-004) |
+| **Landing page and every marketing section** (`src/sections/home/`, `src/pages/Home.tsx`, footer) | **No score, no dimension bars, no fabricated evidence strings.** A marketing section may illustrate the *concept* — Levav ID, verified evidence, professional identity — but may not render a readiness figure for a real or fictional person |
+
+**Amendment A1 (2026-08-12), after WP-0003 review round 1.** The row above was added because the original table enumerated authenticated surfaces only, while acceptance criterion 4 was unqualified. `src/sections/home/ProfilePreviewSection.tsx` shipped a "74" WRI with four dimension bars and the strings `'QuickWork™ · 12 gigs completed, 4.9★'` and `'Levav Impact™ · 40 verified service hours'`, rendered publicly from `Home.tsx:43`. The ambiguity was Claude's; the defect is still S1, because a fabricated readiness score on a public page is precisely the harm this packet removes.
+
+The rule this establishes for every later packet: **a product invariant binds on marketing surfaces too.** Anywhere Levav renders a capability it does not have — a score, a benchmark, a verification badge, a match strength — the invariant applies, whether or not the viewer is signed in. Illustrative mockups are not exempt, because a visitor cannot tell an illustration from a screenshot.
 
 ## Test scenarios
 
