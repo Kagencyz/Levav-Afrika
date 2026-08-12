@@ -1,12 +1,24 @@
 # WP-0002 — Real verification gates and CI
 
-**Status:** READY_FOR_BUILD
+**Status:** READY_FOR_BUILD · **AMENDED 2026-08-12** — re-read before building if you read this packet before that date
 **Sprint:** 0 · **Owner after handoff:** Codex
 **Requirement IDs:** §46 Sprint 0 (Codex), §47.1, ENG-003, CODEX-005
 **Audit classification:** MODIFY (`package.json` scripts, `tsconfig`) · BUILD (CI, error baseline)
-**Related decisions:** PDR-0005
+**Related decisions:** PDR-0005, PDR-0006 (item 7 sequencing)
 
 ---
+
+## Amendment log
+
+**2026-08-12 — measurement under the pinned toolchain.** The packet was written against figures taken before the server gate's true coverage was known. Nothing already in it was withdrawn; scope grew by two items in the same requirement set (§47.1, ENG-003), and two stated figures were wrong.
+
+- **Added item 7** — convert `tsconfig.server.json` from its 12-file allowlist to globs. Sequenced after WP-0001, where it costs zero errors.
+- **Added item 8** — no gate typechecks any test file.
+- **Corrected item 1** — "the server project is clean today" was true only of an allowlisted 15 of 25 files.
+- **Corrected item 2** — the frontend baseline is **136**, not 156.
+- Added acceptance criteria 9 and 10, test scenarios 7 and 8, and a verified-figures table.
+
+Kept in WP-0002 rather than split into a new packet: the additions carry the same requirement IDs, touch the same `tsconfig` and `package.json`, and share the WP-0001 dependency. A separate packet would contend for the same files with no independent path to green.
 
 ## Product problem
 
