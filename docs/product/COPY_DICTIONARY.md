@@ -190,31 +190,24 @@ Critical thinking · Problem solving · Initiative and ownership · Reliability 
 | `feed.empty.title` | Your feed is quiet |
 | `feed.empty.body` | Follow people and organisations in your field to see their work here. |
 | `feed.empty.action` | Find people to follow |
-| `feed.compose.placeholder` | Share something useful about your work |
-| `feed.compose.action` | Post |
 | `feed.compose.draft` | Draft saved |
 | `feed.view.following` | Following |
 | `feed.view.foryou` | For you |
 | `feed.view.opportunities` | Opportunities |
 | `feed.view.learning` | Learning |
 | `feed.view.impact` | Impact |
-| `feed.card.verified.quickwork` | Verified QuickWork completion |
-| `feed.card.verified.impact` | Verified contribution |
-| `feed.card.verified.note` | Levav verified this work item. The rest of this post is the author's own. |
 | `feed.action.follow` | Follow |
 | `feed.action.following` | Following |
 | `feed.action.save` | Save |
 | `feed.action.report` | Report |
 | `feed.action.mute` | Mute {name} |
 | `feed.action.block` | Block {name} |
-| `feed.report.body` | Tell us what is wrong with this post. A moderator will review it. |
 | `feed.media.tap` | Tap to load image |
 | `whatsnew.name` | What is New |
-| `whatsnew.source` | Source: {publisher} |
-| `whatsnew.source.action` | Read the original |
-| `whatsnew.ai.label` | Summary drafted by Levav AI from the linked article. |
 
 **Prohibited:** "trending", "viral", "top creator", follower counts near any readiness surface, "connect" for the follow relationship.
+
+**Composer, verified-card, report and What-is-New strings are defined in §15**, which is canonical for the Feed. They were duplicated here in an earlier revision; two had drifted apart.
 
 ## 8. Employer surfaces
 
@@ -464,6 +457,115 @@ Extends §6. Governed by `LEVAV_IMPACT_SPEC.md`.
 | `org.impact.outcomes.nobasis` | No measurement basis published. Levav will show this as unmeasured. |
 
 **Prohibited across these surfaces:** contributor leaderboards, hour badges, "top volunteer", any ranking of contributors, any suggestion that contributing improves hiring chances at that organisation, and any employment vocabulary (salary, hire, position, staff, probation, full-time).
+
+## 15. Feed and network — composer, engagement, profile, notifications
+
+Extends §7. Governed by `FEED_AND_NETWORK_SPEC.md`.
+
+### Composer
+
+| Key | Value |
+|---|---|
+| `feed.compose.open` | Share something |
+| `feed.compose.placeholder` | Share something useful about your work |
+| `feed.compose.visibility` | Who can see this |
+| `feed.compose.attach.work` | Attach verified work |
+| `feed.compose.attach.help` | Choose from your own verified records. Levav never attaches anything for you. |
+| `feed.compose.media.compressed` | Image compressed to {size} for faster loading. |
+| `feed.compose.draft.saved` | Draft saved on this device |
+| `feed.compose.draft.restored` | We restored your unsent draft. |
+| `feed.compose.action` | Post |
+| `feed.compose.posting` | Posting |
+| `feed.compose.failed` | Your post did not send. It is saved — try again when you have a connection. |
+
+### Post card and engagement
+
+| Key | Value |
+|---|---|
+| `feed.card.author.org` | {name} · {orgType} |
+| `feed.card.edited` | Edited |
+| `feed.card.verified.quickwork` | Verified QuickWork completion |
+| `feed.card.verified.impact` | Verified contribution |
+| `feed.card.verified.learn` | Learn achievement |
+| `feed.card.verified.levav28` | Levav 28 milestone |
+| `feed.card.verified.note` | Levav verified this work item. The rest of this post is the author's own. |
+| `feed.card.media.tap` | Tap to load image |
+| `feed.card.media.failed` | This image did not load. |
+| `feed.action.comment` | Comment |
+| `feed.action.reply` | Reply |
+| `feed.action.share` | Share with a comment |
+| `feed.action.copylink` | Copy link |
+| `feed.action.edit` | Edit post |
+| `feed.action.delete` | Delete post |
+| `feed.delete.confirm` | Delete this post? It will be removed from feeds. If it was attached as verified work evidence, that record is kept. |
+| `feed.comment.placeholder` | Add a comment |
+| `feed.comment.empty` | No comments yet. |
+
+### Views and discovery
+
+| Key | Value |
+|---|---|
+| `feed.view.following.empty.title` | You are not following anyone yet |
+| `feed.view.following.empty.body` | Follow people and organisations in your field, and their work appears here. |
+| `feed.view.following.empty.action` | Find people to follow |
+| `feed.view.foryou.note` | Suggested from your career context, skills and follows. Your readiness data is never used to rank what you see. |
+| `feed.view.opportunities.empty` | No opportunities match your profile yet. |
+| `feed.end.reached` | You are up to date. |
+| `feed.loadmore` | Load more |
+
+### Profile and network
+
+| Key | Value |
+|---|---|
+| `profile.follow` | Follow |
+| `profile.following` | Following |
+| `profile.followers.count` | {count} followers |
+| `profile.following.count` | {count} following |
+| `profile.cover.empty` | Add a cover image |
+| `profile.photo.empty` | Add a profile photo |
+| `profile.featured.title` | Featured |
+| `profile.activity.title` | Activity |
+| `profile.activity.empty` | {name} has not posted yet. |
+| `profile.share` | Share this profile |
+
+### Notifications
+
+| Key | Value |
+|---|---|
+| `notifications.title` | Notifications |
+| `notifications.empty` | Nothing new. |
+| `notifications.markread` | Mark all as read |
+| `notifications.follow` | {name} followed you |
+| `notifications.comment` | {name} commented on your post |
+| `notifications.reply` | {name} replied to your comment |
+| `notifications.mention` | {name} mentioned you |
+| `notifications.org.post` | {org} posted an update |
+| `notifications.settings` | Choose what Levav notifies you about |
+
+### Safety
+
+| Key | Value |
+|---|---|
+| `feed.report.title` | Report this |
+| `feed.report.body` | Tell us what is wrong. A moderator will review it. The author is not told who reported it. |
+| `feed.report.submitted` | Thank you. A moderator will review this. |
+| `feed.block.confirm` | Block {name}? You will not see each other's posts, comments or profiles. |
+| `feed.block.done` | You blocked {name}. You can undo this in privacy settings. |
+| `feed.mute.confirm` | Mute {name}? You will stop seeing their posts. They are not told. |
+| `feed.blocked.empty` | You have not blocked or muted anyone. |
+
+### What is New
+
+| Key | Value |
+|---|---|
+| `whatsnew.title` | What is New |
+| `whatsnew.section.levav` | From Levav |
+| `whatsnew.section.workforce` | Workforce and careers |
+| `whatsnew.source` | Source: {publisher} |
+| `whatsnew.source.action` | Read the original |
+| `whatsnew.ai.label` | Summary drafted by Levav AI from the linked article. Read the original for the full account. |
+
+**Prohibited across these surfaces:** "trending", "viral", "top creator", "influencer", engagement counts displayed next to any readiness value, follower counts on cards, streaks, "you're on a roll", any prompt pressuring a member to post, and any suggestion that posting affects readiness or hiring.
 
 ## 10. Strings that must be deleted
 
