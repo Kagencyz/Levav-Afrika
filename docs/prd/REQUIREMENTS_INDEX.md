@@ -92,6 +92,11 @@ These conflict with approved product direction and must not be carried forward:
 | WP-0202 | Event pipeline and sole ingestion writer | EVENT-001/002, DATA-MODEL-002, API-006 | READY_FOR_BUILD |
 | WP-0203 | Dispute workflow | TRUST-002, EVD-002, WRI-GOV-001, SEC-010 | READY_FOR_BUILD |
 | WP-0204 | Privacy and Evidence Centre | PRIV-001, AUTH-003, SEC-010, AFR-001/010 | READY_FOR_BUILD |
+| WP-0301 | WRI model configuration | WRI-004, WRI-GOV-001, SEC-011, §49 | READY_FOR_BUILD |
+| WP-0302 | Scoring and confidence engine (pure) | WRI-001/002/003/004/005, EVD-003, AFR-009 | READY_FOR_BUILD |
+| WP-0303 | Snapshots and recalculation consumer | WRI-004, EVENT-001/002, OBS-002/003/006 | READY_FOR_BUILD |
+| WP-0304 | Trajectory and Role Readiness | WRI-001/002, EMP-TAL-001/002/003 | READY_FOR_BUILD |
+| WP-0305 | Member-facing WRI surfaces | WRI-001/003, LANG-003 | Scoped, **not issued** — awaits WP-0303 |
 
 ### Product contracts issued
 
