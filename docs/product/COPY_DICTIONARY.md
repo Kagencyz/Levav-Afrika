@@ -260,6 +260,76 @@ Copy for security surfaces that exist in the interface but are not yet implement
 
 **Prohibited on any unimplemented control:** "No entries found", "No activity yet", "0 events", "Nothing to show", "Coming soon", an empty table with headers, a zeroed stat card, or a disabled filter row. Each of these implies a working control that returned nothing.
 
+## 12. Sprint 1 — career context, profile sections, visibility
+
+### Career step (WP-0102)
+
+| Key | Value |
+|---|---|
+| `onboarding.career.title` | What work do you do? |
+| `onboarding.career.subtitle` | This shapes your Levav 28 scenarios and the opportunities you see. You can change it later. |
+| `onboarding.career.family` | Career family |
+| `onboarding.career.role` | Role |
+| `onboarding.career.owntitle.action` | My title is not listed |
+| `onboarding.career.owntitle.label` | What do you call your role? |
+| `onboarding.career.owntitle.help` | Use your own words. Levav will suggest the closest match and keep your title as you wrote it. |
+| `onboarding.career.candidates.title` | Closest matches |
+| `onboarding.career.candidates.none` | Levav does not have a match for this yet. Your title is saved as you wrote it, and you can continue. |
+| `onboarding.career.candidates.reject` | None of these match |
+| `onboarding.career.seniority` | Seniority |
+| `onboarding.career.industry` | Industry |
+| `onboarding.career.industry.help` | The sector you work in, which may differ from your profession. |
+| `onboarding.career.target` | Role you are working towards (optional) |
+| `onboarding.career.skip` | Skip for now |
+| `onboarding.confirm.title` | Check what Levav understood |
+| `onboarding.confirm.body` | Correct anything that is wrong. Nothing is used until you confirm it. |
+| `onboarding.confirm.action` | Confirm and continue |
+| `onboarding.resume.title` | Pick up where you left off |
+
+### Profile sections (WP-0103)
+
+| Key | Value |
+|---|---|
+| `profile.section.experience` | Experience |
+| `profile.section.education` | Education |
+| `profile.section.projects` | Projects |
+| `profile.section.certifications` | Certifications |
+| `profile.section.links` | Links |
+| `profile.experience.empty` | Add the roles you have held so employers can see your track record. |
+| `profile.education.empty` | Add your qualifications. |
+| `profile.projects.empty` | Add work you are proud of. Projects are how you show what you can do before you have verified evidence. |
+| `profile.certifications.empty` | Add certifications you hold. |
+| `profile.links.empty` | Add a portfolio, publication or professional link. |
+| `profile.item.selfdeclared.notice` | Everything you add here is your own account of your work. Levav has not verified it. |
+| `profile.item.feature` | Feature this |
+| `profile.item.featured` | Featured |
+| `profile.preview.action` | See what others see |
+| `profile.preview.banner` | You are viewing your profile as another person would. |
+
+### Visibility (WP-0103)
+
+| Key | Value |
+|---|---|
+| `visibility.label` | Who can see this |
+| `visibility.public` | Anyone |
+| `visibility.members` | Signed-in members |
+| `visibility.private` | Only me |
+| `visibility.default.notice` | Your profile is private until you choose what to share. |
+| `visibility.changed.public` | This section is now visible to anyone with your profile link. |
+| `visibility.changed.private` | This section is now visible only to you. It is not deleted. |
+
+### Images (WP-0103)
+
+| Key | Value |
+|---|---|
+| `profile.image.uploading` | Uploading |
+| `profile.image.failed` | That image did not upload. Check your connection and try again. |
+| `profile.image.toolarge` | That image is too large. Choose one under {limit}. |
+| `profile.image.wrongtype` | That file is not an image Levav can use. Use a JPG or PNG. |
+| `profile.image.exif.notice` | Levav removes location data from photos before saving them. |
+
+**Prohibited across these surfaces:** any verified badge or verified language (nothing is verified until Sprint 2), any completeness percentage or profile-strength score (a score is a readiness signal in disguise — PDR-0001), "unlock", and any claim that a complete profile improves employment outcomes.
+
 ## 10. Strings that must be deleted
 
 Present in the codebase today and prohibited from this point. Codex removes them as it touches each surface, and never reintroduces the pattern.

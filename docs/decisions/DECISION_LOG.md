@@ -18,6 +18,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0008 | QuickWork payment, escrow and dispute model | **ESCALATED** | 2026-08-12 |
 | PDR-0009 | Unimplemented controls state their absence; retired local keys are cleared | APPROVED | 2026-08-12 |
 | PDR-0010 | Nominated written work samples may become evidence; publishing never does | **PROPOSED** | 2026-08-12 |
+| PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 
 ---
 
@@ -168,6 +169,25 @@ It gives the Feed a reason to exist inside the readiness system without corrupti
 It cannot be implemented before the Evidence Graph (Sprint 2), the WRI engine (Sprint 3) and the rubric work (Sprint 4) exist. Approving it now would create a specification with no foundation to sit on, and the cap in condition 5 needs the real confidence model to be set meaningfully.
 
 **Decision point:** Sprint 8, when the Feed is specified. Until then this PDR governs nothing and no packet may implement it. WP-0003 proceeds unchanged.
+
+## PDR-0011 — Sprint 1 ships without AI inference
+
+**State:** APPROVED · **Requirements:** ONB-001, ONB-002, AI-001, AI-002, AI-004, AI-008 · **Applies to:** WP-0101 … WP-0106
+
+**Context.** ONB-001 says AI may infer profile structure but the user confirms authoritative use, and lists CV extraction as a capability. Sprint 1 is where onboarding and the profile are built, so the question arrives now. The repository has **no AI integration of any kind** — AI-001 through AI-008 are all BUILD. There is no provider abstraction, no structured-output validation, no prompt versioning, no evaluation set and no failure handling.
+
+**Decision.** Sprint 1 ships no AI inference. No CV extraction, no career classification, no "we think you are a…". Career context is captured by the user selecting from a real taxonomy or entering their own words.
+
+**Reasoning, in order of weight:**
+
+1. **ONB-001's guardrail is satisfied more strongly by not guessing.** The requirement forbids silent classification and demands that inferences be visibly distinguishable from confirmed facts. A system where the user simply declares has no silent classification to guard against. Adding a model and then building the machinery to contain it is more work and more risk than asking a question.
+2. **AI-002 and AI-007 are prerequisites, not refinements.** Critical AI functions must return validated structured outputs, and AI failure must not corrupt data or fabricate facts. Neither control exists. Shipping inference before them means shipping it without them.
+3. **The taxonomy does the work people assume AI is for.** WP-0101's `resolveTitle` maps "Bursar" to candidate roles deterministically, and shows the candidates for confirmation. That is the actual product need, and it is testable, explainable and free.
+4. **AFR-002.** A model call on every onboarding step is a poor fit for the network conditions Levav is built for.
+
+**What this is not.** Not a decision against AI in Levav. The AI architecture (§28) stands and matters — scenario generation, persona behaviour, response evaluation and the Work Scoper all need it. This decision says the **first** AI capability Levav ships will not be one that quietly classifies a person's career, and that the provider abstraction and structured-output validation land before any of it.
+
+**Revisit at:** Sprint 4, when Levav 28 requires an AI layer regardless. CV extraction is a good second capability once AI-001, AI-002, AI-005 and AI-007 exist — at which point it is genuinely useful, because it saves typing rather than making decisions.
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 
