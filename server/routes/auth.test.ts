@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   signUp: vi.fn(),
   signInWithPassword: vi.fn(),
+  resend: vi.fn(),
   profileLimit: vi.fn(),
 }));
 
 vi.mock('../lib/supabase.js', () => ({
   signUpWithPassword: mocks.signUp,
   signInWithPassword: mocks.signInWithPassword,
+  resendSignupConfirmation: mocks.resend,
 }));
 
 vi.mock('../../db/connection.js', () => ({
@@ -49,7 +51,7 @@ describe('Supabase-backed authentication', () => {
     const { caller, context } = createCaller();
 
     await expect(
-      caller.register({ email: profile.email, password: 'safe-password', name: profile.name })
+      caller.register({ email: profile.email, password: 'safe-password', name: profile.name, intent: 'employer' })
     ).resolves.toEqual({ authenticated: false, requiresEmailConfirmation: true });
     expect(context.session).toEqual({});
     expect(mocks.profileLimit).not.toHaveBeenCalled();
@@ -89,10 +91,18 @@ describe('Supabase-backed authentication', () => {
     const { caller } = createCaller();
 
     await expect(
-      caller.register({ email: profile.email, password: 'safe-password', name: profile.name })
+      caller.register({ email: profile.email, password: 'safe-password', name: profile.name, intent: 'general' })
     ).rejects.toMatchObject({
       code: 'TOO_MANY_REQUESTS',
       message: 'Confirmation email limit reached. Please wait an hour and try again.',
     });
+  });
+
+  it('resends employer confirmation through Supabase', async () => {
+    mocks.resend.mockResolvedValue({ error: null });
+    const { caller } = createCaller();
+    await expect(caller.resendConfirmation({ email: profile.email, intent: 'employer' }))
+      .resolves.toEqual({ success: true });
+    expect(mocks.resend).toHaveBeenCalledWith(profile.email, 'employer');
   });
 });

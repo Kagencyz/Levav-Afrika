@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router';
-import { Eye, EyeOff, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Sparkles, Loader2, MailCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { sanitizeInput, isValidEmail } from '@/lib/safeJSON';
 import { StableInput } from '@/components/StableInputs';
@@ -26,6 +26,7 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
+  const intent = searchParams.get('intent') === 'employer' ? 'employer' : 'general';
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
 
   // Keep mode in sync when a nav link changes ?mode= while already mounted.
@@ -36,6 +37,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState({
     firstName: '',
@@ -48,6 +50,17 @@ export default function Auth() {
   const utils = trpc.useUtils();
   const registerMutation = trpc.auth.register.useMutation();
   const loginMutation = trpc.auth.login.useMutation();
+  const resendMutation = trpc.auth.resendConfirmation.useMutation();
+
+  useEffect(() => {
+    if (searchParams.get('confirmed') === '1') {
+      toast.success('Email confirmed. Sign in to continue.');
+    }
+    if (searchParams.get('error_code') === 'otp_expired') {
+      toast.error('That confirmation link has expired. Request a fresh email below.');
+      setMode('signup');
+    }
+  }, [searchParams]);
 
   // SECURITY FIX: Rate limiting state
   const attemptCountRef = useRef(0);
@@ -169,11 +182,12 @@ export default function Auth() {
           email,
           password: formData.password,
           name,
+          intent,
         });
         if (result.requiresEmailConfirmation) {
           attemptCountRef.current = 0;
-          toast.success('Account created. Check your email to confirm it, then sign in.');
-          setMode('login');
+          toast.success('Confirmation email sent.');
+          setConfirmationEmail(email);
           setFormData((current) => ({ ...current, password: '', confirmPassword: '' }));
           return;
         }
@@ -186,7 +200,11 @@ export default function Auth() {
         // Preference selection next (upgrade brief §3); a goal carried from
         // a landing-page path card rides along to pre-select itself.
         const goal = searchParams.get('goal');
-        navigate(goal ? `/welcome?goal=${encodeURIComponent(goal)}` : '/welcome');
+        if (intent === 'employer') {
+          navigate('/employers');
+        } else {
+          navigate(goal ? `/welcome?goal=${encodeURIComponent(goal)}` : '/welcome');
+        }
       } else {
         await loginMutation.mutateAsync({
           email,
@@ -198,7 +216,7 @@ export default function Auth() {
         attemptCountRef.current = 0;
         logWithCurrentUser('login', 'Authentication', 'success');
         toast.success('Welcome back!');
-        navigate('/dashboard');
+        navigate(intent === 'employer' ? '/employers' : '/dashboard');
       }
     } catch (err) {
       const rawMessage = err instanceof Error ? err.message : '';
@@ -238,16 +256,55 @@ export default function Auth() {
             <Sparkles size={20} className="text-black" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">
-            {mode === 'login' ? 'Welcome Back' : 'Join Levav\u2122'}
+            {mode === 'login' ? 'Welcome Back' : intent === 'employer' ? 'Create Employer Account' : 'Join Levav\u2122'}
           </h1>
           <p className="text-sm text-[#A0A0A0]">
             {mode === 'login'
               ? 'Sign in to your account to continue'
-              : 'Create your account and start your journey'}
+              : intent === 'employer'
+                ? 'Confirm your work email, then register your organization'
+                : 'Create your account and start your journey'}
           </p>
         </div>
 
         <GlassCard className="p-6 sm:p-8" hover={false}>
+          {confirmationEmail ? (
+            <div className="text-center space-y-5" aria-live="polite">
+              <MailCheck className="w-12 h-12 text-[#C6FF34] mx-auto" />
+              <div>
+                <h2 className="text-xl font-semibold text-white">Check your email</h2>
+                <p className="text-sm text-white/60 mt-2">
+                  We sent a confirmation link to <strong className="text-white">{confirmationEmail}</strong>.
+                  Confirm it, then return here to sign in.
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={resendMutation.isPending}
+                onClick={async () => {
+                  try {
+                    await resendMutation.mutateAsync({ email: confirmationEmail, intent });
+                    toast.success('A fresh confirmation email was sent.');
+                  } catch (error) {
+                    const message = error instanceof Error ? error.message : '';
+                    toast.error(/wait before/i.test(message)
+                      ? 'Please wait before requesting another email.'
+                      : 'Could not resend the email. Please try again.');
+                  }
+                }}
+                className="btn-lime w-full disabled:opacity-50"
+              >
+                {resendMutation.isPending ? 'Sending…' : 'Resend confirmation email'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setConfirmationEmail(null); setMode('login'); }}
+                className="text-sm text-white/60 hover:text-white"
+              >
+                I have confirmed my email — sign in
+              </button>
+            </div>
+          ) : (
           <AnimatePresence mode="wait">
             <motion.form
               key={mode}
@@ -416,9 +473,10 @@ export default function Auth() {
               </button>
             </motion.form>
           </AnimatePresence>
+          )}
 
           {/* Toggle */}
-          <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
+          {!confirmationEmail && <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
             <p className="text-sm text-[#A0A0A0]">
               {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
               <button
@@ -428,7 +486,7 @@ export default function Auth() {
                 {mode === 'login' ? 'Sign Up' : 'Sign In'}
               </button>
             </p>
-          </div>
+          </div>}
         </GlassCard>
       </motion.div>
     </div>

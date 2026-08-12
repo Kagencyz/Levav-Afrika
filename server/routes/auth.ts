@@ -5,7 +5,13 @@ import { router, publicProcedure } from '../trpc.js';
 import { db } from '../../db/connection.js';
 import { users } from '../../db/schema.js';
 import { signToken } from '../lib/jwt.js';
-import { signInWithPassword, signUpWithPassword } from '../lib/supabase.js';
+import {
+  resendSignupConfirmation,
+  signInWithPassword,
+  signUpWithPassword,
+} from '../lib/supabase.js';
+
+const signupIntent = z.enum(['employer', 'general']).default('general');
 
 async function getPublicProfile(userId: string) {
   const rows = await db
@@ -49,6 +55,7 @@ export const authRouter = router({
         email: z.string().email(),
         password: z.string().min(6).max(128),
         name: z.string().trim().min(2).max(200),
+        intent: signupIntent,
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -58,7 +65,7 @@ export const authRouter = router({
 
       let signupResult;
       try {
-        signupResult = await signUpWithPassword(email, input.password, input.name);
+        signupResult = await signUpWithPassword(email, input.password, input.name, input.intent);
       } catch (error) {
         console.error(JSON.stringify({
           level: 'error',
@@ -107,6 +114,32 @@ export const authRouter = router({
         requiresEmailConfirmation: false as const,
         user,
       };
+    }),
+
+  resendConfirmation: publicProcedure
+    .input(z.object({ email: z.string().email(), intent: signupIntent }))
+    .mutation(async ({ input }) => {
+      let result;
+      try {
+        result = await resendSignupConfirmation(
+          input.email.trim().toLowerCase(),
+          input.intent,
+        );
+      } catch {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Authentication service is unavailable',
+        });
+      }
+      if (result.error) {
+        throw new TRPCError({
+          code: result.error.status === 429 ? 'TOO_MANY_REQUESTS' : 'BAD_REQUEST',
+          message: result.error.status === 429
+            ? 'Please wait before requesting another confirmation email.'
+            : 'Unable to resend confirmation email.',
+        });
+      }
+      return { success: true as const };
     }),
 
   login: publicProcedure
