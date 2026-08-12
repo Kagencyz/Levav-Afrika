@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { safeJSONParse } from '@/lib/safeJSON';
 import {
@@ -1136,12 +1137,12 @@ function AccessDenied() {
         <p className="text-[#666666] text-sm mb-6">
           You do not have permission to access the admin panel. Please contact your administrator if you believe this is an error.
         </p>
-        <a
-          href="#/"
+        <Link
+          to="/"
           className="inline-flex items-center gap-2 bg-[#C6FF34] text-black px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-[#d4ff5c] transition-colors"
         >
           Go Home
-        </a>
+        </Link>
       </motion.div>
     </div>
   );

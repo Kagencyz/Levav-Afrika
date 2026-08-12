@@ -282,11 +282,11 @@ export default function NotificationBell() {
             {/* Footer */}
             <div className="px-5 py-3 border-t border-white/[0.06]">
               <Link
-                to="/notifications"
+                to="/dashboard"
                 onClick={() => setOpen(false)}
                 className="block text-center text-xs font-medium text-[#A0A0A0] hover:text-[#C6FF34] transition-colors font-body"
               >
-                View all notifications
+                Back to dashboard
               </Link>
             </div>
           </motion.div>

@@ -268,7 +268,7 @@ function ProjectCard({
       {/* Action Buttons */}
       <div className="flex items-center gap-2 pt-1">
         <button
-          onClick={() => navigate(`/workspace/${project.id}`)}
+          onClick={() => navigate(`/contract/${project.id}`)}
           className="flex-1 flex items-center justify-center gap-1.5 bg-[#C6FF34]/10 border border-[#C6FF34]/20 text-[#C6FF34] text-xs font-medium py-2.5 rounded-xl hover:bg-[#C6FF34]/15 transition-all"
         >
           <ExternalLink className="w-3.5 h-3.5" />
