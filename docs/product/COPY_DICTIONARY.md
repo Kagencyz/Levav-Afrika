@@ -248,6 +248,18 @@ Subject lines are sentence case, under 60 characters, and name the thing that ha
 
 **Prohibited in email:** "Hi there", "We're excited", exclamation marks in subject lines, countdowns, artificial urgency.
 
+## 11. Admin — unavailable controls
+
+Copy for security surfaces that exist in the interface but are not yet implemented. The governing rule: **an unimplemented control states that it is unimplemented.** It never renders an empty result, because an empty result reads as "nothing happened" and that is a false assurance about a control that is not running.
+
+| Key | Value |
+|---|---|
+| `admin.audit.unavailable.title` | Levav is not recording an audit trail yet |
+| `admin.audit.unavailable.body` | Audit logging is not in place. No record is being kept of sign-ins, privileged actions or protected-data access, and none exists for any earlier period. Treat the absence of records here as "not measured", never as "nothing happened". |
+| `admin.audit.unavailable.planned` | Server-side audit logging is specified in the Master PRD (SEC-005) and is scheduled for production hardening. |
+
+**Prohibited on any unimplemented control:** "No entries found", "No activity yet", "0 events", "Nothing to show", "Coming soon", an empty table with headers, a zeroed stat card, or a disabled filter row. Each of these implies a working control that returned nothing.
+
 ## 10. Strings that must be deleted
 
 Present in the codebase today and prohibited from this point. Codex removes them as it touches each surface, and never reintroduces the pattern.

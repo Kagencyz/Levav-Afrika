@@ -223,6 +223,18 @@ These exist as pages, consume review attention, and are outside the Master PRD's
 | `src/pages/Booking.tsx`, `ContentStudio.tsx` | DEFER | Not in §7.1 release scope |
 | `contracts/index.ts` | REMOVE | Dead, unreferenced, stale vs schema. **WP-0001** |
 | 8 unreachable routers | REMOVE | FINDING-07. **WP-0001** |
-| `src/lib/auditService.ts` | REMOVE | A localStorage "audit log" is worse than none — it implies a control that does not exist |
+| `src/lib/auditService.ts` | REMOVE | A localStorage "audit log" is worse than none — it implies a control that does not exist. Verified inert since the httpOnly-cookie migration: its actor lookup reads `localStorage['user']`, which nothing writes. See PDR-0009 |
+
+## Dead reads of `localStorage['user']`
+
+Nothing in `src/` writes the `user` key — it was removed when the session moved to an httpOnly cookie. Three modules still read it, so each resolves `null` permanently and any branch behind it is unreachable:
+
+| Site | Disposition |
+|---|---|
+| `src/lib/auditService.ts:127` | Deleted under WP-0001 A1 |
+| `src/components/SmartMatchWidget.tsx:260` | **Open.** Dispositioned when SmartMatch is rebuilt (Sprint 6 — depends on Role Fit, which does not exist) |
+| `src/pages/Projects.tsx:90` | **Open.** Dispositioned when Projects is rebuilt |
+
+Both open sites may contain silent failures or unreachable branches presenting as working features. Neither is in a current packet; recorded here so the finding is not lost.
 
 **Note on removal:** REMOVE means "conflicts with approved product direction and must not be carried forward". For user-facing surfaces, Codex must replace them with an honest state or an unregistered route — never a screen that keeps claiming a capability Levav does not have.

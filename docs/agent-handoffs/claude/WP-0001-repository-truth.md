@@ -30,7 +30,7 @@ None directly. This packet protects every later journey by removing the instruct
 4. **Delete the eight unreachable routers** (PDR-0006): `server/routes/employer.ts`, `job.ts`, `application.ts`, `message.ts`, `notification.ts`, `review.ts`, `upload.ts`, `wri.ts`.
 5. **Keep and adapt `server/router.test.ts`.** The allowlist guard stays; update it to assert the registered set exactly, so both an unexpected registration and a silent removal fail.
 6. **Delete `contracts/index.ts`** and the `@contracts` path alias if nothing else uses it.
-7. **Delete `src/lib/auditService.ts`** and its call sites. A localStorage "audit log" implies a control that does not exist (SEC-005). Any surface that called it must not silently lose a user-visible behaviour — if one did, report it rather than inventing a replacement.
+7. **Delete `src/lib/auditService.ts`** and its call sites, and replace the Admin Audit Logs tab per **Amendment A1 below**. A localStorage "audit log" implies a control that does not exist (SEC-005).
 8. **Retain `CREATIVE_BRIEF.md`** — its visual direction is still governing. Add one line at its top: "Visual direction only. Product claims in this document are superseded by Master PRD v4.1."
 
 ## Out of scope
@@ -175,3 +175,93 @@ None. Everything here is settled by PDR-0006 and the Master PRD authority order.
 ## Report back
 
 Use the §42.2 format: packet ID, audit classification, implementation summary, files changed, migrations (none expected), API changes, tests added or changed, commands run with results, security and permission checks, performance notes, known limitations, and status.
+
+---
+
+# Amendment A1 — Audit service disposition
+
+**Raised by:** Codex, `BLOCKED_PRODUCT_DECISION` on WP-0001, 2026-08-12
+**Resolved by:** Claude. **Decision recorded as:** PDR-0009
+**Packet status:** returns to **READY_FOR_BUILD**. Codex was correct to stop.
+
+## What Codex reported, verified
+
+Confirmed accurate: `src/components/admin/AuditSection.tsx` imports `getAuditLog`, `getAuditStats`, `AuditEntry` and `AuditStatus`; `src/pages/Admin.tsx:1226` registers the `Audit Logs` tab and renders the component at line 1323; `logWithCurrentUser` is imported by `src/pages/Auth.tsx:8`, `src/hooks/useAuth.ts:3` and `src/pages/Onboarding.tsx:6`.
+
+## Two facts that change the disposition
+
+**A1.1 — The audit log is already inert at runtime.** `logWithCurrentUser` (`auditService.ts:127`) resolves the actor from `localStorage.getItem('user')`. **Nothing in `src/` writes that key.** It was removed when the session moved to an httpOnly cookie, which `useAuth.ts` itself documents. Every call therefore returns `null` at line 129 without writing an entry.
+
+Consequence: deleting the module breaks a **compile-time** import, not a live behaviour. The Admin Audit Logs tab already displays an empty log for every admin, on every device, and has since the auth migration. There is no working feature here to preserve — only the appearance of one.
+
+**A1.2 — The record shape is partly fabricated.** `auditService.ts:55` hard-codes `ipAddress: 'client-side'` with the comment "Would be server IP in production". Any entry written before the auth migration carries a fabricated IP field. An audit trail with an invented provenance column is worse than no audit trail: it is a record that cannot be relied on but looks as though it can.
+
+## Disposition — Option 2, with a binding constraint on the copy
+
+**Retain the Audit Logs tab. Replace its contents with an explicit statement that Levav is not recording an audit trail.**
+
+Option 1 (remove the tab) was rejected: silently dropping a security surface from an admin console leaves an administrator with no signal, and SEC-005 is a real requirement scheduled for Sprint 10. The tab should mark the gap, not hide it.
+
+Option 2 is only safe under one condition, which is the reason this needed a product decision rather than an engineering one:
+
+> The empty state must state that audit logging **is not in place**. It must never read as "no entries found", "no activity yet", "0 events" or any equivalent.
+
+"No entries" tells an administrator that nothing happened. For a security control, silence reads as assurance, and that false assurance is exactly the defect being removed. The copy must affirmatively deny the control's existence.
+
+### Exact file dispositions
+
+| File | Disposition |
+|---|---|
+| `src/lib/auditService.ts` | **Delete.** |
+| `src/components/admin/AuditSection.tsx` | **Rewrite** as a static unavailable state. No import from `auditService`. No stats cards, no filters, no search, no table, no columns, no date pickers, no export control. |
+| `src/pages/Admin.tsx` | **Keep** the tab registration at line 1226 and the render at line 1323 unchanged. |
+| `src/pages/Auth.tsx:8` | Remove the import and both `logWithCurrentUser` calls (register, login). |
+| `src/hooks/useAuth.ts:3` | Remove the import and the `logout` call at the top of the `logout` callback. Everything else in that callback — the `auth.logout` mutation and the prototype-state cleanup — is unchanged. |
+| `src/pages/Onboarding.tsx:6` | Remove the import and the onboarding-completion call. |
+
+Removing the three call sites is behaviour-neutral, because all three already return `null` (A1.1). Confirm this in the report rather than assuming it.
+
+### Approved copy
+
+Added to `docs/product/COPY_DICTIONARY.md` §11. Use these keys; do not paraphrase.
+
+| Key | Value |
+|---|---|
+| `admin.audit.unavailable.title` | Levav is not recording an audit trail yet |
+| `admin.audit.unavailable.body` | Audit logging is not in place. No record is being kept of sign-ins, privileged actions or protected-data access, and none exists for any earlier period. Treat the absence of records here as "not measured", never as "nothing happened". |
+| `admin.audit.unavailable.planned` | Server-side audit logging is specified in the Master PRD (SEC-005) and is scheduled for production hardening. |
+
+If WP-0004 has not yet landed the copy module when Codex reaches this, inline the strings **exactly as written** and add a `TODO(WP-0004)` comment naming the three keys. Do not reword them to fit the layout.
+
+## A1.3 — `levav_audit_log` must be actively cleared
+
+**Answer: clear it once on application load. It may not remain as orphaned local data.**
+
+The key holds `userId` and `userEmail` for up to 500 entries. That is personal data, sitting in browser storage, with no purpose, no retention rule and no lawful basis once the feature is gone (SEC-010, PRIV-001). "Harmless orphaned data" is not a privacy position — orphaned personal data with no owner and no expiry is precisely what those requirements exist to prevent. It is also unreachable by any Levav deletion or export request, since no server knows it exists.
+
+Implementation constraint: **one cleanup path, not two.** WP-0003 clears `wriScore` on load. Do not build a second, competing cleanup. Whichever packet lands first creates a single module — suggested `src/lib/retiredLocalState.ts` — that clears a named list of retired keys once per load, with a comment naming the packets that added each key and the condition for removing the module. The second packet adds its key to that list.
+
+Removal condition for the module: once no supported client can still be carrying the retired keys. Not a date — a decision, recorded when it is taken.
+
+## Additional acceptance criteria for A1
+
+10. `grep -rn "auditService\|logWithCurrentUser\|getAuditLog\|getAuditStats" src` returns no results.
+11. The Admin Audit Logs tab still exists and is reachable, and renders the three approved strings and nothing else.
+12. The tab contains no number, no count, no zero, no empty table, no filter control and no fabricated column.
+13. Register, sign in, complete onboarding and sign out all behave exactly as before. Confirm in the report that all three removed calls were already returning `null`.
+14. `levav_audit_log` is cleared on load through a single retired-key cleanup module, and that module carries the comment described in A1.3.
+15. No new `localStorage` key is introduced by this change.
+
+## Additional test scenarios for A1
+
+| # | Scenario | Expected |
+|---|---|---|
+| 7 | Admin opens Audit Logs | Three approved strings; no table, no counts, no controls |
+| 8 | Seed `levav_audit_log` with entries, reload | Key cleared; tab still shows the unavailable state; no error |
+| 9 | Register, sign in, complete onboarding, sign out | Unchanged behaviour end to end |
+| 10 | Audit tab at 360 px | Copy legible, not truncated |
+| 11 | `grep` for the removed symbols | No results |
+
+## Noted, deliberately out of scope
+
+`src/components/SmartMatchWidget.tsx:260` and `src/pages/Projects.tsx:90` also read `localStorage.getItem('user')` — the same key nothing writes. Both are therefore dead paths reading a permanently absent value, and both may contain unreachable branches or silent failures. **Do not fix them in this packet.** Claude has recorded them; they are dispositioned when those surfaces are rebuilt. Report anything further you notice about them without acting.

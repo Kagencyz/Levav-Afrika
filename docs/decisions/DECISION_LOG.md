@@ -16,6 +16,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0006 | Unreachable routers are deleted, not preserved | APPROVED | 2026-08-12 |
 | PDR-0007 | Day 15 evidence-sufficiency threshold | **ESCALATED** | 2026-08-12 |
 | PDR-0008 | QuickWork payment, escrow and dispute model | **ESCALATED** | 2026-08-12 |
+| PDR-0009 | Unimplemented controls state their absence; retired local keys are cleared | APPROVED | 2026-08-12 |
 
 ---
 
@@ -92,6 +93,25 @@ Consequences, decided explicitly:
 **Decision.** Delete them. They will be rebuilt against the Evidence Graph and entitlement model, and nothing in them survives that rebuild. The allowlist guard in `server/router.test.ts` is **kept** — it is a good control and continues to protect the registration surface.
 
 **Why deletion rather than retention.** Code that looks 90% finished is an invitation. `employer.ts` reads `ctx.user.id` where the context provides `userId`; `upload.getPresignedUrl` has no authorisation check. Git history preserves them for reference.
+
+## PDR-0009 — Unimplemented controls state their absence; retired local keys are cleared
+
+**State:** APPROVED · **Requirements:** SEC-005, SEC-010, PRIV-001, LANG-003
+**Raised by:** Codex `BLOCKED_PRODUCT_DECISION` on WP-0001 · **Applied in:** WP-0001 Amendment A1
+
+**Context.** `src/lib/auditService.ts` writes an "audit log" to `localStorage` and feeds the Admin Audit Logs tab. Two verified facts: nothing in `src/` writes `localStorage['user']`, so the service's actor lookup returns `null` on every call and no entry has been written since the httpOnly-cookie migration; and the record shape hard-codes `ipAddress: 'client-side'`. The tab renders an empty log today, and would render fabricated provenance if it ever rendered anything.
+
+**Decision, part 1 — unimplemented controls.** A security or compliance surface that exists in the interface but is not implemented must **state that it is not implemented**. It must never render an empty result set, a zero count, or a disabled control.
+
+The reasoning generalises beyond audit: for a control that is supposed to observe things, an empty result and a control that is not running are visually identical, and the empty result is read as assurance. "No entries found" tells an administrator nothing happened. "Levav is not recording an audit trail" tells them the truth. This binds on every future surface where a control is scheduled but absent — access history, export logs, moderation queues, consent records.
+
+**Decision, part 2 — retired local keys.** Personal data left in `localStorage` after its feature is removed must be actively cleared, not abandoned. `levav_audit_log` holds up to 500 records of `userId` and `userEmail`.
+
+Orphaned personal data has no purpose, no retention rule, no lawful basis, and — because no server knows it exists — no way to satisfy a deletion or export request (SEC-010, PRIV-001). "Harmless" is not a category the privacy requirements recognise.
+
+Cleanup is consolidated into **one** retired-key module shared with WP-0003's `wriScore` removal, with a documented removal condition. Two competing cleanup paths is how one of them silently stops running.
+
+**Rejected alternative.** Removing the Audit Logs tab outright. It is the tidier change, but it deletes the only visible marker that SEC-005 is unmet, and an administrator who remembers the tab would reasonably assume audit had moved rather than never existed.
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 
