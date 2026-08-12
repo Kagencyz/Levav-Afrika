@@ -145,41 +145,6 @@ function StatusBadge({ status }: { status: Application["status"] }) {
   );
 }
 
-// ── WRI Score indicator ────────────────────────────────
-function WriIndicator({
-  score,
-  trend,
-}: {
-  score: number;
-  trend: Application["wriTrend"];
-}) {
-  const getColor = (s: number) => {
-    if (s >= 85) return "text-[#C6FF34]";
-    if (s >= 70) return "text-yellow-400";
-    if (s >= 55) return "text-orange-400";
-    return "text-red-400";
-  };
-  const getBg = (s: number) => {
-    if (s >= 85) return "bg-[#C6FF34]/10";
-    if (s >= 70) return "bg-yellow-500/10";
-    if (s >= 55) return "bg-orange-500/10";
-    return "bg-red-500/10";
-  };
-
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        className={`inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 rounded-md text-xs font-bold ${getColor(score)} ${getBg(score)}`}
-      >
-        {score}
-      </span>
-      {trend === "up" && <TrendingUp size={14} className="text-[#C6FF34]" />}
-      {trend === "down" && <TrendingDown size={14} className="text-red-400" />}
-      {trend === "flat" && <Minus size={14} className="text-[#666666]" />}
-    </div>
-  );
-}
-
 // ── Avatar fallback ────────────────────────────────────
 function Avatar({ name }: { name: string }) {
   const initials = name
@@ -367,9 +332,6 @@ export default function ApplicationsSection() {
                 <th className="px-5 py-3.5 text-xs font-medium text-[#666666] uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-5 py-3.5 text-xs font-medium text-[#666666] uppercase tracking-wider">
-                  WRI Score
-                </th>
                 <th className="px-5 py-3.5 text-xs font-medium text-[#666666] uppercase tracking-wider text-right">
                   Actions
                 </th>
@@ -379,7 +341,7 @@ export default function ApplicationsSection() {
               {filtered.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={6}
                     className="px-5 py-12 text-center text-[#666666]"
                   >
                     <FileText size={32} className="mx-auto mb-3 opacity-30" />
@@ -421,12 +383,6 @@ export default function ApplicationsSection() {
                     </td>
                     <td className="px-5 py-4">
                       <StatusBadge status={app.status} />
-                    </td>
-                    <td className="px-5 py-4">
-                      <WriIndicator
-                        score={app.wriScore}
-                        trend={app.wriTrend}
-                      />
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">

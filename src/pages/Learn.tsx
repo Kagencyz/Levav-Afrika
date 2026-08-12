@@ -27,7 +27,6 @@ import {
   getLearnProgress,
   saveLessonCompletion,
   enrollInCourse,
-  awardWriPoints,
 } from "@/lib/levavData";
 import type { LearnCourse, LearnLesson } from "@/lib/levavData";
 
@@ -470,7 +469,7 @@ function CatalogView({
               </span>
             </h2>
             <p className="text-[#A0A0A0] max-w-xl mx-auto">
-              Enroll in any course and begin building your skills today. Every lesson completed earns WRI points.
+              Enroll in any course and begin building your skills today.
             </p>
           </motion.div>
 
@@ -829,7 +828,7 @@ function CourseDetailView({
             <p className="text-[#A0A0A0] text-sm max-w-md mx-auto mb-6">
               {progress.progress === 100
                 ? "Congratulations! You have completed this course. Download your certificate of completion."
-                : `Finish all ${course.lessons.length} lessons to earn your certificate of completion and boost your WRI score.`}
+                : `Finish all ${course.lessons.length} lessons to earn your certificate of completion.`}
             </p>
             {progress.progress === 100 ? (
               <button
@@ -1008,14 +1007,12 @@ function LessonViewer({
     if (isCompleted) return;
 
     saveLessonCompletion(courseId, lessonId);
-    awardWriPoints("learn-lesson-complete");
     setIsCompleted(true);
     setJustCompleted(true);
 
     onAddToast({
       id: `lesson-${lessonId}-${Date.now()}`,
       message: "Lesson Completed!",
-      subMessage: "+5 WRI Points earned",
       type: "success",
     });
 
@@ -1023,11 +1020,10 @@ function LessonViewer({
     const updatedProgress = getCourseProgress(courseId);
     if (updatedProgress.progress === 100) {
       setTimeout(() => {
-        awardWriPoints("learn-course-complete");
         onAddToast({
           id: `course-${courseId}-${Date.now()}`,
           message: "Course Complete!",
-          subMessage: "+25 WRI Points earned. Certificate unlocked!",
+          subMessage: "Certificate unlocked!",
           type: "courseComplete",
         });
       }, 1500);
@@ -1195,7 +1191,7 @@ function LessonViewer({
                   >
                     <CheckCircle className="w-5 h-5" />
                   </motion.div>
-                  Lesson Completed — +5 WRI Points
+                  Lesson Completed
                 </div>
               )}
             </motion.div>

@@ -445,50 +445,10 @@ export default function SkillGap() {
             </p>
           </motion.div>
 
-          {/* WRI Score Cards */}
-          <motion.div
-            className="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div
-              className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5 text-center"
-              variants={fadeUp}
-              custom={0}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Target className="w-4 h-4 text-[#C6FF34]" />
-                <span className="text-[#666666] text-xs uppercase tracking-wider">Current WRI</span>
-              </div>
-              <p className="text-white text-3xl font-semibold">{currentWRI}</p>
-            </motion.div>
-
-            <motion.div
-              className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5 text-center"
-              variants={fadeUp}
-              custom={1}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Award className="w-4 h-4 text-[#7E3BED]" />
-                <span className="text-[#666666] text-xs uppercase tracking-wider">Target WRI</span>
-              </div>
-              <p className="text-white text-3xl font-semibold">{targetWRI}</p>
-            </motion.div>
-
-            <motion.div
-              className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5 text-center"
-              variants={fadeUp}
-              custom={2}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-[#C6FF34]" />
-                <span className="text-[#666666] text-xs uppercase tracking-wider">Gap to Close</span>
-              </div>
-              <p className="text-3xl font-semibold bg-gradient-to-r from-[#C6FF34] to-[#7E3BED] bg-clip-text text-transparent">
-                +{targetWRI - currentWRI}
-              </p>
-            </motion.div>
+          <motion.div className="mx-auto max-w-2xl rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 text-center" variants={fadeUp} initial="hidden" animate="visible">
+            {/* TODO(WP-0004): resolve these through wri.confidence.none.* copy keys. */}
+            <h2 className="text-lg font-semibold text-white">No evidence yet</h2>
+            <p className="mt-2 text-sm leading-6 text-white/60">You have not created evidence yet. Levav 28 Day 1 is the fastest way to start.</p>
           </motion.div>
         </div>
       </section>

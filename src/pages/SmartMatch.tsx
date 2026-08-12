@@ -126,7 +126,6 @@ const FILTER_OPTIONS: { label: string; value: FilterOption }[] = [
 function ProfileSidebar({ profile }: { profile: Profile }) {
   const skills = profile.skills || ["React", "TypeScript", "Tailwind"];
   const location = profile.location || "Lusaka, Zambia";
-  const wri = profile.wri || 70;
   const category = profile.category || "engineering";
 
   const skillIcons = [
@@ -150,25 +149,6 @@ function ProfileSidebar({ profile }: { profile: Profile }) {
             <Target className="w-4 h-4 text-black" />
           </div>
           <h3 className="text-white font-semibold text-sm">Your Profile</h3>
-        </div>
-
-        {/* WRI */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[#A0A0A0] text-xs">WRI Score</span>
-            <span className="text-[#C6FF34] text-xs font-semibold">{wri}/100</span>
-          </div>
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#C6FF34] to-[#7E3BED]"
-              initial={{ width: 0 }}
-              animate={{ width: `${wri}%` }}
-              transition={{ duration: 1, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
-            />
-          </div>
-          <p className="text-[#666666] text-[10px] mt-1">
-            Higher WRI = better job matches
-          </p>
         </div>
 
         {/* Location */}
@@ -480,9 +460,7 @@ export default function SmartMatch() {
               ease: [0.19, 1, 0.22, 1],
             }}
           >
-            Our AI algorithm analyzes your skills, location preferences, WRI
-            score, and category alignment to surface the best opportunities for
-            your career growth.
+            Match suggestions use your skills, location preferences and category alignment.
           </motion.p>
 
           {/* Summary stats */}

@@ -1,6 +1,6 @@
 /**
  * Levav Data Store
- * Central data models for Levav 28™, Learn, QuickWork™, Impact, and WRI™
+ * Central data models for Levav 28™, Learn, QuickWork™, and Impact.
  * All data persists to localStorage for static deployment.
  */
 
@@ -16,7 +16,6 @@ export interface Levav28Day {
   subtitle: string;
   phase: 'CONFRONT' | 'DISSECT' | 'OWN' | 'EXECUTE';
   tasks: Levav28Task[];
-  wriUnlock: WriDimension | null; // which WRI dimension this day unlocks
   quote: string;
 }
 
@@ -28,19 +27,6 @@ export interface Levav28Task {
   completed: boolean;
   actionUrl?: string; // e.g., '/quickwork', '/learn', '/impact'
   actionLabel?: string;
-}
-
-export type WriDimension = 'technical' | 'communication' | 'reliability' | 'leadership' | 'creativity' | 'growth';
-
-export interface WriScore {
-  overall: number;
-  technical: number;
-  communication: number;
-  reliability: number;
-  leadership: number;
-  creativity: number;
-  growth: number;
-  history: { date: string; score: number; reason: string }[];
 }
 
 export interface LearnCourse {
@@ -156,7 +142,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'Meet Yourself',
     subtitle: 'Honest self-assessment. Who are you really?',
     phase: 'CONFRONT',
-    wriUnlock: null,
     quote: 'The first step to transformation is seeing yourself clearly.',
     tasks: [
       { id: 'd1t1', title: 'Complete your Levav ID profile', description: 'Fill in all profile fields — be honest about your current skills and gaps.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'Go to Profile' },
@@ -169,7 +154,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'The Mirror',
     subtitle: 'CONFRONT your gaps. No excuses.',
     phase: 'CONFRONT',
-    wriUnlock: null,
     quote: 'You cannot change what you refuse to confront.',
     tasks: [
       { id: 'd2t1', title: 'Identify your top 3 skill gaps', description: 'Research 3 roles you want. List the skills you are missing for each.', type: 'reflection', completed: false },
@@ -182,7 +166,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'First Step',
     subtitle: 'Pick up your first QuickWork™.',
     phase: 'CONFRONT',
-    wriUnlock: 'reliability',
     quote: 'Capability is proven through action, not intention.',
     tasks: [
       { id: 'd3t1', title: 'Browse QuickWork™ gigs', description: 'Look through available gigs and find one that matches your current skills.', type: 'action', completed: false, actionUrl: '/quickwork', actionLabel: 'Browse Gigs' },
@@ -195,7 +178,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'Learn Something',
     subtitle: 'Start your first lesson.',
     phase: 'CONFRONT',
-    wriUnlock: 'technical',
     quote: 'The day you stop learning is the day you stop growing.',
     tasks: [
       { id: 'd4t1', title: 'Enroll in a Learn course', description: 'Find a course in your field and enroll. Commit to finishing it.', type: 'action', completed: false, actionUrl: '/learn', actionLabel: 'Browse Courses' },
@@ -208,7 +190,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'Give Back',
     subtitle: 'Volunteer at a Levav Impact™ partner.',
     phase: 'CONFRONT',
-    wriUnlock: 'leadership',
     quote: 'True leadership begins with service.',
     tasks: [
       { id: 'd5t1', title: 'Find an Impact opportunity', description: 'Browse NGOs and community organizations that need your skills.', type: 'action', completed: false, actionUrl: '/impact', actionLabel: 'Find Opportunities' },
@@ -221,7 +202,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'The Grind',
     subtitle: 'CONFRONT the hard work.',
     phase: 'CONFRONT',
-    wriUnlock: null,
     quote: 'There is no shortcut to any place worth going.',
     tasks: [
       { id: 'd6t1', title: 'Work on your gig', description: 'Spend at least 2 hours on your QuickWork™ gig. Deliver something.', type: 'action', completed: false },
@@ -234,17 +214,16 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     title: 'Week 1 Checkpoint',
     subtitle: 'Review. Reflect. Recalibrate.',
     phase: 'CONFRONT',
-    wriUnlock: 'growth',
     quote: 'Progress is measured by the distance between who you were and who you are becoming.',
     tasks: [
       { id: 'd7t1', title: 'Complete the Week 1 review', description: 'Answer reflection questions about your first week.', type: 'quiz', completed: false },
-      { id: 'd7t2', title: 'Update your WRI™ score', description: 'Your actions this week have started building your score. Check it.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'View WRI Score' },
+      { id: 'd7t2', title: 'Review your progress', description: 'Review the work you completed this week.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'View progress' },
       { id: 'd7t3', title: 'Celebrate small wins', description: 'Share one win from this week with your cohort. You have earned it.', type: 'external', completed: false },
     ],
   },
   // Week 2: DISSECT (Days 8-14)
   {
-    day: 8, title: 'Deep Dive', subtitle: 'DISSECT your craft.', phase: 'DISSECT', wriUnlock: null,
+    day: 8, title: 'Deep Dive', subtitle: 'DISSECT your craft.', phase: 'DISSECT',
     quote: 'Mastery requires understanding the details.',
     tasks: [
       { id: 'd8t1', title: 'Complete Lesson 3', description: 'Push through the hard parts of your course.', type: 'action', completed: false, actionUrl: '/learn', actionLabel: 'Continue Course' },
@@ -253,7 +232,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 9, title: 'Feedback Loop', subtitle: 'DISSECT your performance.', phase: 'DISSECT', wriUnlock: 'communication',
+    day: 9, title: 'Feedback Loop', subtitle: 'DISSECT your performance.', phase: 'DISSECT',
     quote: 'Feedback is the breakfast of champions.',
     tasks: [
       { id: 'd9t1', title: 'Request feedback on your gig', description: 'Ask your employer for honest feedback on your work so far.', type: 'action', completed: false },
@@ -262,7 +241,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 10, title: 'Skill Sprint', subtitle: 'DISSECT and sharpen.', phase: 'DISSECT', wriUnlock: null,
+    day: 10, title: 'Skill Sprint', subtitle: 'DISSECT and sharpen.', phase: 'DISSECT',
     quote: 'A sharp blade cuts better. A sharp skill opens more doors.',
     tasks: [
       { id: 'd10t1', title: 'Complete a course project', description: 'Finish a hands-on project from your Learn course.', type: 'action', completed: false, actionUrl: '/learn', actionLabel: 'Go to Course' },
@@ -271,7 +250,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 11, title: 'Network', subtitle: 'DISSECT your connections.', phase: 'DISSECT', wriUnlock: null,
+    day: 11, title: 'Network', subtitle: 'DISSECT your connections.', phase: 'DISSECT',
     quote: 'Your network is your net worth.',
     tasks: [
       { id: 'd11t1', title: 'Reach out to a champion', description: 'Send a thoughtful message to a Levav Champion in your field.', type: 'action', completed: false },
@@ -280,7 +259,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 12, title: 'Deliver', subtitle: 'DISSECT your work quality.', phase: 'DISSECT', wriUnlock: null,
+    day: 12, title: 'Deliver', subtitle: 'DISSECT your work quality.', phase: 'DISSECT',
     quote: 'Excellence is not an act, but a habit.',
     tasks: [
       { id: 'd12t1', title: 'Submit your completed gig', description: 'Deliver your final work to the employer. Make it excellent.', type: 'action', completed: false },
@@ -289,7 +268,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 13, title: 'Double Down', subtitle: 'DISSECT your weaknesses.', phase: 'DISSECT', wriUnlock: null,
+    day: 13, title: 'Double Down', subtitle: 'DISSECT your weaknesses.', phase: 'DISSECT',
     quote: 'The obstacle is the way.',
     tasks: [
       { id: 'd13t1', title: 'Apply for a second gig', description: 'Now that you have experience, apply for a more challenging gig.', type: 'action', completed: false, actionUrl: '/quickwork', actionLabel: 'Browse More Gigs' },
@@ -298,7 +277,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 14, title: 'Week 2 Checkpoint', subtitle: 'DISSECT your progress.', phase: 'DISSECT', wriUnlock: null,
+    day: 14, title: 'Week 2 Checkpoint', subtitle: 'DISSECT your progress.', phase: 'DISSECT',
     quote: 'Two weeks of consistent effort create momentum.',
     tasks: [
       { id: 'd14t1', title: 'Complete Week 2 review', description: 'Reflect on your growth over the past two weeks.', type: 'quiz', completed: false },
@@ -308,7 +287,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
   },
   // Week 3: OWN (Days 15-21)
   {
-    day: 15, title: 'Take Ownership', subtitle: 'OWN your path.', phase: 'OWN', wriUnlock: 'creativity',
+    day: 15, title: 'Take Ownership', subtitle: 'OWN your path.', phase: 'OWN',
     quote: 'The moment you take ownership is the moment your transformation accelerates.',
     tasks: [
       { id: 'd15t1', title: 'Create something original', description: 'Build a small project, write an article, or create a design entirely your own.', type: 'action', completed: false },
@@ -317,7 +296,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 16, title: 'Teach', subtitle: 'OWN by teaching others.', phase: 'OWN', wriUnlock: null,
+    day: 16, title: 'Teach', subtitle: 'OWN by teaching others.', phase: 'OWN',
     quote: 'The best way to learn is to teach.',
     tasks: [
       { id: 'd16t1', title: 'Mentor a new cohort member', description: 'Help someone who is behind you in the program.', type: 'external', completed: false },
@@ -326,7 +305,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 17, title: 'Build', subtitle: 'OWN your portfolio.', phase: 'OWN', wriUnlock: null,
+    day: 17, title: 'Build', subtitle: 'OWN your portfolio.', phase: 'OWN',
     quote: 'Show, do not tell. Your portfolio is your proof.',
     tasks: [
       { id: 'd17t1', title: 'Polish your Levav profile', description: 'Add all your completed work, reviews, and certificates.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'Update Profile' },
@@ -335,7 +314,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 18, title: 'Specialize', subtitle: 'OWN your niche.', phase: 'OWN', wriUnlock: null,
+    day: 18, title: 'Specialize', subtitle: 'OWN your niche.', phase: 'OWN',
     quote: 'A specialist is worth 10 generalists.',
     tasks: [
       { id: 'd18t1', title: 'Choose your specialization', description: 'Decide on one area to become exceptional at.', type: 'reflection', completed: false },
@@ -344,7 +323,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 19, title: 'Lead', subtitle: 'OWN your influence.', phase: 'OWN', wriUnlock: null,
+    day: 19, title: 'Lead', subtitle: 'OWN your influence.', phase: 'OWN',
     quote: 'Leadership is not a title. It is an action.',
     tasks: [
       { id: 'd19t1', title: 'Lead a cohort discussion', description: 'Facilitate a group discussion or study session.', type: 'external', completed: false },
@@ -353,7 +332,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 20, title: 'Iterate', subtitle: 'OWN your improvement.', phase: 'OWN', wriUnlock: null,
+    day: 20, title: 'Iterate', subtitle: 'OWN your improvement.', phase: 'OWN',
     quote: 'Iteration is the engine of excellence.',
     tasks: [
       { id: 'd20t1', title: 'Complete another course module', description: 'Keep learning. Momentum compounds.', type: 'action', completed: false, actionUrl: '/learn', actionLabel: 'Continue Learning' },
@@ -362,17 +341,17 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 21, title: 'Week 3 Checkpoint', subtitle: 'OWN your progress.', phase: 'OWN', wriUnlock: null,
+    day: 21, title: 'Week 3 Checkpoint', subtitle: 'OWN your progress.', phase: 'OWN',
     quote: 'Three weeks of ownership makes you a different person.',
     tasks: [
       { id: 'd21t1', title: 'Complete Week 3 review', description: 'Assess your progress across all dimensions.', type: 'quiz', completed: false },
-      { id: 'd21t2', title: 'Update your WRI™ score', description: 'Check how your actions have built your score.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'Check WRI Score' },
+      { id: 'd21t2', title: 'Review your progress', description: 'Review the work you completed this week.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'View progress' },
       { id: 'd21t3', title: 'Plan your EXECUTE phase', description: 'Set goals for the final week of transformation.', type: 'reflection', completed: false },
     ],
   },
   // Week 4: EXECUTE (Days 22-28)
   {
-    day: 22, title: 'The Sprint', subtitle: 'EXECUTE with everything you have.', phase: 'EXECUTE', wriUnlock: null,
+    day: 22, title: 'The Sprint', subtitle: 'EXECUTE with everything you have.', phase: 'EXECUTE',
     quote: 'The final week is where champions are made.',
     tasks: [
       { id: 'd22t1', title: 'Pick up an urgent gig', description: 'Find a gig with a tight deadline. Test yourself under pressure.', type: 'action', completed: false, actionUrl: '/quickwork', actionLabel: 'Find Urgent Gigs' },
@@ -381,7 +360,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 23, title: 'Excellence', subtitle: 'EXECUTE at your highest level.', phase: 'EXECUTE', wriUnlock: null,
+    day: 23, title: 'Excellence', subtitle: 'EXECUTE at your highest level.', phase: 'EXECUTE',
     quote: 'Excellence is the gradual result of always striving to do better.',
     tasks: [
       { id: 'd23t1', title: 'Deliver exceptional work', description: 'Go above and beyond on your current gig. Make the client say "wow".', type: 'action', completed: false },
@@ -390,7 +369,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 24, title: 'Legacy', subtitle: 'EXECUTE for impact.', phase: 'EXECUTE', wriUnlock: null,
+    day: 24, title: 'Legacy', subtitle: 'EXECUTE for impact.', phase: 'EXECUTE',
     quote: 'Leave every place better than you found it.',
     tasks: [
       { id: 'd24t1', title: 'Complete your Impact project', description: 'Deliver your volunteer project. Document the impact.', type: 'action', completed: false, actionUrl: '/impact', actionLabel: 'Complete Project' },
@@ -399,7 +378,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 25, title: 'Showcase', subtitle: 'EXECUTE your presentation.', phase: 'EXECUTE', wriUnlock: null,
+    day: 25, title: 'Showcase', subtitle: 'EXECUTE your presentation.', phase: 'EXECUTE',
     quote: 'If people do not know what you can do, you might as well not do it.',
     tasks: [
       { id: 'd25t1', title: 'Create your portfolio showcase', description: 'Compile your best work into a presentable portfolio.', type: 'action', completed: false, actionUrl: '/dashboard', actionLabel: 'Build Portfolio' },
@@ -408,7 +387,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 26, title: 'Connect', subtitle: 'EXECUTE your network.', phase: 'EXECUTE', wriUnlock: null,
+    day: 26, title: 'Connect', subtitle: 'EXECUTE your network.', phase: 'EXECUTE',
     quote: 'Opportunities do not happen. You create them.',
     tasks: [
       { id: 'd26t1', title: 'Apply to 3 opportunities', description: 'Apply to real jobs or gigs using your new profile and portfolio.', type: 'action', completed: false, actionUrl: '/opportunities', actionLabel: 'Browse Opportunities' },
@@ -417,7 +396,7 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     ],
   },
   {
-    day: 27, title: 'Final Push', subtitle: 'EXECUTE the last mile.', phase: 'EXECUTE', wriUnlock: null,
+    day: 27, title: 'Final Push', subtitle: 'EXECUTE the last mile.', phase: 'EXECUTE',
     quote: 'The last mile is always the hardest. That is why most people never finish.',
     tasks: [
       { id: 'd27t1', title: 'Complete all pending tasks', description: 'Go back and finish any incomplete tasks from previous days.', type: 'action', completed: false },
@@ -429,7 +408,6 @@ export const LEVAV28_DAYS: Levav28Day[] = [
     day: 28, title: 'Levav Graduate',
     subtitle: 'You are not the same person who started.',
     phase: 'EXECUTE',
-    wriUnlock: null,
     quote: 'The person who finishes Day 28 is not the same person who started Day 1.',
     tasks: [
       { id: 'd28t1', title: 'Complete the Final Assessment', description: 'Demonstrate everything you have learned in the final assessment.', type: 'quiz', completed: false },
@@ -674,7 +652,7 @@ export const FEED_POSTS: FeedPost[] = [
   {
     id: 'feed-5', authorId: 'seed-chidi', authorName: 'Chidi Eze', authorInitials: 'CE',
     authorMeta: 'Backend Engineer · Nairobi',
-    body: 'Capable and available, not idle — took that QuickWork line personally. Picked up a 3-day API integration gig between contracts instead of waiting around. Got paid, got a review, and my WRI Reliability score is the highest it\'s ever been.',
+    body: 'Capable and available, not idle — took that QuickWork line personally. Picked up a 3-day API integration project between contracts instead of waiting around. Got paid and received a review.',
     tag: 'QuickWork™ win',
     likedBy: ['seed-amara', 'seed-thandiwe'], comments: [], createdAt: '2026-07-19T10:20:00.000Z', isSeed: true,
   },
@@ -702,7 +680,6 @@ const LS_KEYS = {
   impactApplicants: 'impact_applicants',
   feedPosts: 'feed_posts',
   feedFollowing: 'feed_following',
-  wriScore: 'wri_score',
   contentStudio: 'content_studio',
 };
 
@@ -1027,90 +1004,4 @@ export function toggleFollow(authorId: string) {
     : [...following, authorId];
   localStorage.setItem(LS_KEYS.feedFollowing, JSON.stringify(next));
   return next;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// WRI SCORING ENGINE
-// ═══════════════════════════════════════════════════════════════
-
-/** Get the user's current WRI score. Returns 0 for new users. */
-export function getWriScore(): WriScore {
-  return safeJSONParse(LS_KEYS.wriScore, {
-    overall: 0,
-    technical: 0,
-    communication: 0,
-    reliability: 0,
-    leadership: 0,
-    creativity: 0,
-    growth: 0,
-    history: [],
-  });
-}
-
-/** Save WRI score */
-export function saveWriScore(score: WriScore) {
-  localStorage.setItem(LS_KEYS.wriScore, JSON.stringify(score));
-}
-
-/** WRI scoring rules — each task completion adds to specific dimensions */
-export const WRI_SCORING_RULES: Record<string, { dimension: WriDimension; points: number; description: string }> = {
-  'levav28-day3-complete': { dimension: 'reliability', points: 15, description: 'Completed Day 3: Picked up first QuickWork gig' },
-  'levav28-day4-complete': { dimension: 'technical', points: 15, description: 'Completed Day 4: Started first Learn course' },
-  'levav28-day5-complete': { dimension: 'leadership', points: 15, description: 'Completed Day 5: Volunteered at Impact partner' },
-  'levav28-day7-complete': { dimension: 'growth', points: 20, description: 'Completed Week 1 checkpoint' },
-  'levav28-day9-complete': { dimension: 'communication', points: 15, description: 'Completed Day 9: Feedback loop' },
-  'levav28-day15-complete': { dimension: 'creativity', points: 15, description: 'Completed Day 15: Created something original' },
-  'learn-lesson-complete': { dimension: 'technical', points: 5, description: 'Completed a Learn lesson' },
-  'learn-course-complete': { dimension: 'technical', points: 25, description: 'Completed a full Learn course' },
-  'quickwork-applied': { dimension: 'reliability', points: 5, description: 'Applied to a QuickWork gig' },
-  'quickwork-completed': { dimension: 'reliability', points: 20, description: 'Completed a QuickWork gig' },
-  'quickwork-positive-review': { dimension: 'communication', points: 20, description: 'Received positive review on QuickWork' },
-  'impact-volunteer': { dimension: 'leadership', points: 15, description: 'Volunteered at Levav Impact partner' },
-  'impact-hours-4': { dimension: 'leadership', points: 10, description: 'Completed 4+ volunteer hours' },
-  'profile-complete': { dimension: 'growth', points: 10, description: 'Completed Levav ID profile' },
-  'feed-first-post': { dimension: 'communication', points: 10, description: 'Shared your first update on the feed' },
-};
-
-/** Award WRI points for a specific achievement */
-export function awardWriPoints(achievementKey: string): WriScore {
-  const rule = WRI_SCORING_RULES[achievementKey];
-  if (!rule) return getWriScore();
-
-  const score = getWriScore();
-
-  // Check if already awarded (prevent double-counting)
-  const alreadyAwarded = score.history.some((h) => h.reason === rule.description);
-  if (alreadyAwarded) return score;
-
-  score[rule.dimension] = Math.min(100, score[rule.dimension] + rule.points);
-  score.overall = Math.round(
-    (score.technical + score.communication + score.reliability + score.leadership + score.creativity + score.growth) / 6
-  );
-  score.history.push({
-    date: new Date().toISOString(),
-    score: rule.points,
-    reason: rule.description,
-  });
-
-  saveWriScore(score);
-  return score;
-}
-
-/** Check if WRI score has been initialized (user has done at least one qualifying task) */
-export function isWriInitialized(): boolean {
-  const score = getWriScore();
-  return score.history.length > 0;
-}
-
-/** Get WRI unlock status — which dimensions are unlocked */
-export function getWriUnlockStatus(): Record<WriDimension, boolean> {
-  const score = getWriScore();
-  return {
-    technical: score.technical > 0,
-    communication: score.communication > 0,
-    reliability: score.reliability > 0,
-    leadership: score.leadership > 0,
-    creativity: score.creativity > 0,
-    growth: score.growth > 0,
-  };
 }

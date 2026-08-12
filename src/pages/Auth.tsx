@@ -5,7 +5,6 @@ import { Eye, EyeOff, ArrowRight, Sparkles, Loader2, MailCheck } from 'lucide-re
 import { toast } from 'sonner';
 import { sanitizeInput, isValidEmail } from '@/lib/safeJSON';
 import { StableInput } from '@/components/StableInputs';
-import { logWithCurrentUser } from '@/lib/auditService';
 import { trpc } from '@/providers/trpc';
 import GlassCard from '@/components/GlassCard';
 
@@ -195,7 +194,6 @@ export default function Auth() {
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();
         attemptCountRef.current = 0;
-        logWithCurrentUser('register', 'Authentication', 'success');
         toast.success('Account created!');
         // Preference selection next (upgrade brief §3); a goal carried from
         // a landing-page path card rides along to pre-select itself.
@@ -214,7 +212,6 @@ export default function Auth() {
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();
         attemptCountRef.current = 0;
-        logWithCurrentUser('login', 'Authentication', 'success');
         toast.success('Welcome back!');
         navigate(intent === 'employer' ? '/employers' : '/dashboard');
       }

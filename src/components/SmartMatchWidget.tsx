@@ -93,9 +93,6 @@ export function calculateMatchScore(job: Job, profile: Profile): MatchResult {
     reasons.push("Remote — flexible location");
   }
 
-  const wri = profile.wri || 70;
-  score += (wri / 100) * 20;
-
   if (job.category && profile.category && job.category === profile.category) {
     score += 10;
     reasons.push("Category match");
@@ -264,7 +261,6 @@ function getProfile(): Profile {
         skills: user.skills || ["React", "TypeScript"],
         location: user.location || "Lusaka, Zambia",
         category: user.category || "engineering",
-        wri: user.wri || 70,
       };
     }
   } catch {
@@ -274,7 +270,6 @@ function getProfile(): Profile {
     skills: ["React", "TypeScript", "Tailwind"],
     location: "Lusaka, Zambia",
     category: "engineering",
-    wri: 70,
   };
 }
 
