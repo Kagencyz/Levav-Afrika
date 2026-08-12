@@ -17,6 +17,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0007 | Day 15 evidence-sufficiency threshold | **ESCALATED** | 2026-08-12 |
 | PDR-0008 | QuickWork payment, escrow and dispute model | **ESCALATED** | 2026-08-12 |
 | PDR-0009 | Unimplemented controls state their absence; retired local keys are cleared | APPROVED | 2026-08-12 |
+| PDR-0010 | Nominated written work samples may become evidence; publishing never does | **PROPOSED** | 2026-08-12 |
 
 ---
 
@@ -112,6 +113,61 @@ Orphaned personal data has no purpose, no retention rule, no lawful basis, and �
 Cleanup is consolidated into **one** retired-key module shared with WP-0003's `wriScore` removal, with a documented removal condition. Two competing cleanup paths is how one of them silently stops running.
 
 **Rejected alternative.** Removing the Audit Logs tab outright. It is the tidier change, but it deletes the only visible marker that SEC-005 is unmet, and an administrator who remembers the tab would reasonably assume audit had moved rather than never existed.
+## PDR-0010 — Nominated written work samples may become evidence; publishing never does
+
+**State:** PROPOSED · endorsed in principle by the product owner 2026-08-12 · **decided at Sprint 8**
+**Requirements:** FEED-002, FEED-008, EVD-001, EVD-003, WRI-003, WRI-005, AI-002, AI-008, TRUST-001
+**Relationship to PDR-0001:** complementary, not a reversal. PDR-0001 stands in full.
+
+**Context.** WP-0003 removes `feed-first-post`, which awarded +10 communication for the existence of a user's first post. The product owner asked whether feed writing should be able to count for readiness at all, "especially if it's valid and helpful". The answer is yes — under the same rules as every other piece of evidence, and only for what the artefact actually demonstrates.
+
+### The distinction this PDR turns on
+
+**The act of publishing is not evidence. A piece of written work can be.**
+
+`feed-first-post` measured the act: one post, once, +10, regardless of content. That is unfixable by tuning, because nothing about it is an observation of behaviour. What *is* observable is the writing itself — its clarity, structure, reasoning and audience awareness.
+
+So the mechanism is not "posting raises your score". It is: **a member nominates a piece of their own professional writing for assessment, and the assessment is what produces evidence.** The feed is where the writing happens to live. Publishing frequency becomes irrelevant to readiness, which removes the volume incentive entirely.
+
+### The trap in "helpful"
+
+Helpfulness must never be inferred from engagement. Reactions, comments, saves, shares, follower counts and reach are **inadmissible as evidence inputs** — using them is FEED-008, restated. A post that many people liked is a popular post, and Levav does not measure popularity.
+
+Helpfulness is assessed from the artefact, against a rubric: does the writing make a reader more able to do something, decide something or understand something, in a professional context. That is a property of the text, and it is assessable without counting anyone's approval.
+
+### What a written sample can and cannot show
+
+The decisive constraint. A post describing work is a **claim** about that work. The assessment can observe the writing; it cannot verify that the described events happened.
+
+| Observable in the artefact | Not observable |
+|---|---|
+| Communication — clarity, structure, audience awareness | Reliability and execution |
+| Critical thinking — where the writing reasons through a real problem, shows its assumptions and considers alternatives | Collaboration and teamwork |
+| Professional discipline — where the writing demonstrates documentation quality or rigour | Initiative and ownership |
+| | Leadership readiness · Adaptability · Problem solving · Contribution |
+
+**Eligible dimensions are limited to Communication, Critical Thinking and Professional Discipline**, and only where the sample genuinely exercises them. Nothing else may be inferred from a self-authored text.
+
+### Conditions, all of which must hold
+
+1. **Nominated, not automatic.** The member explicitly submits a specific piece for assessment. Levav never harvests the feed.
+2. **Bounded.** A small standing allowance — proposed three nominations per assessment window, exact figure a Sprint 8 decision. Volume produces no additional evidence.
+3. **Rubric-assessed and versioned.** Behaviourally anchored rubric, structured AI output, recorded rubric and model version (WRI-005, AI-002, AI-003). Low-confidence assessment routes to human review, never to a silent score.
+4. **Recorded as E0.** Self-authored, self-selected, produced under no controlled conditions and with unrestricted assistance. It is the weakest evidence tier and its provenance must say so.
+5. **Capped, and never sufficient alone.** A nominated sample may contribute to a dimension but may never, by itself, lift that dimension above provisional confidence. E0 cannot substitute for E2 or E3 (WRI-003, EVD-003).
+6. **Authorship risk is a signal only.** Suspected undisclosed AI authorship is a risk flag that may trigger a follow-up or a live task. It never produces a WRI penalty on its own (L28-008, AI-008).
+7. **Engagement metrics are structurally excluded** from the assessment input, the evidence record and the confidence calculation.
+8. **Independent endorsement is not a shortcut.** A qualified peer confirming a sample's substance may raise Evidence Confidence, subject to reviewer trust and reciprocal-endorsement detection (TRUST-001). It never converts E0 into verified work evidence.
+
+### Why this is worth building
+
+It gives the Feed a reason to exist inside the readiness system without corrupting it, and it gives members a route to demonstrate written reasoning that Levav 28 cannot fully cover — self-directed writing about problems the member chose, which is closer to how senior professionals actually demonstrate judgement. It is also the honest form of what `feed-first-post` was gesturing at.
+
+### Why it is PROPOSED and not APPROVED
+
+It cannot be implemented before the Evidence Graph (Sprint 2), the WRI engine (Sprint 3) and the rubric work (Sprint 4) exist. Approving it now would create a specification with no foundation to sit on, and the cap in condition 5 needs the real confidence model to be set meaningfully.
+
+**Decision point:** Sprint 8, when the Feed is specified. Until then this PDR governs nothing and no packet may implement it. WP-0003 proceeds unchanged.
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 
