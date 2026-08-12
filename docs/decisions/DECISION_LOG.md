@@ -19,6 +19,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0009 | Unimplemented controls state their absence; retired local keys are cleared | APPROVED | 2026-08-12 |
 | PDR-0010 | Nominated written work samples may become evidence; publishing never does | **PROPOSED** | 2026-08-12 |
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
+| PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
 
 ---
 
@@ -188,6 +189,24 @@ It cannot be implemented before the Evidence Graph (Sprint 2), the WRI engine (S
 **What this is not.** Not a decision against AI in Levav. The AI architecture (§28) stands and matters — scenario generation, persona behaviour, response evaluation and the Work Scoper all need it. This decision says the **first** AI capability Levav ships will not be one that quietly classifies a person's career, and that the provider abstraction and structured-output validation land before any of it.
 
 **Revisit at:** Sprint 4, when Levav 28 requires an AI layer regardless. CV extraction is a good second capability once AI-001, AI-002, AI-005 and AI-007 exist — at which point it is genuinely useful, because it saves typing rather than making decisions.
+
+## PDR-0012 — Absence of evidence is never a low score
+
+**State:** APPROVED · **Requirements:** WRI-001, WRI-003, AFR-009, EMP-003, §48 · **Applies to:** Sprint 3 onward
+
+**Context.** A dimension with no supporting evidence has to render as *something*. The default engineering answer is zero, or an empty progress bar, or a greyed number — all of which a reader interprets as "measured, and low".
+
+**Decision.** An unmeasured dimension is **not measured**. Never zero, never an empty bar, never a greyed figure, never a position on a scale. The distinction between *we looked and found little* and *we have not looked* is carried through the data model, the API and the interface, and is never collapsed for layout convenience.
+
+**Why this is a product decision and not a display detail.**
+
+1. **It is the difference between a measurement system and a scoring game.** Zero asserts a fact Levav does not have.
+2. **It is a fairness control.** Evidence volume correlates with access to prior opportunity. A person who has had fewer chances to demonstrate readiness has less evidence — a coverage fact, not a readiness fact. Rendering that as a low score converts prior disadvantage into a measured deficit, in a product built for a workforce where prior disadvantage is the norm. AFR-009 makes the same point about devices and networks; this is the general case.
+3. **It protects the employer too.** An employer comparing candidates on a screen full of zeroes is being told something false. EMP-003 requires explainable appearance; "not measured" is explainable, zero is misleading.
+
+**Consequences.** Overall WRI is computed only across measured dimensions, and always reports how many of the ten those are. A profile with two measured dimensions does not score 20% of a person. Employer-facing surfaces show coverage with the same prominence as the estimate. No sort or filter may rank an unmeasured dimension as though it were low.
+
+**Rejected alternative.** Rendering zero with an explanatory tooltip. The number is read; the tooltip is not.
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 
