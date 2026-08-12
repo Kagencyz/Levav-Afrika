@@ -10,6 +10,7 @@ import { appRouter } from './router';
  */
 const ALLOWED_PROCEDURES = [
   'auth.register',
+  'auth.resendConfirmation',
   'auth.login',
   'auth.logout',
   'auth.me',

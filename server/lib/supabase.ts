@@ -11,6 +11,8 @@ export type AuthResult = {
   error: AuthError | null;
 };
 
+export type AuthActionResult = { error: AuthError | null };
+
 type AuthPayload = {
   id?: unknown;
   user?: { id?: unknown } | null;
@@ -20,7 +22,7 @@ type AuthPayload = {
   code?: unknown;
 };
 
-async function authRequest(path: string, body: object): Promise<AuthResult> {
+async function rawAuthRequest(path: string, body: object) {
   const response = await fetch(`${env.SUPABASE_URL}/auth/v1/${path}`, {
     method: 'POST',
     headers: {
@@ -32,6 +34,11 @@ async function authRequest(path: string, body: object): Promise<AuthResult> {
   });
 
   const payload = (await response.json().catch(() => ({}))) as AuthPayload;
+  return { response, payload };
+}
+
+async function authRequest(path: string, body: object): Promise<AuthResult> {
+  const { response, payload } = await rawAuthRequest(path, body);
   if (!response.ok) {
     const code = typeof payload.error_code === 'string'
       ? payload.error_code
@@ -66,10 +73,45 @@ async function authRequest(path: string, body: object): Promise<AuthResult> {
   };
 }
 
-export function signUpWithPassword(email: string, password: string, name: string) {
-  return authRequest('signup', { email, password, data: { name } });
+function redirectPath(intent: 'employer' | 'general') {
+  const siteUrl = env.CORS_ORIGINS.find((origin) => origin.startsWith('https://'))
+    ?? env.CORS_ORIGINS[0];
+  const query = new URLSearchParams({ confirmed: '1', intent });
+  return `${siteUrl}/auth?${query.toString()}`;
+}
+
+export function signUpWithPassword(
+  email: string,
+  password: string,
+  name: string,
+  intent: 'employer' | 'general' = 'general',
+) {
+  const redirectTo = encodeURIComponent(redirectPath(intent));
+  return authRequest(`signup?redirect_to=${redirectTo}`, {
+    email,
+    password,
+    data: { name, signup_intent: intent },
+  });
 }
 
 export function signInWithPassword(email: string, password: string) {
   return authRequest('token?grant_type=password', { email, password });
+}
+
+export async function resendSignupConfirmation(
+  email: string,
+  intent: 'employer' | 'general' = 'general',
+): Promise<AuthActionResult> {
+  const redirectTo = encodeURIComponent(redirectPath(intent));
+  const { response, payload } = await rawAuthRequest(
+    `resend?redirect_to=${redirectTo}`,
+    { type: 'signup', email },
+  );
+  if (response.ok) return { error: null };
+  const code = typeof payload.error_code === 'string'
+    ? payload.error_code
+    : typeof payload.code === 'string'
+      ? payload.code
+      : undefined;
+  return { error: { status: response.status, code } };
 }

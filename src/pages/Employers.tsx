@@ -352,15 +352,15 @@ function CTALogin() {
             Join Africa&apos;s most trusted hiring platform. Register your business and gain access to verified, workforce-ready talent.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/auth?mode=signup" className="btn-lime inline-flex items-center justify-center gap-2 py-3.5">
+            <Link to="/auth?mode=signup&intent=employer" className="btn-lime inline-flex items-center justify-center gap-2 py-3.5">
               Create Account <ArrowRight size={16} />
             </Link>
-            <Link to="/auth" className="inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-full border border-white/20 text-white hover:bg-white/5 transition-all">
+            <Link to="/auth?intent=employer" className="inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-full border border-white/20 text-white hover:bg-white/5 transition-all">
               Log In
             </Link>
           </div>
           <p className="text-white/30 text-xs mt-6">
-            Already registered? <Link to="/auth" className="text-[#C6FF34] hover:underline">Log in to check verification status</Link>
+            Already registered? <Link to="/auth?intent=employer" className="text-[#C6FF34] hover:underline">Log in to check verification status</Link>
           </p>
         </motion.div>
       </div>
