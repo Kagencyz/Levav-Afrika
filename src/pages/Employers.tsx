@@ -28,7 +28,7 @@ import {
   LineChart,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useNotifications } from '@/hooks/useNotifications';
+import { trpc } from '@/providers/trpc';
 
 // ─── Industry & Size Options ───────────────────────────
 const INDUSTRIES = [
@@ -123,8 +123,13 @@ const VERIFIED_EMPLOYERS = [
 // ════════════════════════════════════════════════════════
 export default function Employers() {
   const { isAuthenticated } = useAuth();
-  const [hasRegistered, setHasRegistered] = useState(false);
-  const [registrationStatus, setRegistrationStatus] = useState<'pending' | 'verified' | 'rejected'>('pending');
+  const organizations = trpc.organization.listMine.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  const organization = organizations.data?.[0];
+  const registrationStatus = organization?.verificationStatus === 'in_review'
+    ? 'pending'
+    : organization?.verificationStatus;
 
   return (
     <div className="relative">
@@ -133,10 +138,12 @@ export default function Employers() {
       <Features />
       <HowItWorks />
       {isAuthenticated ? (
-        hasRegistered ? (
-          <StatusView status={registrationStatus} onReapply={() => { setHasRegistered(false); setRegistrationStatus('pending'); }} />
+        organizations.isLoading ? (
+          <section className="py-24 bg-black text-center text-white/50">Loading your organization…</section>
+        ) : organization && registrationStatus ? (
+          <StatusView status={registrationStatus} organizationName={organization.name} />
         ) : (
-          <RegistrationForm onSubmit={() => { setHasRegistered(true); setRegistrationStatus('pending'); }} />
+          <RegistrationForm onSubmit={() => void organizations.refetch()} />
         )
       ) : (
         <CTALogin />
@@ -367,7 +374,12 @@ function RegistrationForm({ onSubmit }: { onSubmit: () => void }) {
   const [form, setForm] = useState<EmployerForm>(INITIAL_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof EmployerForm, string>>>({});
   const [submitted, setSubmitted] = useState(false);
-  const { notifyEmployerVerified } = useNotifications();
+  const register = trpc.organization.register.useMutation({
+    onSuccess: () => {
+      setSubmitted(true);
+      onSubmit();
+    },
+  });
 
   const updateField = (field: keyof EmployerForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -394,35 +406,7 @@ function RegistrationForm({ onSubmit }: { onSubmit: () => void }) {
 
   const handleSubmit = () => {
     if (validateStep(2)) {
-      let employers: any[] = [];
-      try {
-        const raw = localStorage.getItem('employer_profiles');
-        if (raw) employers = JSON.parse(raw);
-      } catch {
-        employers = [];
-      }
-      employers.push({
-        id: Date.now(),
-        companyName: form.companyName,
-        registrationNumber: form.registrationNumber,
-        industry: form.industry,
-        companySize: form.companySize,
-        website: form.website,
-        description: form.description,
-        businessAddress: form.businessAddress,
-        city: form.city,
-        country: form.country,
-        contactName: form.contactName,
-        contactTitle: form.contactTitle,
-        contactEmail: form.contactEmail,
-        contactPhone: form.contactPhone,
-        verificationStatus: 'pending',
-        createdAt: new Date().toISOString(),
-      });
-      localStorage.setItem('employer_profiles', JSON.stringify(employers));
-      notifyEmployerVerified(form.companyName);
-      setSubmitted(true);
-      onSubmit();
+      register.mutate(form);
     }
   };
 
@@ -646,10 +630,15 @@ function RegistrationForm({ onSubmit }: { onSubmit: () => void }) {
                 </div>
 
                 <div className="flex flex-col gap-3 pt-2">
-                  <motion.button onClick={handleSubmit}
-                    className="btn-lime w-full inline-flex items-center justify-center gap-2 py-3.5"
+                  {register.error && (
+                    <p role="alert" className="text-red-400 text-sm text-center">
+                      {register.error.message}
+                    </p>
+                  )}
+                  <motion.button onClick={handleSubmit} disabled={register.isPending}
+                    className="btn-lime w-full inline-flex items-center justify-center gap-2 py-3.5 disabled:opacity-50"
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <ShieldCheck size={18} /> Submit for Verification
+                    <ShieldCheck size={18} /> {register.isPending ? 'Submitting…' : 'Submit for Verification'}
                   </motion.button>
                   <motion.button onClick={() => setStep(1)}
                     className="inline-flex items-center justify-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors py-2"
@@ -667,7 +656,7 @@ function RegistrationForm({ onSubmit }: { onSubmit: () => void }) {
 }
 
 // ─── Status View (after registration) ──────────────────
-function StatusView({ status, onReapply }: { status: 'pending' | 'verified' | 'rejected'; onReapply?: () => void }) {
+function StatusView({ status, organizationName }: { status: 'pending' | 'verified' | 'rejected'; organizationName: string }) {
   const statusConfig = {
     pending: {
       icon: Clock, color: '#7E3BED', bg: '#7E3BED', title: 'Verification in Progress',
@@ -706,6 +695,7 @@ function StatusView({ status, onReapply }: { status: 'pending' | 'verified' | 'r
           </div>
 
           <h2 className="font-display text-2xl text-white mb-3">{config.title}</h2>
+          <p className="text-white font-medium mb-2">{organizationName}</p>
           <p className="text-white/50 mb-8">{config.desc}</p>
 
           {status === 'verified' && (
@@ -734,13 +724,9 @@ function StatusView({ status, onReapply }: { status: 'pending' | 'verified' | 'r
           )}
 
           {status === 'rejected' && (
-            <motion.button
-              className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-full border border-white/20 text-white hover:bg-white/5 transition-all"
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-              onClick={onReapply}
-            >
-              Reapply with Updated Information
-            </motion.button>
+            <Link to="/contact" className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-full border border-white/20 text-white hover:bg-white/5 transition-all">
+              Contact Support
+            </Link>
           )}
         </motion.div>
       </div>
