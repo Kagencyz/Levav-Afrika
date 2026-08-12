@@ -11,6 +11,7 @@ import {
   check,
   pgPolicy,
   pgRole,
+  index,
 } from 'drizzle-orm/pg-core';
 import { authUid, authUsers, authenticatedRole } from 'drizzle-orm/supabase';
 
@@ -257,6 +258,16 @@ export const organizations = pgTable(
     organizationType: orgTypeEnum('organization_type').notNull(),
     industry: varchar('industry', { length: 120 }),
     size: varchar('size', { length: 60 }),
+    registrationNumber: varchar('registration_number', { length: 120 }),
+    website: varchar('website', { length: 500 }),
+    description: text('description'),
+    businessAddress: varchar('business_address', { length: 500 }),
+    city: varchar('city', { length: 120 }),
+    country: varchar('country', { length: 120 }),
+    contactName: varchar('contact_name', { length: 255 }),
+    contactTitle: varchar('contact_title', { length: 120 }),
+    contactEmail: varchar('contact_email', { length: 320 }),
+    contactPhone: varchar('contact_phone', { length: 40 }),
     verificationStatus: orgVerificationEnum('verification_status').notNull().default('pending'),
     businessDocuments: jsonb('business_documents').$type<string[]>().notNull().default([]),
     // Archival instead of hard delete — an organization going through dispute
@@ -331,6 +342,8 @@ export const organizationMembers = pgTable(
     // Also serves organizationId-first lookups — no separate index is added
     // for userId-alone lookups since no access path in this milestone needs it.
     uniqueIndex('org_member_unique').on(table.organizationId, table.userId),
+    index('org_members_user_id_idx').on(table.userId),
+    index('org_members_invited_by_user_id_idx').on(table.invitedByUserId),
     // Slice 1 conservative model — service-path only, per
     // docs/full-stack/ORGANIZATION_DOMAIN_MODEL.md. Deliberately NOT the
     // authenticated-role policies proposed and rejected earlier in this

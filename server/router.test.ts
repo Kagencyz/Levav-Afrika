@@ -16,6 +16,8 @@ const ALLOWED_PROCEDURES = [
   'dashboard.summary',
   'onboarding.complete',
   'onboarding.get',
+  'organization.listMine',
+  'organization.register',
   'talent.createOwnProfile',
   'talent.updateOwnProfile',
   'talent.getOwnProfile',
