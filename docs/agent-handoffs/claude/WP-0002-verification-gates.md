@@ -22,12 +22,18 @@ None directly. This packet is what makes every later acceptance review mean some
 
 ## In scope
 
-1. **Make `typecheck` cover both projects.** `npm run typecheck` runs `tsconfig.server.json` **and** `tsconfig.app.json` and reports both. The server project must continue to exit non-zero on any error — it is clean today and stays clean.
+1. **Make `typecheck` cover both projects.** `npm run typecheck` runs `tsconfig.server.json` **and** `tsconfig.app.json` and reports both. The server project must continue to exit non-zero on any error.
+
+   **The server project is not as clean as it looks.** `tsconfig.server.json` includes a hand-maintained allowlist of 12 named files, so it checks 15 of the 25 files in `server/` and `api/` — three arrive transitively through `router.ts`, and ten are never checked at all. "Green server typecheck" today means "green on 60% of the server". Item 7 fixes this; until it lands, do not read the server project's exit code as covering the server.
 2. **Commit a frontend error baseline** (PDR-0005). A checked-in file records the current known frontend errors, keyed stably enough to survive line moves (file + error code + message is acceptable; choose and justify). Provide `npm run typecheck:baseline` to regenerate it deliberately.
 3. **Gate on the delta, not the total.** A new error not in the baseline fails. A reduced count updates the baseline in the same commit. **The baseline may never grow** — if a packet increases it, that packet fails.
 4. **CI on push and pull request**, running: install, `npm run typecheck`, `npm test`, `npm run build`. All four must pass for green.
 5. **Record the verified numbers** in `docs/implementation/IMPLEMENTATION_STATE.md` (create it if absent): test count, server error count, frontend baseline count, bundle size, build time. These are the reference figures Claude reviews future packets against.
 6. **Lint decision.** `eslint.config.js` exists with none of its dependencies installed. Either install and configure it so it runs clean, and add it as a gate; or delete the orphan config and state in the report that lint is deferred. Do not leave a config file that cannot run — that is another false signal. §47.1 makes lint a gate only "once a working lint script and dependencies are intentionally configured".
+
+7. **Convert `tsconfig.server.json` from an allowlist to globs.** Replace the 12 named file entries with `api/**/*.ts` and `server/**/*.ts` (keep `db/**` and `contracts/**`, keep the `**/*.test.ts` exclude). An allowlist decays silently — every server file Codex adds from here on sits outside the gate until someone remembers to edit the include list, which is the same class of false signal this packet exists to remove.
+
+   **Measured cost, `cf4ef15` under `npm ci` with the pinned TypeScript 5.9.3: zero, once WP-0001 lands.** Globbed today the server project reports 24 errors in 7 files — but every one of those files is deleted by WP-0001 step 4 under PDR-0006, except `server/lib/s3.ts` (2 errors, uninstalled `@aws-sdk/*`), which is imported only by `upload.ts` and is orphaned by the same deletion. Do this item **after** the WP-0001 deletions and it costs nothing. Do it before, and it converts 24 hidden errors into a failed Vercel deploy, because `build` is `typecheck && vite build`. If any error survives the deletions, stop and report rather than widening the exclude list — re-narrowing the gate to make it pass defeats the packet.
 
 ## Out of scope
 
@@ -40,7 +46,7 @@ None directly. This packet is what makes every later acceptance review mean some
 
 - `npm test` keeps passing at ≥56 tests.
 - `npm run build` keeps producing a working Vercel deployment. If `build` now runs a slower gate, keep total build time reasonable and report it.
-- The server project stays at zero errors.
+- The server project stays at zero errors — and after item 7, at zero errors across all of `server/` and `api/`, not across an allowlisted subset of it.
 
 ## Acceptance criteria
 
@@ -52,6 +58,7 @@ None directly. This packet is what makes every later acceptance review mean some
 6. `docs/implementation/IMPLEMENTATION_STATE.md` exists and records the five verified figures with the date and commit they were measured at.
 7. Lint is either a working gate or explicitly deferred with the orphan config removed. No third outcome.
 8. Auth, routes and deployment behaviour are unchanged.
+9. `tsconfig.server.json` contains no per-file include entries for `server/` or `api/`, and `tsc -p tsconfig.server.json --listFiles` shows every non-test file in both directories. Report the file count and the error count; both must be stated, and the error count must be zero.
 
 ## Data requirements
 
@@ -85,6 +92,8 @@ None. Any user-visible change is a defect.
 | 4 | Fix one baselined frontend error without regenerating the baseline | Gate passes; report notes the baseline can shrink |
 | 5 | Add a new frontend error equal in count to one fixed | Fails — the delta is per-error, not per-count |
 | 6 | Fresh clone, `npm ci`, run all four steps | All pass with no local-only state |
+| 7 | Add a new file `server/routes/scratch.ts` containing a type error, without touching any tsconfig | `npm run typecheck` fails. Before item 7 it passes — that is the decay this packet closes |
+| 8 | Introduce a type error in `server/middleware.ts` | Fails. It is unchecked today |
 
 ## Dependencies
 
