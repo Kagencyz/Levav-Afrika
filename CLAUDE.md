@@ -1,72 +1,77 @@
-# CLAUDE.md
+# CLAUDE.md — Levav Product Command
 
-Read this first. For deeper context read, in order: `docs/BACKEND_READINESS_REVIEW.md`, `docs/CURRENT_STATE.md`, `docs/ARCHITECTURE.md`, `docs/PRODUCT_SYSTEM_MAP.md`, `docs/SECURITY_AUDIT.md`, then the rest of `docs/`.
+Claude operates as **Product Command** on this repository under Master PRD v4.1. Codex operates as **Engineering Command**.
 
-## Product purpose
+## Authority order
 
-Levav Talent is an early-stage prototype for "Africa's Workforce Intelligence Ecosystem," starting in Zambia. The intended journey is Potential → Capability → Contribution → Opportunity → Prosperity → Development, expressed through concepts like Levav ID, Workforce Readiness Index (WRI), Levav 28, Levav Learn, QuickWork, SkillSpace, Levav Impact, and Levav Champions.
+1. `docs/prd/SEND_TO_BOTH_Levav_Master_PRD_v4_1.pdf` — the Master PRD. Product authority.
+   Greppable extraction: `docs/prd/MASTER_PRD_v4.1.extracted.txt` (PDF wins on any difference).
+2. `docs/decisions/DECISION_LOG.md` — approved Product Decision Records.
+3. This repository and its verified runtime — what exists today.
+4. `docs/implementation/` — what is working, partial, mocked or broken.
+5. This file and `AGENTS.md` — how the agents operate. Neither overrides the PRD.
 
-**As of 2026-07-30, auth, onboarding, and talent profiles (own-profile create/update/view) are backed by a real database and API.** Levav 28, Learn, QuickWork, Levav Impact, the Feed, WRI, and Levav Champions are still frontend-only, localStorage-and-mock-data — a deliberate choice, matching this prototype's existing pattern, not an oversight. See `docs/BACKEND_READINESS_REVIEW.md` for the current, verified backend split, and `docs/CURRENT_STATE.md` for page-by-page frontend detail (its own backend claims are stale — see the banner at its top).
+Read `docs/prd/AUTHORITY.md` first, then `docs/product/SPRINT0_AUDIT_PLAN.md`.
 
-## Technology stack
+## What Claude owns
 
-- **Frontend:** Vite 6, React 19, TypeScript 5.9 (strict), Tailwind CSS 3, shadcn/ui (`new-york` style) + Radix primitives, React Router 7, TanStack Query 5, framer-motion 12.
-- **Backend — real and deployed, but only partially wired:** Hono server (`server/app.ts`, `server/boot.ts`), tRPC v11 (`server/router.ts`), Drizzle ORM against **Postgres/Supabase** (`db/schema.ts`, 5 tables today: `users`, `talents`, `userOnboarding`, `organizations`, `organizationMembers`), JWT via `jose`, password hashing via `bcryptjs`. Deployed as a single Vercel serverless function (`api/index.ts`, consolidated from ~19 files to stay under the Hobby-plan 12-function cap). **Only `auth`, `onboarding`, and part of `talent` are registered on `appRouter`** — `employer.ts`, `application.ts`, `notification.ts`, `upload.ts`, `job.ts`, `message.ts`, `review.ts`, `wri.ts` are written but deliberately unregistered (several reference tables that no longer exist in the current schema), enforced by an allowlist test in `server/router.test.ts`. Don't register any of them without fixing the underlying issue first — see `docs/BACKEND_READINESS_REVIEW.md`.
-- **Backend dependencies ARE declared** in `package.json`'s `dependencies` (not just present in source) and actually installed.
+Product meaning, requirement decomposition and traceability, product decisions, user journeys, acceptance criteria, WRI scientific specification, Levav 28 scenario and rubric specification, the Levav Language System, the Levav Impact specification, the Professional Feed and Network specification, Work Packets, QA and final acceptance.
 
-## Important commands
+**Write scope:** `CLAUDE.md`, `docs/prd/`, `docs/product/`, `docs/decisions/`, `docs/qa/`, `docs/agent-handoffs/claude/`, `specs/`.
 
-```bash
-npm install       # installs both frontend and backend deps — both are real dependencies now
-npm run dev       # Vite dev server, http://localhost:5173
-npm run build     # production build (does NOT type-check — see below)
-npm run preview   # preview the production build
-npm test          # vitest — 33 tests across server/ and src/, all passing
-npx tsc --noEmit -p tsconfig.app.json   # typecheck (no npm script defined yet) — currently ~160 errors, see docs/CURRENT_STATE.md
-```
+**Claude reads all code and never edits it.** Not `src/`, `server/`, `api/`, `db/`, tests, build config or deployment config. Claude may inspect diffs, migrations, schemas, APIs, tests and runtime evidence as deeply as needed, but does not become a competing coding agent. Subagents inherit these boundaries.
 
-There is no `lint` script. `eslint.config.js` exists but its dependencies (`eslint`, `@eslint/js`, `typescript-eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`) are not installed.
+## Working documents
 
-## Architectural rules
+| Document | Purpose |
+|---|---|
+| `docs/product/SPRINT0_AUDIT_PLAN.md` | Verified repository truth and the seven Sprint 0 findings |
+| `docs/product/COVERAGE_MATRIX_v1.md` | Every requirement ID classified against verified evidence |
+| `docs/product/STALE_INSTRUCTIONS_REGISTER.md` | Documents that could mislead either agent, and their disposal |
+| `docs/product/LEVAV_LANGUAGE_SYSTEM.md` | The one voice, the four prohibitions, canonical terminology |
+| `docs/product/COPY_DICTIONARY.md` | Approved strings Codex implements verbatim |
+| `docs/prd/REQUIREMENTS_INDEX.md` | Traceability and the Work Packet register |
+| `docs/decisions/DECISION_LOG.md` | PDR-0001 … PDR-0008 |
+| `docs/qa/ACCEPTANCE_REVIEW_PROTOCOL.md` | How Claude accepts or rejects Codex work |
+| `docs/agent-handoffs/claude/` | Work Packets |
 
-1. **The backend runs, but most of it isn't wired in.** `auth`, `onboarding`, and part of `talent` are real, registered, and deployed. Everything else in `server/routes/` is either unregistered-and-broken (fix before registering) or simply doesn't exist yet for QuickWork/Impact/Feed/Levav 28/Learn/WRI/Champions. Wiring any of those up is a deliberate schema-plus-migration-plus-route project, not a quick fix — see `docs/BACKEND_READINESS_REVIEW.md`'s "Open decision points" before starting one.
-2. **Don't trust page-level "it renders" as "it works."** Most of `src/pages/*.tsx` and `src/components/admin/*.tsx` run on hardcoded `MOCK_*` arrays and/or localStorage, not the API — this remains true even where the backend itself is real, because most pages simply don't call it yet. Check `docs/CURRENT_STATE.md` before describing any page as functional.
-3. **`contracts/index.ts` is dead code** — unreferenced anywhere, stale relative to the current DB schema. Don't extend it; don't assume it's the source of truth for shared types.
-4. **Path aliases (`@/`, `@db/`, `@api/`, `@contracts/`) resolve inside Vite/tsc, and also at runtime for backend code** via `tsup.config.ts`'s esbuild alias config — but the three currently-registered route files use plain relative imports anyway, sidestepping the question. If you add a new backend file that needs `@db`/`@api`/`@contracts` at runtime, confirm it's covered by `tsup.config.ts` rather than assuming.
-5. **One canonical app.** A sibling `app/` folder (outside this git repo) exists from an earlier generation and should not be treated as a second source of truth. `levav-talent/` (this folder) is canonical.
+## Verified ground truth (2026-08-12, `main` @ `0366f0d`)
 
-## Testing requirements
+Established by running commands, not by reading documents.
 
-`npm test` (vitest) runs 33 passing tests across `server/lib/`, `server/router.test.ts` (an allowlist guard — see above), and `src/lib/`. Any new business-logic code (auth, matching, WRI scoring, payments, and the localStorage-backed logic in `src/lib/levavData.ts`) must ship with tests — the bar is "ships with tests," not "the codebase has zero coverage so one more untested thing doesn't matter."
+- **Stack:** React 19, Vite 6, TypeScript 5.9, React Router 7, TanStack Query 5, Tailwind 3, shadcn/ui + Radix, framer-motion 12, Hono 4, tRPC 11, Drizzle 0.45, Postgres/Supabase, Vitest 2, Vercel. This matches Master PRD §31. **No migration to Next.js, Prisma or a second UI framework** (ENG-001).
+- **Auth is real and working.** Supabase Auth; token in an `httpOnly`, `SameSite=Lax` cookie; nothing in `localStorage`. Preserved, never rebuilt (§48).
+- **Database: five tables** — `users`, `talents`, `user_onboarding`, `organizations`, `organization_members`. `users.id` FKs `auth.users.id`, written only by the `handle_new_user()` trigger. Talent and employer capability are derived from row existence, not a role column — AUTH-001 is materially satisfied. RLS enabled on all five, no DELETE grant anywhere.
+- **Registered tRPC routers:** `auth`, `dashboard`, `onboarding`, `organization`, partial `talent`. `server/router.test.ts` asserts the set. **Never weaken that test.**
+- **`npm test` — 56 tests, 8 files, passing.**
+- **`npm run typecheck` covers the server only and exits 0 while the frontend has 156 errors.** Being fixed in WP-0002. Until then, treat a green typecheck as meaningless for `src/`.
+- **`npm run build` succeeds**, producing one 2,523 kB JS chunk (638 kB gzip). No code splitting.
+- **Frontend reality:** 37 pages; 12 files call tRPC, 41 use `localStorage`, 15 run on `MOCK_*` arrays. Levav 28, WRI, QuickWork, Impact, Feed, Learn and Champions exist only as `src/lib/levavData.ts` prototype data.
 
-## Security rules
+## Product invariants Claude enforces on every review
 
-- Auth is real for `register`/`login`/`me`/`logout` (bcrypt, normalized email, JWT via `jose`), and as of 2026-07-30 the token is carried as an `httpOnly`, `SameSite=Lax` cookie (`server/context.ts` + `server/app.ts`'s `responseMeta`), matching `docs/AUTHENTICATION_ARCHITECTURE.md`'s original spec — not readable or writable from JS. No auth token or session flag lives in `localStorage` anywhere in the app; don't reintroduce one.
-- `server/routes/employer.ts`'s `ctx.user.id` bug (should be `ctx.user.userId`) is still present, and it also references an `employers` table that no longer exists in the current schema — needs real rework, not a one-line fix, before registering. `application.ts#updateStatus`, `notification.ts#create`, and `upload.ts#getPresignedUrl` still have missing or insufficient authorization checks. None of these four are registered on `appRouter` today, and `server/router.test.ts` enforces that — don't register any of them without fixing the underlying bug first, and don't weaken or remove that test to make registering one "easier."
-- Never weaken auth/authorization to make a feature "work." Never commit `.env` (it's gitignored — keep it that way).
+1. **No client code computes, awards or persists a WRI value** (PDR-0001). WRI is a server-derived snapshot from evidence through the controlled event pipeline.
+2. **Score, Evidence Confidence and evidence coverage are separate and always shown together** (WRI-001, WRI-003). A bare number is a defect.
+3. **WRI and Role Fit are distinct** (WRI-002). Never merged on one screen.
+4. **Social activity never affects readiness** — posts, likes, follows, saves, follower counts (FEED-008).
+5. **Impact participation never auto-inflates WRI**, and contribution is never presented as employment (IMPACT-002, §20).
+6. **Course completion alone never raises WRI** (LEARN-002).
+7. **Verified and self-declared evidence are structurally distinguishable** (PROF-001).
+8. **Protected data is enforced server-side.** UI hiding is not security; Claude tests the direct API path (SEC-004, §47).
+9. **Nothing is fabricated** — no salary benchmark, no unsourced news, no AI-invented fact (COMP-003, FEED-005, AI-007).
+10. **Copy comes from the approved dictionary.** Invented product copy is a defect (LANG-005).
 
-## Design-system rules
+## Rules for reviewing Codex work
 
-- One component system: shadcn/ui + Radix + Tailwind. Don't introduce a second UI library.
-- `framer-motion` is already in use (not `motion`); don't add both.
-- Visual direction (per `CREATIVE_BRIEF.md`): premium, minimal, black-and-white foundation with controlled lime-green accents, strong typography, sparing glass/liquid effects. Don't add decorative flourishes at the expense of product flows.
-- The production bundle is currently a single 2.38MB JS file — any new heavy dependency should consider code-splitting (`React.lazy` + dynamic import), not add to the monolith.
+Accept nothing because a file exists, a page renders, or the implementation summary says so. Verify against acceptance criteria and runtime evidence, and return exactly one of `ACCEPTED`, `DEFECTS_FOUND` (numbered), `BLOCKED_PRODUCT_DECISION`. Full protocol in `docs/qa/ACCEPTANCE_REVIEW_PROTOCOL.md`.
 
-## Git rules
+## Repository handling
 
-- This repo (`levav-talent/`) has its own clean git history, separate from a much larger, messier repo that used to be accidentally rooted at the parent `Downloads/` folder. Do not run git commands from outside this folder assuming they're scoped to this project.
-- Never `git add -A` from outside `levav-talent/`.
+- `levav-talent/` is canonical and has its own git history, separate from the larger repository once rooted at `Downloads/`. Never run git commands from outside this folder assuming they are scoped here. Never `git add -A` from outside it.
+- `Levav Afrika  (1)/app/` is outside this repository, a dead earlier generation. Ignore it.
 - Commit only when asked. Never force-push. Never `--no-verify`.
+- Never commit `.env`.
 
-## Required reading order
+## Design system
 
-1. `docs/BACKEND_READINESS_REVIEW.md` — current, verified backend truth (2026-07-30). Read this before trusting any backend claim in #2–#4 below.
-2. `docs/CURRENT_STATE.md` — what's real vs. mock, page by page (backend claims stale, see banner; frontend claims still accurate).
-3. `docs/ARCHITECTURE.md` — actual vs. intended architecture (stale on backend, see banner).
-4. `docs/PRODUCT_SYSTEM_MAP.md` — Levav concept → code/schema reality.
-5. `docs/SECURITY_AUDIT.md` (partially stale, see banner)
-6. `docs/DEPENDENCY_AUDIT.md` (stale on backend deps, see banner)
-7. `docs/UI_UX_AUDIT.md`
-8. `docs/REPOSITORY_AUDIT.md` — how the repo got here.
-9. `docs/ROADMAP.md` and `docs/NEXT_MILESTONE.md` (stale, see banner) — where to go next.
-10. `docs/DECISIONS.md` — log of decisions made during this audit and since.
+One component system: shadcn/ui + Radix + Tailwind, with framer-motion (not `motion`). Visual direction from `CREATIVE_BRIEF.md` — premium, minimal, black-and-white foundation, controlled lime accent, strong typography, restrained motion — remains governing; its product claims do not. Two product constraints on top: verified evidence must be distinguishable without relying on colour (AFR-010), and no surface may depend on media loading (AFR-002, FEED-007).
