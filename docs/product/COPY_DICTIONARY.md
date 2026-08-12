@@ -382,6 +382,89 @@ Copy for security surfaces that exist in the interface but are not yet implement
 
 **Prohibited across these surfaces:** "no access recorded", "no disputes found", any resolution timeline Levav cannot honour, any implication that disputing harms the member's standing, and any display of rubric content, anchors or weights (SEC-011).
 
+## 14. Levav Impact — dashboards, navigation and application
+
+Extends §6. Governed by `LEVAV_IMPACT_SPEC.md`.
+
+### Member navigation and Personal Home card
+
+| Key | Value |
+|---|---|
+| `impact.nav.label` | Impact |
+| `impact.discovery.title` | Contribution opportunities |
+| `impact.discovery.subtitle` | Use your professional skills where they are needed, and build a verified record of what you delivered. |
+| `impact.discovery.empty` | No opportunities match what you are looking for yet. Widen your skills or location filters, or check back — organisations publish new work regularly. |
+| `impact.home.card.title` | Impact |
+| `impact.home.card.none` | Contribute your professional skills to organisations doing work that matters. |
+| `impact.home.card.none.action` | Find contribution opportunities |
+| `impact.home.card.applied` | You applied to {opportunity} at {organisation} on {date}. |
+| `impact.home.card.active` | {opportunity} at {organisation} · {hoursLogged} of up to {hoursCeiling} hours |
+| `impact.home.card.awaiting` | {organisation} has not yet verified your contribution to {opportunity}. |
+| `impact.home.card.verified` | {organisation} verified your contribution to {opportunity}. |
+| `impact.home.card.verified.action` | Add to my profile |
+| `impact.mycontributions.title` | My contributions |
+| `impact.mycontributions.empty` | You have not contributed through Levav yet. Verified contributions appear here and can be shown on your profile. |
+
+### Application
+
+| Key | Value |
+|---|---|
+| `impact.apply.title` | Apply to contribute |
+| `impact.apply.shared` | {organisation} will see your name, headline, public profile and the skills relevant to this opportunity. |
+| `impact.apply.availability` | When are you available? |
+| `impact.apply.message` | Anything you want to add (optional) |
+| `impact.apply.message.help` | Leaving this blank does not count against your application. |
+| `impact.apply.ceiling` | This asks for up to {hours} hours over {duration}. The organisation cannot ask you for more. |
+| `impact.apply.action` | Send application |
+| `impact.apply.incomplete` | Your profile is incomplete. You can add these details now or apply as you are. |
+| `impact.apply.submitted` | Your application has been sent to {organisation}. |
+| `impact.apply.noresponse` | {organisation} has not responded in {days} days. You can withdraw this application if you would rather not wait. |
+| `impact.apply.declined` | {organisation} did not take this application forward. This is not recorded anywhere on your profile and does not affect your readiness. |
+| `impact.apply.withdraw` | Withdraw application |
+
+### Placement
+
+| Key | Value |
+|---|---|
+| `impact.placement.supervisor` | Supervised and verified by {name}, {role} at {organisation} |
+| `impact.placement.hours` | {logged} of up to {ceiling} hours |
+| `impact.placement.outputs.title` | What you are delivering |
+| `impact.placement.submit` | Submit outputs |
+| `impact.placement.withdraw` | Withdraw from this placement |
+| `impact.placement.withdraw.notice` | You can withdraw at any time. It is not recorded on your profile and does not affect your readiness. |
+| `impact.placement.ended` | {organisation} ended this placement on {date}. Reason given: {reason} |
+| `impact.placement.report` | Report a problem with this placement |
+
+### Organisation dashboard
+
+| Key | Value |
+|---|---|
+| `org.impact.nav.label` | Impact |
+| `org.impact.dashboard.title` | Impact programme |
+| `org.impact.action.applicants` | {count} applicants waiting for a decision · oldest {days} days |
+| `org.impact.action.verify` | {count} placements waiting for your verification · oldest {days} days |
+| `org.impact.action.ending` | {count} placements end this week |
+| `org.impact.action.unfilled` | {count} opportunities are open with no applicants |
+| `org.impact.summary.note` | These figures count verified contributions only. |
+| `org.impact.opportunities.empty` | You have not published any contribution opportunities yet. |
+| `org.impact.opportunities.create` | Create an opportunity |
+| `org.impact.publish.unverified` | Your organisation must be verified before you can publish contribution opportunities. |
+| `org.impact.publish.ceiling.required` | Set a maximum number of hours and an end date. Contribution opportunities cannot be open-ended. |
+| `org.impact.publish.toolarge` | This exceeds what Levav accepts as a contribution opportunity. Work at this scale should be paid — post it as QuickWork or a job. |
+| `org.impact.publish.outputs.required` | Describe what will exist when this work is done. This is what your supervisor will verify. |
+| `org.impact.publish.supervisor.required` | Name the person who will supervise and verify this work. |
+| `org.impact.verify.title` | Verify this contribution |
+| `org.impact.verify.body` | Confirm only what you observed. The contributor can dispute anything inaccurate. |
+| `org.impact.verify.outputs` | Which of the expected outputs were delivered? |
+| `org.impact.verify.hours` | Hours confirmed |
+| `org.impact.outcomes.activity` | Activity — what was done |
+| `org.impact.outcomes.output` | Outputs — what now exists |
+| `org.impact.outcomes.outcome` | Outcomes — what changed, as measured by your organisation |
+| `org.impact.outcomes.basis` | Publish how you measure this outcome. Levav shows your basis alongside the claim. |
+| `org.impact.outcomes.nobasis` | No measurement basis published. Levav will show this as unmeasured. |
+
+**Prohibited across these surfaces:** contributor leaderboards, hour badges, "top volunteer", any ranking of contributors, any suggestion that contributing improves hiring chances at that organisation, and any employment vocabulary (salary, hire, position, staff, probation, full-time).
+
 ## 10. Strings that must be deleted
 
 Present in the codebase today and prohibited from this point. Codex removes them as it touches each surface, and never reintroduces the pattern.
