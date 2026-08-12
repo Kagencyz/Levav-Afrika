@@ -85,7 +85,9 @@ Observations have no rater, need no rubric, and are not opinions. They are the s
 
 **Evaluation** (`kind = evaluation`) — a judgement made by a person or an instrument against a **published, versioned rubric** with behavioural anchors (WRI-005). A client rating communication. An AI evaluating a Levav 28 response.
 
-Evaluations must carry `actor_user_id` (or the model identity), `actor_relationship`, and `instrument_version`. An evaluation without a rubric version is invalid and must be rejected at write time, not cleaned up later.
+Evaluations must carry `actor_user_id` (or the model identity), `actor_relationship`, and `instrument_version` — the per-dimension version key from `specs/rubrics/BARS_v1.md` §1, e.g. `bars.d5.v1`. An evaluation without a rubric version is invalid and must be rejected at write time, not cleaned up later.
+
+**A rater declining to rate produces nothing.** Where a rater returns `not_exercised` for a dimension (`BARS_v1.md` §3), no evidence is created for that dimension. It is not a node with a low value, and it is not a node declaring that dimension with an empty payload. Absent opportunity and absent behaviour are different facts, and the graph must not collapse them.
 
 The WRI engine weights these differently. That is Sprint 3's business, but the graph must make the distinction available, and a schema that blurs them cannot be unblurred afterwards.
 

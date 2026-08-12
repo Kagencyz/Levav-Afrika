@@ -100,7 +100,9 @@ These conflict with approved product direction and must not be carried forward:
 | `specs/product-contracts/EVIDENCE_GRAPH_CONTRACT_v1.md` | Evidence node shape, levels, immutability, visibility, event pipeline | Sprint 2, and Sprint 3 via §43 |
 | `specs/product-contracts/WRI_SCIENTIFIC_SPEC_v1.md` | Ten dimensions, BARS, confidence, snapshots, validation, fairness | Sprint 3 |
 
-Nine of ten BARS rubrics remain to be authored in `specs/rubrics/` before any Levav 28 evidence-producing task ships (Sprint 4).
+| `specs/rubrics/BARS_v1.md` | Rating instrument for all ten dimensions, versioned per dimension | Sprint 4 |
+
+All ten BARS rubrics are authored. Scenario content in `specs/scenarios/` remains outstanding before Levav 28 ships (Sprint 4).
 
 ## Requirements blocked on human decision (Master PRD §49)
 

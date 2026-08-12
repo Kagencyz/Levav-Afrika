@@ -96,7 +96,9 @@ Five levels, one meaning across all dimensions:
 | 4 | Delivered as agreed while absorbing a change in scope, a missing input, or a competing priority, and said which trade-off they made |
 | 5 | Delivered as agreed and surfaced a downstream risk the requester had not identified, in time for it to be acted on |
 
-**Authoring requirement:** the remaining nine dimensions must be anchored to this pattern in `specs/rubrics/`, versioned, **before any Levav 28 evidence-producing task ships** (Sprint 4). Anchors are internal (SEC-011) — never exposed to employers or users.
+**All ten dimensions are anchored in `specs/rubrics/BARS_v1.md`**, versioned independently as `bars.d1.v1` … `bars.d10.v1`. That document is the rating instrument; this one defines the constructs it rates. Anchors are internal (SEC-011) — never exposed to employers, users or any client response.
+
+**A rater may decline.** Where a task did not put the person in a position to demonstrate a behaviour, the rating is `not_exercised`, which produces **no evidence for that dimension** — not a low rating, not a zero, and no entry in the confidence calculation. This is PDR-0012 expressed at the rating level, and `BARS_v1.md` §3 is binding on how it is applied.
 
 ## 4. Evidence to dimension
 
