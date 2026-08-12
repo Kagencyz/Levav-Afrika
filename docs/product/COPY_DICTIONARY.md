@@ -578,6 +578,23 @@ Extends §7. Governed by `FEED_AND_NETWORK_SPEC.md`.
 | `whatsnew.digest.title` | Get a digest |
 | `whatsnew.digest.body` | A summary of what is new in your field, as often as you want it. You choose the frequency and can stop at any time. |
 | `whatsnew.uncertain` | This is early or contested. Read the source before acting on it. |
+| `whatsnew.byline.member` | By {name}, {headline} |
+| `whatsnew.byline.partner` | By {name} at {organisation} · Content partner |
+| `whatsnew.byline.champion` | By {name} · Levav Champion |
+| `whatsnew.disclosure` | {name} works in {field}. Levav shows this so you can weigh it. |
+| `whatsnew.corrected` | Corrected on {date}. |
+| `whatsnew.contribute.action` | Write for What is New |
+| `whatsnew.contribute.title` | Contribute to What is New |
+| `whatsnew.contribute.body` | Write about how the work is actually done in your field. Every submission is reviewed against the same standard as everything else here. |
+| `whatsnew.contribute.standard` | Be specific, be useful, say where your information comes from, and say plainly when something is uncertain. |
+| `whatsnew.contribute.disclosure` | Do you have a commercial interest in this subject? Readers are told either way. |
+| `whatsnew.contribute.rights` | You keep ownership of what you write. Levav publishes it and you can withdraw it later. |
+| `whatsnew.contribute.noreadiness` | Writing here does not change your WRI, your Role Fit or how employers see you. |
+| `whatsnew.contribute.frompost` | Submit an existing post |
+| `whatsnew.contribute.submitted` | Submitted. We review within {days} days and will tell you either way. |
+| `whatsnew.contribute.accepted` | Your piece is published in {section}. |
+| `whatsnew.contribute.returned` | Returned with notes — {reason}. You can revise and submit again. |
+| `whatsnew.contribute.declined` | Not taken forward this time. This is private and does not affect your profile or your standing on Levav. |
 | `whatsnew.source` | Source: {publisher} |
 | `whatsnew.source.action` | Read the original |
 | `whatsnew.ai.label` | Summary drafted by Levav AI from the linked article. Read the original for the full account. |

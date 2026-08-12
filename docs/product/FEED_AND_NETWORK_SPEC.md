@@ -165,7 +165,41 @@ Once Sprint 9 delivers governed aggregate Workforce Intelligence, Levav can publ
 
 That is the real answer to "go-to place", and it is deliberately not available yet. It is gated on DATA-001 … DATA-004: aggregate only, minimum cohort thresholds enforced, no individual record inferable. **Publishing a Levav-derived statistic before those controls exist is prohibited**, and doing it carelessly once would cost the credibility the whole product depends on.
 
-### 8.5 Rules for external news, without exception
+### 8.5 Who can publish into What is New
+
+Levav does not have to write all of this, and should not. Members and content partners contribute — but What is New is an **editorial surface**, and that is the distinction which governs everything below.
+
+| | Feed | What is New |
+|---|---|---|
+| Who publishes | Any member or verified organisation | Levav, plus **reviewed** contributions |
+| Review | None before publication; moderation after | **Every card is reviewed before it appears** |
+| What it means | This person said this | Levav put this in front of you |
+
+That difference is the whole reason What is New can become a destination. An unreviewed feed of everyone's opinions already exists one tab away.
+
+**Four contributor types:**
+
+1. **Members (talents and professionals).** Any member may submit work for consideration — a practitioner's account of how something is actually done in their sector. Submission is from a post they already published, or written directly for What is New. The section that benefits most is *How the work is done*, which is better written by someone doing the work than by an editor.
+2. **Content partners.** Organisations, publishers, training providers, professional bodies and subject specialists with a standing arrangement to contribute. Verified, named, and bound by the same editorial standard.
+3. **Champions** (CHAMP-001/002). Verified high-value contributors are the natural standing contributor pool, and contributing here is one of the things Champion status is *for*. Champion status does not bypass review.
+4. **Organisations**, on their own page and in *From Levav* where the update is genuinely of general interest — not marketing.
+
+**Rules that apply to every contributor without exception:**
+
+- **The §8.2 editorial standard applies identically.** A member's submission and a partner's submission clear the same bar as Levav's own. Specific, actionable, grounded, honest about uncertainty.
+- **Attribution is always visible** — author name, and their organisation where relevant, linking to their Levav profile or organisation page.
+- **Conflict of interest is declared on the card.** A software vendor writing about tooling in their category, a training provider writing about certification, a recruiter writing about hiring — the reader is told, on the card, not in a policy page. This is not optional and it is not a footnote.
+- **No paid placement, ever.** Money never buys a What is New card. If sponsored content is ever introduced it is labelled and sits outside the editorial sections, and it can never displace genuine relevance (FEED-008, MON-001). A partnership arrangement buys *consideration*, never publication.
+- **Contributing never affects readiness.** Not WRI, not Role Fit, not employer ranking, not search order. Publishing is not evidence (Evidence Graph §2.1), and PDR-0010 stays PROPOSED — decided at Sprint 8 — with nomination and rubric assessment as its only possible mechanism, never publication.
+- **The contributor keeps ownership** of what they write and grants Levav a licence to publish and summarise it. They may withdraw it; withdrawal removes it going forward and does not rewrite history.
+- **Partner status is revocable** and is reviewed on the same terms it was granted.
+- **Corrections are visible.** A corrected card shows that it was corrected and when. Silent editing of a published card is prohibited — it is the same integrity principle as EVD-002.
+
+**Submission flow:** submit → editorial review → accepted, returned with a reason, or declined. A decline is private to the contributor, never public, and never affects their standing anywhere in Levav.
+
+**Response commitment:** contributors are told how long review takes and are notified of the outcome. Silence is the fastest way to lose good contributors, and it is the same failure the Impact spec designs against for applicants.
+
+### 8.6 Rules for external news, without exception
 
 - Publisher name and a link to the original on every card.
 - No card without a source. No aggregated-without-attribution content.

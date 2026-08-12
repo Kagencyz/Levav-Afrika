@@ -227,7 +227,11 @@ Two sections carry named hazards. **Professional growth** is where a workforce p
 
 **The long-term differentiator is deliberately deferred.** Once Sprint 9 delivers governed aggregate Workforce Intelligence, Levav can publish workforce insight from its own data that no other publisher holds. That is the real answer to "go-to place". It is gated on DATA-001…004 — aggregate only, cohort thresholds enforced, no individual record inferable — and publishing a Levav-derived statistic before those controls exist is prohibited. Getting that wrong once would cost the credibility the entire product rests on.
 
-**Still escalated (§49).** Scope is settled; **editorial ownership is not.** Who holds responsibility, which publishers Levav sources from, and what republication rights it has all need a named human owner before a single card ships. Curation is an editorial position with reputational and legal consequences, and no agent may assume it.
+**Contributors (added 2026-08-12 on the product owner's direction).** Members, content partners, Champions and organisations may all publish into What is New. The governing distinction is that the Feed is unreviewed and What is New is editorial — **every contributed card is reviewed before it appears**, which is the only reason the surface can be a destination rather than another opinion stream.
+
+Three rules make contribution safe rather than corrupting: the editorial standard applies identically to a member, a partner and Levav itself; commercial interest is declared on the card where the reader sees it, not in a policy page; and **money never buys a card** — a partnership buys consideration, never publication. Contributing affects no readiness value by any route.
+
+**Still escalated (§49).** Scope and the contributor model are settled; **editorial ownership is not.** Who holds responsibility, which publishers Levav sources from, and what republication rights it has all need a named human owner before a single card ships. Curation is an editorial position with reputational and legal consequences, and no agent may assume it.
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 
