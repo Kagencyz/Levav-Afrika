@@ -2,74 +2,50 @@
 
 **Owner:** Claude (Product Command). Codex reads this file; Codex does not edit it.
 
-This register exists because a defect list relayed through chat did not survive into Codex's working context, and WP-0001/WP-0003 were resubmitted with an unchanged working tree. **The repository is the durable channel.** Before returning `READY_FOR_REVIEW` on any packet, check this file for open defects against it.
+This register exists because a defect list relayed through chat did not survive into Codex's working context, and WP-0001/WP-0003 were once resubmitted with an unchanged working tree. **The repository is the durable channel.** Before returning `READY_FOR_REVIEW` on any packet, check this file for open defects against it.
 
-**Review status is verified against the tree, not the report.** Claude checks file contents and modification times before reading an implementation summary. A report claiming a fix that the tree does not contain is itself a defect.
-
----
-
-## WP-0001 + WP-0003 — round 2 · 4 open · 2026-08-12
-
-Round 2 changed no files. All four defects below were raised in round 1 and remain unfixed. Line numbers are from `main` @ `664be76` plus Codex's uncommitted tree.
-
-### D1 — S1 BLOCKING — public landing page renders a fabricated WRI
-**Requirements:** WRI-001, FEED-008, PDR-0002, PDR-0003, LANG §2.3 · **File:** `src/sections/home/ProfilePreviewSection.tsx`, rendered from `src/pages/Home.tsx:43`
-
-| Location | Action |
-|---|---|
-| Lines 19–24 | Delete the `wriDimensions` array. `Technical` and `Leadership` are retired non-PRD constructs (PDR-0002) |
-| Line 107 | Delete the `74` score element |
-| Line 108 | Delete its `WRI&trade;` label |
-| Line 113 onward | Delete the `{wriDimensions.map(...)}` block and its animated progress bars — AC4 names progress indicators implying a hidden value explicitly |
-| Line 28 | `'QuickWork™ · 12 gigs completed, 4.9★'` — remove the fabricated metrics; `gigs` is prohibited (PDR-0003) |
-| Line 29 | `'Levav Impact™ · 40 verified service hours'` — remove the fabricated figure |
-| Line 62 | `your WRI™ measures readiness` claims a live capability. Reword to intent, not present tense |
-
-Keep the section, the profile card, the name, the role and the verified badge. Illustrate the concept; render no number.
-
-### D2 — S2 — a stale, unarchived document repeats the fake-auth claim
-**Requirements:** WP-0001 AC3 · **File:** `docs/AUTHENTICATION_ARCHITECTURE.md`
-
-Cites archived `docs/SECURITY_AUDIT.md` as current three times, references `api/lib/jwt.ts` and `api/context.ts` (neither exists), and states *"because the backend has never run… this is precisely the fake-auth problem."* Same hazard class as the pre-v4.1 `AGENTS.md`.
-
-**Fix:** `git mv docs/AUTHENTICATION_ARCHITECTURE.md docs/archive/`. Its httpOnly-cookie recommendation is already implemented. `docs/DOMAIN_MODEL.md` cites it at lines 14, 34 and 55 — repoint those in the same pass.
-
-### D3 — S2 — `docs/DOMAIN_MODEL.md` cites archived documents as authority
-**Requirements:** WP-0001 AC3
-
-- **Line 93** — "the `employer` router stays unregistered per `docs/NEXT_MILESTONE.md` §4". That router is **deleted** (PDR-0006) and that document is archived.
-- **Line 98** — "Full status in `docs/PRODUCT_SYSTEM_MAP.md`" — archived.
-
-**Fix:** repoint both at `docs/product/COVERAGE_MATRIX_v1.md`; state the routers are deleted, not unregistered.
-
-### D4 — S3 — dead WRI scaffolding retained
-**Requirements:** ENG-005, COMP-003
-
-- `src/pages/TalentProfile.tsx` — `WRI_COLORS`, `WRI_LABELS`, `DEFAULT_WRI_BREAKDOWN`, `wriBreakdown`, and `breakdownEntries` at line 581 (computed, never used).
-- `src/pages/MarketIntel.tsx` — the `WRIDistributionSection` component body survives, containing **"Talent with WRI scores above 80 earn on average 35% more than those below."** A fabricated compensation benchmark in the tree is a COMP-003 problem waiting to be re-rendered.
-
-**Fix:** delete both.
+**Review status is verified against the tree, not the report.** Claude checks file contents and modification times before reading an implementation summary.
 
 ---
 
-## Confirmed good — do not redo
+## Open defects
 
-Verified by Claude in round 1 and unchanged. Re-doing any of this wastes a cycle:
+**None.**
 
-- `AGENTS.md` is a byte-exact match to the supplied text.
-- No WRI writer, audit symbol or `@contracts` alias remains anywhere in `src/` or `server/`.
-- Retired key strings are correct — `wri_score` and `levav_audit_log`, matching the original `LS_KEYS.wriScore` value and `AUDIT_KEY`, not the variable names.
-- `retiredLocalState.ts` introduces no replacement key (AC15 holds) and carries the PDR-0009 removal condition.
-- `AuditSection.tsx` renders the three approved strings verbatim, with no number, table or filter.
-- The WRI retirement guard test is well constructed.
-- Router allowlist failure demonstrations were correct; the registered set is untouched.
-- 56/56 tests across 9 files. Build succeeds. Bundle 21 kB smaller.
-- Frontend typecheck improved 156 → 136.
+---
 
-## Still open, not a defect
+## Carry-forward follow-ups
 
-The 360 px visual scenarios (WP-0003 #7, WP-0001 A1 #10) remain unverified — Codex's browser connection was unavailable, correctly declared. **Claude will verify these.** Do not block on them.
+Not defects against any current packet — each was checked and found not to violate the acceptance criteria it sits near. Recorded so they are not lost, and dispositioned to the packet that will own the surface.
 
-## On acceptance
+| # | Finding | Why it is not a defect | Owning packet |
+|---|---|---|---|
+| F-01 | `src/pages/SkillGap.tsx` — `getUserWRI()` still exists with a hard-coded `return 72` fallback; `currentWRI` (line 305) and `targetWRI = 95` (line 306) are computed and **never rendered** | WP-0003 AC4 requires that no surface *renders* a numeric WRI. Verified: neither variable is referenced anywhere else in the file, and the page shows the approved empty state instead | Sprint 3 (WRI engine) or the first packet to touch SkillGap. Delete `getUserWRI`, both variables, and the `talent_profile.wri` read path |
+| F-02 | `src/pages/TalentProfile.tsx` — mock talent objects still carry `wri: 87`, `wri: 82`, … | Dead data. Every render path was removed; the named D4 symbols are gone | Whichever packet rebuilds TalentProfile |
+| F-03 | Landing page copy — "Gigs and freelance projects. Stay active, keep earning." (PathsSection) uses a term PDR-0003 prohibits; "A 28-day transformation…" is empty-inspiration framing under Language System §2.2 | WP-0003 explicitly scoped out copy rewrites beyond the named WRI strings | WP-0004 and the Language packets |
+| F-04 | The `talent_profile` localStorage key can carry a `wri` field, read by `SkillGap` and `SmartMatchWidget` | Nothing writes it; the read is inert. Adding it to the retired-key list now would imply a live vector that does not exist | Revisit if any writer is ever introduced; otherwise resolved by F-01 |
 
-When D1–D4 are fixed in the tree: commit, push the branch, and open the draft PR for the Vercel preview. Publishing a preview before D1 is fixed would put a fabricated Workforce Readiness Index on a public URL, which is why the PR is held.
+---
+
+## Closed
+
+### WP-0001 + WP-0003 — **ACCEPTED** 2026-08-12
+
+All four defects fixed and verified in the tree before the implementation report was read.
+
+| ID | Defect | Verification |
+|---|---|---|
+| D1 | Public landing page rendered a fabricated WRI | `ProfilePreviewSection.tsx` rewritten. Verified live at 360 px: no `74`, no dimension bars, no fabricated evidence metrics. Copy reframed to "is intended to become a living professional record" — honest about a capability that does not yet exist. Codex additionally corrected "gigs" → "projects" nearby, unprompted (PDR-0003) |
+| D2 | `docs/AUTHENTICATION_ARCHITECTURE.md` stale and unarchived | Moved to `docs/archive/`; citing pointers in `DOMAIN_MODEL.md` updated |
+| D3 | `DOMAIN_MODEL.md` cited archived docs as authority | Lines 93 and 98 corrected; no archived-doc reference remains |
+| D4 | Dead WRI scaffolding | `WRI_COLORS`, `WRI_LABELS`, `DEFAULT_WRI_BREAKDOWN`, `breakdownEntries` and the `WRIDistributionSection` body all removed, including the fabricated "35% more" compensation claim |
+
+**Gates re-run by Claude, not taken from the report:** 56/56 tests across 9 files · server typecheck clean · build succeeds · frontend typecheck 156 → **136** (baseline shrank, never grew) · `AGENTS.md` still a byte-exact match · all removal greps clean · retired keys `wri_score` and `levav_audit_log` correct against the originals · no replacement key introduced.
+
+**360 px verification, performed by Claude:**
+
+- **Landing page** — `document.scrollWidth === 360`, no horizontal overflow, no numeric WRI present.
+- **SkillGap** — approved empty-state copy renders verbatim; `scrollWidth === 360`; no numeric score.
+- **Admin Audit Logs** — **not verified live.** `/admin` correctly redirects to `/auth`, and Claude does not create accounts or enter credentials. Verified structurally instead: `AuditSection.tsx` contains only fluid layout (`space-y-6`, `rounded-2xl … p-6 sm:p-8`, `max-w-3xl`), no table, no grid, no fixed width and no unbreakable string, so it cannot overflow at 360 px. Stated as a limitation rather than claimed as a live check.
+
+**Authorised on acceptance:** commit, push `agent/wp-0001-wp-0003`, and open the draft PR for the Vercel preview.
