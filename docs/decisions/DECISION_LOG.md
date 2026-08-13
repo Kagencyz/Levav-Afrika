@@ -21,7 +21,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 | PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
 | PDR-0013 | What is New editorial scope | APPROVED | 2026-08-12 |
-| PDR-0015 | Claude acts as Engineering Command while Codex is unavailable | APPROVED | 2026-08-13 |
+| PDR-0015 | Claude acts as Engineering Command while Codex is unavailable | **LAPSED, UNEXERCISED** | 2026-08-13 |
 
 ---
 
@@ -248,7 +248,17 @@ Funding model, escrow provider, milestone release conditions, partial completion
 
 ## PDR-0015 — Claude acts as Engineering Command while Codex is unavailable
 
-**State:** APPROVED · **Requirements:** §41 (write ownership), §42 (handoff), §45 CODEX-*, §46 Sprint 0 · **Applies to:** from 2026-08-13 until Codex returns
+**State:** **LAPSED, UNEXERCISED** (2026-08-13) · **Requirements:** §41 (write ownership), §42 (handoff), §45 CODEX-*, §46 Sprint 0 · **Was in force:** 2026-08-13, for approximately two hours
+
+> **Closing note — nothing was built under this authorisation.**
+>
+> Codex returned before any implementation began. Three agents were dispatched against WP-0001 slices and **all three terminated on an account usage limit before making a single file edit**; the working tree was verified clean immediately afterwards. The only commit produced under this decision is the decision itself.
+>
+> **Codex has nothing to review from this authorisation.** There is no Claude-authored application code anywhere in the repository. The `claude/wp-0001-implementation` branch is named for work that never happened and contains only this record.
+>
+> The record is retained rather than deleted because the authorisation was genuinely granted and the governance event is real. A decision log that quietly drops a decision once it stops being convenient is not a decision log.
+>
+> Per the reversal clause below, the `CLAUDE.md` prohibition on Claude editing code is **back in force** with no further action required.
 
 **Numbering note.** PDR-0014 (Supabase CLI owns migrations) is issued and open in PR #18 but not yet merged to `main`. This record takes 0015 to avoid a collision; if #18 is abandoned, 0014 is left permanently unused rather than recycled.
 
