@@ -6,6 +6,12 @@ Master PRD §50.1(3) requires Claude to identify documentation that could mislea
 
 Claude cannot edit Codex-owned files. Every disposal in a Codex-owned file is issued through **WP-0001**.
 
+> **Correction, 2026-08-13.** This register is itself subject to the rule it enforces, and three of its own figures were re-measured under `npm ci` with the pinned TypeScript 5.9.3 (`GROUND_TRUTH_AUDIT_2026-08-13.md`). Where these disagree with the rows below, these win.
+>
+> - **The `tsconfig.app.json` figure of 156 is not a frontend figure.** That project includes `["src", "api", "server", "db", "contracts"]`. The frontend count is **136 in `src/`**; the remaining 20 are 18 in dead routers and 2 in test files. The row calling 156 "the only claim still roughly true" is therefore true of the wrong quantity.
+> - **"Server only" understates the gap.** `tsconfig.server.json` uses a hand-maintained allowlist of 12 named files and checks 15 of the 25 files in `server/` and `api/`. Ten are never checked, and coverage decays silently as files are added.
+> - **A new entry belongs in this register: `db/migrations/`.** Six Drizzle migrations that have never been applied to any database, read across the documentation as the schema of record. Production was built by a Supabase history almost entirely absent from this repository. **SEVERITY: CRITICAL** — `npm run db:migrate` against production would attempt all six against a database that already holds those objects. Disposal is PDR-0014 and WP-0005; see FINDING-08.
+
 ---
 
 ## S-01 — `AGENTS.md` describes an architecture that no longer exists (SEVERITY: CRITICAL)

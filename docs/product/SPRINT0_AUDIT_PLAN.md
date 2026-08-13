@@ -6,6 +6,17 @@
 
 ---
 
+> ## Corrections from the 2026-08-13 re-measurement
+>
+> This document remains the Sprint 0 record and its figures are **not** rewritten — a dated audit that silently changes its numbers is no longer evidence of anything. The corrections below were measured under `npm ci` with the pinned TypeScript 5.9.3 and are recorded in `GROUND_TRUTH_AUDIT_2026-08-13.md`. **Where they disagree with the text beneath, the corrections win.**
+>
+> - **C-1 — "server only" is too generous.** `tsconfig.server.json` includes a hand-maintained allowlist of 12 named files, so `npm run typecheck` covers **15 of the 25 files** in `server/` and `api/`. Ten are never checked. Coverage decays silently: any new server file sits outside the gate until someone edits the include list. Closed by WP-0002 item 7.
+> - **C-2 — the frontend figure is 136, not 156.** `tsconfig.app.json` is not a frontend project; its include is `["src", "api", "server", "db", "contracts"]`, so it re-checks the whole server on looser settings with tests included. The 156 is **136 in `src/`**, 18 in dead routers WP-0001 deletes, and 2 in test files. The frontend baseline WP-0002 commits is 136.
+> - **C-3 — no gate typechecks any test file.** `tsconfig.server.json` excludes `**/*.test.ts` and Vitest does not typecheck. `server/routes/auth.test.ts` and `server/lib/vercelRequest.test.ts` carry type errors while passing green, and `server/router.test.ts` — the control PDR-0006 preserves — sits in the same blind spot. Closed by WP-0002 item 8.
+> - **C-4 — the tRPC caller count depends on its definition.** §4's "12 files call tRPC" holds only as *files referencing the client*. Ten actually invoke a procedure, and **eight invoke one that is registered**; three call sites target unregistered routers. Of those three, only `NotificationBell` is mounted — see FINDING-10.
+> - **C-5 — never measure in an uninstalled tree.** A fresh clone has no `node_modules`, so `npx tsc` resolves TypeScript **6.0.2** instead of the pinned `~5.9`, rejects `baseUrl` as a config error, and exits **before checking a single file** — indistinguishable from a clean pass if you only look for file-level errors. The row above using bare `npx tsc` is exactly the invocation that fails this way. Run `npm ci` first and confirm `npx tsc --version` reports 5.9.
+> - **C-6 — `db/migrations/` is not the schema of record.** It describes a history that has never been applied. Production was built by a Supabase history that is almost entirely absent from this repository. See FINDING-08 and PDR-0014.
+
 ## 1. How this audit was conducted
 
 Nothing in this document is taken from a repository document. Every claim below was produced by running commands or reading source. Where an existing document disagrees, the document is listed in `STALE_INSTRUCTIONS_REGISTER.md`, not repeated here.
@@ -15,8 +26,8 @@ Commands run and results:
 | Command | Result |
 |---|---|
 | `git log --oneline -1` | `0366f0d Merge pull request #13 … employer-email-confirmation` |
-| `npm run typecheck` | **Exit 0.** Runs `tsc -p tsconfig.server.json --noEmit` — **server only** |
-| `npx tsc --noEmit -p tsconfig.app.json` | **156 errors.** The frontend is not covered by any gate |
+| `npm run typecheck` | **Exit 0.** Runs `tsc -p tsconfig.server.json --noEmit` — **server only** ⚠️ see correction C-1 |
+| `npx tsc --noEmit -p tsconfig.app.json` | **156 errors.** The frontend is not covered by any gate ⚠️ see correction C-2 |
 | `npm test` | **56 tests, 8 files, all passing** (7.4s) |
 | `npm run build` | **Succeeds** in 2m55s. Output: single `index-*.js` at **2,523.74 kB** (638 kB gzip) |
 
@@ -69,6 +80,8 @@ These are not the same product, and the existing content is not a migration sour
 ### FINDING-03 — The typecheck gate is misleading
 
 `npm run typecheck` passes while the frontend carries 156 real TypeScript errors, because the script points only at `tsconfig.server.json`. `npm run build` inherits the same blind spot. Any agent that runs the documented gate will conclude the repository is type-clean. **Classification: MODIFY.** Issued as **WP-0002**.
+
+**Corrected 2026-08-13 (C-1, C-2, C-3):** the finding is right and is worse than stated. The gate is not merely "server only" — it covers 15 of 25 server files via a hand-maintained allowlist, and decays silently as files are added. The frontend figure is 136, not 156. And no gate typechecks any test file, including the router allowlist control. WP-0002 items 7 and 8 close the additional gaps.
 
 ### FINDING-04 — "Gig" is the dominant QuickWork vocabulary in code
 
