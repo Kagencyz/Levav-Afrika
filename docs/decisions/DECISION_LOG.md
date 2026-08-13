@@ -244,3 +244,26 @@ Levav 28 Day 15 must gate on evidence sufficiency rather than calendar completio
 **State:** **ESCALATED to human owner** (Master PRD §49) · **Requirements:** QW-008
 
 Funding model, escrow provider, milestone release conditions, partial completion, revision limits, cancellation, refunds, chargebacks and platform fee are all §49 decisions requiring human approval. Sprint 5 builds the **assignment lifecycle and payment state model** without committing to a provider, so that the commercial decision plugs in through an adapter (API-004). `src/pages/MilestonePayments.tsx` and `ContractWorkspace.tsx` stay deferred until this is resolved.
+
+## PDR-0014 — The Supabase CLI owns migrations
+
+**State:** APPROVED · **Requirements:** ENG-001, ENG-003, ENG-005, §46, §47 · **Applies to:** immediately, all sprints
+
+**Context.** The repository contains two migration systems. `db/migrations/` holds six Drizzle migrations; `supabase/migrations/` holds one Supabase file. Verified against the live database (FINDING-08, `GROUND_TRUTH_AUDIT_2026-08-13.md`): production carries no Drizzle migrations table at all, only `supabase_migrations.schema_migrations`. **The Drizzle chain has never been applied to anything.** Production was built by a five-migration Supabase history, four of which have no file in this repository, and the fifth of which exists here at a different version than the one applied.
+
+Three things follow: the production schema cannot be rebuilt from source; `db/migrations/` is not the schema of record despite being read as one; and `npm run db:migrate` pointed at production would find no Drizzle migrations table, conclude nothing had been applied, and attempt all six migrations against a database that already holds those objects.
+
+**Decision.** The **Supabase CLI owns schema migrations**. `supabase/migrations/` is the schema of record. `db/migrations/` is removed and `drizzle-kit`'s migration commands are removed with it. The live schema is captured into `supabase/migrations/` so that a new environment can be built from this repository alone.
+
+**This decision is about migrations only.** Drizzle ORM stays. `drizzle-orm` remains the runtime query builder, `db/schema.ts` remains the typed query surface every route depends on, and Drizzle 0.45 remains in the approved stack under ENG-001. **No agent may read this decision as licence to replace Drizzle**, and §48's prohibition on blind rewrites applies with full force. What is removed is `drizzle-kit generate` and `drizzle-kit migrate` as the path by which schema changes reach a database — nothing else.
+
+**Why not make Drizzle authoritative instead.** It is the option that sounds tidier, because `db/schema.ts` is already Drizzle and the ORM stays. It was rejected on risk. Making Drizzle authoritative means reconciling a six-migration history that has never run against a live database that already contains every object it would create — a hand-written baseline plus a fabricated migrations table, performed against production, to reach a state the Supabase history already occupies. The Supabase history is the one that actually produced production; adopting it costs a schema capture, and adopting Drizzle costs a live reconciliation with a real chance of a partial apply.
+
+**Consequences.**
+
+1. `db/schema.ts` becomes a **mirror** of a schema it no longer defines. It must be verified against the live database, and any future divergence is a defect in the mirror, not in the database.
+2. Schema changes are authored as Supabase migrations and applied through the Supabase CLI. A change that appears in `db/schema.ts` without a corresponding migration has not happened.
+3. `npm run db:migrate` and `npm run db:generate` are removed. Their continued presence is a standing hazard, not a convenience.
+4. The `20260811220321` / `20260811220734` version mismatch on `reconcile_supabase_auth` is reconciled as part of the capture — the repository must hold the record that was actually applied.
+
+**Implemented by:** WP-0005.
