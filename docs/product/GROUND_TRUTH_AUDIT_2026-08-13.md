@@ -74,27 +74,29 @@ It is correctly bidirectional — a new router fails, a removed one fails. But i
 
 1. **Aliasing.** `_def.procedures` is keyed by the object key as written, never by the procedure's origin. `talent: router({ list: jobRouter.listAll })` produces the allowlisted key `talent.list` and passes. This is not contrived — `router.ts` already uses that idiom three times (`createOwnProfile: talentRouter.create`), so remapping a name onto a different implementation reads as house style.
 2. **Lazy registration.** Lazy entries are recorded in `_def.lazy` and never enter `_def.procedures`, yet resolve at call time. A lazily-registered `job` router is fully reachable over HTTP and contributes zero keys to the assertion.
-3. **Authorization drift.** The test never inspects procedure type or middleware chain. Downgrading `talent.getOwnProfile` from `authedProcedure` to `publicProcedure` passes unchanged — and authorization is precisely the property the quarantine exists to contain.
+Both defeat the property PDR-0006 names — a quarantined procedure becomes reachable while the registration surface *appears* unchanged.
+
+**Not part of this finding: authorization drift.** The test also ignores procedure type and middleware chain, so downgrading `talent.getOwnProfile` from `authedProcedure` to `publicProcedure` passes unchanged. That is true, but it is **not** evidence against PDR-0006, which scopes this control to the registration surface and never claims it guards authorization. Recorded here as a known property of the test, not as a defect in the decision.
 
 Secondary: the allowlist is hand-maintained, so a reviewer can turn a red test green by editing `ALLOWED_PROCEDURES` in the same commit, which is indistinguishable in a diff from a legitimate update.
 
-**This is not an argument for weakening the test.** It is protective against the regression it names. It should not be relied on as a *reachability and authorization* guard, which is the job PDR-0006 currently gives it.
+**This is not an argument for weakening the test.** It is protective against the regression it names. The narrow claim is that aliasing and lazy registration let the registration surface change while it stays green.
 
 **Classification: ENHANCE.** Needs a packet, sequenced with or after WP-0001.
 
-### FINDING-10 — Three frontend call sites target unregistered routers, and one substitutes mock data silently
+### FINDING-10 — One mounted component substitutes mock data when its unregistered router 404s; two more are dead definitions
 
-`server/router.ts` deliberately omits the `review`, `notification` and `upload` routers. Three frontend call sites invoke them anyway and 404 at runtime:
+`server/router.ts` deliberately omits the `review`, `notification` and `upload` routers. Three frontend files call them anyway, but they are not equivalent — **only one is reachable in the running application.**
 
-- `src/components/ReviewForm.tsx` — `trpc.review.create`
-- `src/components/NotificationBell.tsx` — four `trpc.notification.*` procedures
-- `src/components/FileUpload.tsx` — hand-rolled `fetch('/api/trpc/upload.getPresignedUrl?…')`
+**Live defect — `src/components/NotificationBell.tsx`.** Imported and rendered twice by `src/components/Navbar.tsx` (lines 195 and 295), so it runs on every authenticated page. It calls four `trpc.notification.*` procedures, all of which 404. `NotificationBell.tsx:138-152` handles the failure by falling back to `MOCK_NOTIFICATIONS` and rendering a hardcoded unread count of `3`. Users are shown fabricated notifications, presented identically to real ones, with no indication anything failed.
 
-`NotificationBell.tsx:138-152` handles the failure by falling back to `MOCK_NOTIFICATIONS` and rendering a hardcoded unread count of `3`. The user is shown fabricated notifications, presented identically to real ones, with no indication anything failed.
+That breaches **invariant 9** (nothing is fabricated) and **PDR-0009** (unimplemented controls state their absence).
 
-That breaches **invariant 9** (nothing is fabricated) and **PDR-0009** (unimplemented controls state their absence). It is also a false signal for reviewers: the component looks functional in any environment.
+**Dead definitions — `src/components/ReviewForm.tsx` and `src/components/FileUpload.tsx`.** Both have **zero importers and zero render sites**; a repo-wide search finds neither mounted anywhere. `ReviewForm` calls `trpc.review.create` and `FileUpload` hand-rolls `fetch('/api/trpc/upload.getPresignedUrl?…')`, but the running application cannot issue either request. These are unused files, not runtime failures.
 
-**Classification: MODIFY.** The dead call sites must either be removed or made to state their absence. This does not wait on the backend.
+The distinction matters for scope: one is a user-visible fabrication that must be fixed, and two are dead code to delete. Treating all three as live 404s would size the work wrongly.
+
+**Classification: MODIFY** for `NotificationBell` (state absence rather than fabricate) · **REMOVE** for the two unused components. Neither waits on the backend.
 
 ### FINDING-11 — AUTH-001 is contradicted client-side, latently
 
@@ -122,11 +124,11 @@ Both are currently inert: nothing writes either key, so `getUserRole()` always f
 |---|---|---|
 | FINDING-08 | A new packet — migration ownership, live schema capture, `db:migrate` made safe | Nothing. Independent of Sprint 0 sequencing |
 | FINDING-09 | A packet, or an addition to whichever packet lands the WP-0001 deletions | WP-0001 |
-| FINDING-10 | A packet, or inclusion in WP-0003 (it is the same fabrication class) | Nothing |
+| FINDING-10 | `NotificationBell` fix — a packet, or inclusion in WP-0003 (same fabrication class). The two unused components are a deletion, and can ride with WP-0001 | Nothing |
 | FINDING-11 | Ride-along with the next packet touching those files | Nothing |
 | FINDING-12 | Edits to `CLAUDE.md` and `SPRINT0_AUDIT_PLAN.md` | Nothing |
 
 ## 5. Open decisions
 
 1. **FINDING-08 needs a human decision before a packet can be written:** does Drizzle or the Supabase CLI own migrations going forward? Both are wired into the repository today, only one has ever run against production, and the answer determines whether `db/migrations/` is reconciled or removed.
-2. **FINDING-09 touches an approved decision.** PDR-0006 names `server/router.test.ts` as the control preserved when the eight routers are deleted. If that control is narrower than the decision assumes, PDR-0006 may need an amendment rather than a silent packet.
+2. **FINDING-09 touches an approved decision, on narrow grounds.** PDR-0006 keeps `server/router.test.ts` as the control that "continues to protect the registration surface". Aliasing and lazy registration both let that surface change while the test stays green, so the decision's confidence in the control is not fully earned — that, and only that, is the question. The test's silence on authorization is **not** part of the case: PDR-0006 never claimed it guarded authorization. Whether this warrants amending PDR-0006 or simply strengthening the test in a packet is the open call.
