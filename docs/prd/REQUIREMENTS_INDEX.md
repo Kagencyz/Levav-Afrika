@@ -82,6 +82,7 @@ These conflict with approved product direction and must not be carried forward:
 | WP-0002 | Real verification gates and CI | §47.1, ENG-003, CODEX-005 | READY_FOR_BUILD |
 | WP-0003 | Remove client-side WRI scoring | WRI-001/003/004, EVD-001, FEED-008, IMPACT-002, LEARN-002 | READY_FOR_BUILD |
 | WP-0004 | Copy architecture foundation | LANG-002/003/004/005, AFR-008 | READY_FOR_BUILD |
+| WP-0005 | Migration ownership and schema reproducibility | ENG-001/003/005, §46, §47 | READY_FOR_BUILD |
 | WP-0101 | Career taxonomy | ONB-002, GRAPH-001/003, DATA-MODEL-001 | READY_FOR_BUILD |
 | WP-0102 | Intelligent onboarding | ONB-001/002/003, AUTH-001, LANG-002/003 | READY_FOR_BUILD |
 | WP-0103 | Professional profile | PROF-001/002/003, AUTH-003, DATA-MODEL-003, SEC-004 | READY_FOR_BUILD |

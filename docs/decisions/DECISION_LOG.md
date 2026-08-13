@@ -21,6 +21,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 | PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
 | PDR-0013 | What is New editorial scope | APPROVED | 2026-08-12 |
+| PDR-0014 | The Supabase CLI owns migrations | APPROVED | 2026-08-13 |
 
 ---
 
