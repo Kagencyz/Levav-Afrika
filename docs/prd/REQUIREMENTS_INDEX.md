@@ -78,7 +78,7 @@ These conflict with approved product direction and must not be carried forward:
 
 | ID | Title | Requirements covered | Status |
 |---|---|---|---|
-| WP-0001 | Repository truth and authority reset | ENG-003/004/005, §1, §46 | READY_FOR_BUILD |
+| WP-0001 | Repository truth and authority reset | ENG-003/004/005, §1, §46 | READY_FOR_BUILD · **Amendment A2 2026-08-13** (router test guards reachability) |
 | WP-0002 | Real verification gates and CI | §47.1, ENG-003, CODEX-005 | READY_FOR_BUILD |
 | WP-0003 | Remove client-side WRI scoring | WRI-001/003/004, EVD-001, FEED-008, IMPACT-002, LEARN-002 | READY_FOR_BUILD |
 | WP-0004 | Copy architecture foundation | LANG-002/003/004/005, AFR-008 | READY_FOR_BUILD |

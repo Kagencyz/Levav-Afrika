@@ -265,3 +265,41 @@ Removal condition for the module: once no supported client can still be carrying
 ## Noted, deliberately out of scope
 
 `src/components/SmartMatchWidget.tsx:260` and `src/pages/Projects.tsx:90` also read `localStorage.getItem('user')` — the same key nothing writes. Both are therefore dead paths reading a permanently absent value, and both may contain unreachable branches or silent failures. **Do not fix them in this packet.** Claude has recorded them; they are dispositioned when those surfaces are rebuilt. Report anything further you notice about them without acting.
+
+---
+
+# Amendment A2 (2026-08-13) — the router allowlist test must guard reachability, not names
+
+**Raised by:** FINDING-09, `docs/product/GROUND_TRUTH_AUDIT_2026-08-13.md` · **Authority:** PDR-0006 Amendment A1
+
+In-scope item 5 requires the allowlist guard to "assert the registered set exactly, so both an unexpected registration and a silent removal fail". That is necessary and remains required. It is not sufficient.
+
+The assertion compares `Object.keys(appRouter._def.procedures)` against a hand-maintained allowlist — **procedure names only**. Two changes alter the reachable surface while leaving the test green:
+
+1. **Aliasing.** `_def.procedures` is keyed by the object key as written, never by the procedure's origin. `talent: router({ list: someOtherRouter.listAll })` yields the allowlisted key `talent.list` and passes. `server/router.ts` already uses this idiom three times, so it reads as house style, not as a bypass.
+2. **Lazy registration.** Lazily-registered entries land in `_def.lazy`, never enter `_def.procedures`, and still resolve at call time — reachable over HTTP, invisible to the assertion.
+
+## Additional scope for A2
+
+16. **Strengthen `server/router.test.ts` so it fails when the reachable procedure set changes**, not merely when the registered name set changes. It must detect (a) any lazily-registered procedure, and (b) a procedure whose implementation originates outside the allowed route modules, including when registered under an allowlisted name. **The mechanism is yours to choose** — asserting `_def.lazy` is empty and constraining `server/router.ts`'s import surface is one workable combination, but any approach that provably closes both gaps is acceptable. Explain the approach in the report.
+
+This does not license weakening anything. The existing exact-set assertion stays; A2 adds to it.
+
+## Additional acceptance criteria for A2
+
+16. A deliberate lazily-registered router fails the test. Show the failure, then revert.
+17. A deliberate alias registering a non-route-module procedure under an allowlisted name fails the test. Show the failure, then revert.
+18. The existing addition and removal scenarios (criterion 5, scenarios 2 and 3) still fail as before — A2 must not regress them.
+19. The report states the chosen mechanism and what it does **not** cover.
+
+## Additional test scenarios for A2
+
+| # | Scenario | Expected |
+|---|---|---|
+| 12 | Register a router lazily via `lazy(() => import(...))` | `server/router.test.ts` fails |
+| 13 | Alias a procedure from a non-route module under an existing allowlisted key | `server/router.test.ts` fails |
+| 14 | Normal registered set, unchanged | Passes |
+
+## Explicitly not in scope for A2
+
+**Authorisation coverage.** The test ignores procedure type and middleware chain, so downgrading `authedProcedure` to `publicProcedure` passes. That is a real property of the test and it is recorded, but PDR-0006 scoped this control to the registration surface and never claimed otherwise. Do not extend the test to assert authorisation in this packet, and do not treat its absence as a defect here — entitlement checking belongs with the Evidence Graph and entitlement work, not with a name-set guard.

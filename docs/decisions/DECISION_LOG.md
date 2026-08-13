@@ -13,7 +13,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0003 | "Assignment" is the canonical QuickWork unit; "gig" is prohibited | APPROVED | 2026-08-12 |
 | PDR-0004 | Levav 28 prototype content is retired, not migrated | APPROVED | 2026-08-12 |
 | PDR-0005 | Frontend typecheck becomes a required gate with a bounded debt allowance | APPROVED | 2026-08-12 |
-| PDR-0006 | Unreachable routers are deleted, not preserved | APPROVED | 2026-08-12 |
+| PDR-0006 | Unreachable routers are deleted, not preserved | APPROVED · **amended A1 2026-08-13** | 2026-08-12 |
 | PDR-0007 | Day 15 evidence-sufficiency threshold | **ESCALATED** | 2026-08-12 |
 | PDR-0008 | QuickWork payment, escrow and dispute model | **ESCALATED** | 2026-08-12 |
 | PDR-0009 | Unimplemented controls state their absence; retired local keys are cleared | APPROVED | 2026-08-12 |
@@ -97,6 +97,23 @@ Consequences, decided explicitly:
 **Decision.** Delete them. They will be rebuilt against the Evidence Graph and entitlement model, and nothing in them survives that rebuild. The allowlist guard in `server/router.test.ts` is **kept** — it is a good control and continues to protect the registration surface.
 
 **Why deletion rather than retention.** Code that looks 90% finished is an invitation. `employer.ts` reads `ctx.user.id` where the context provides `userId`; `upload.getPresignedUrl` has no authorisation check. Git history preserves them for reference.
+
+### Amendment A1 (2026-08-13) — the retained control is narrower than this decision assumed
+
+**Raised by:** FINDING-09, `docs/product/GROUND_TRUTH_AUDIT_2026-08-13.md` · **Applied in:** WP-0001 Amendment A2
+
+**The decision does not change.** The eight routers are still deleted, and `server/router.test.ts` is still kept. What changes is this record's confidence in that control.
+
+The original text says the guard "continues to protect the registration surface". Measured, it compares **procedure names only** — `Object.keys(appRouter._def.procedures)` against a hand-maintained allowlist. Two changes alter the reachable surface while leaving it green:
+
+1. **Aliasing.** `_def.procedures` is keyed by the object key as written, never by the procedure's origin. `talent: router({ list: someQuarantinedRouter.listAll })` produces the allowlisted key `talent.list` and passes. `server/router.ts` already uses this idiom three times (`createOwnProfile: talentRouter.create`), so remapping a name onto a different implementation reads as house style rather than as a bypass.
+2. **Lazy registration.** Lazily-registered entries are recorded in `_def.lazy` and never enter `_def.procedures`, yet resolve at call time. A lazily-registered router is fully reachable over HTTP while contributing zero keys to the assertion.
+
+**What this amendment requires.** The control must fail when the set of **reachable** procedures changes, not merely when the set of registered *names* changes. It must detect both a lazily-registered procedure and a procedure whose implementation originates outside the allowed route modules, including under an allowlisted name. The mechanism is Codex's to choose; the property is not.
+
+**What this amendment does not claim.** The test's silence on authorisation — it never inspects procedure type or middleware chain, so an `authedProcedure` → `publicProcedure` downgrade passes — is a real property but **not** a defect in this decision. This record scoped the control to the registration surface and never claimed it guarded authorisation. Recorded so a future reader does not treat authorisation coverage as a promise this PDR made.
+
+**Still binding, unchanged:** the test is a security control. It is strengthened, never weakened, and the allowlist is never edited to turn a red test green without a stated reason.
 
 ## PDR-0009 — Unimplemented controls state their absence; retired local keys are cleared
 
