@@ -5,7 +5,7 @@
 **Requirement IDs:** ENG-001, ENG-003, ENG-005, §46, §47
 **Audit classification:** MODIFY (`package.json` scripts) · REMOVE (`db/migrations/`) · BUILD (schema capture)
 **Related decisions:** PDR-0014
-**Source finding:** FINDING-08, `docs/product/GROUND_TRUTH_AUDIT_2026-08-13.md`
+**Source finding:** FINDING-08. The audit document `docs/product/GROUND_TRUTH_AUDIT_2026-08-13.md` lands on a separate branch and **is not present in the tree carrying this packet** — do not go looking for it here. Every fact this packet depends on is reproduced in *Verified figures at handoff* below, and all of it is re-derivable against the live database with the read-only calls named there. Reproduce those figures rather than relying on either document.
 
 ---
 
@@ -62,8 +62,8 @@ Live grants to `levav_app`: `SELECT` on `users`; `SELECT, INSERT, UPDATE` on `ta
 
 1. `supabase/migrations/` contains a record for every migration listed by `list_migrations` against production, at the applied version. State the list and show it matching.
 2. A fresh database built from `supabase/migrations/` alone reproduces production's structure. Provide the comparison output covering tables, RLS policies and grants, including the absence of any DELETE grant.
-3. `db/migrations/` is gone, and no script, config or doc references it.
-4. `db:generate` and `db:migrate` are gone from `package.json`. Grep output confirms no remaining caller.
+3. `db/migrations/` is gone, and no script or config references it. **Documentation is exempt** — `docs/` necessarily discusses the removed path, and PDR-0014 and this packet both name it deliberately. Scope the check to executable and configuration files.
+4. `db:generate` and `db:migrate` are gone from `package.json`. Grep output over non-`docs/` files confirms no remaining caller.
 5. `db/schema.ts` is confirmed to match the live schema, with the check shown. If it diverged, the correction is in the diff and described in the report.
 6. The workflow for authoring a schema change is written down.
 7. **No DDL was executed against production during this packet.** State this explicitly in the report.
@@ -98,13 +98,15 @@ None. Any user-visible change is a defect.
 | 1 | Build a fresh database from `supabase/migrations/` | Five tables, RLS enabled on all five, 18 policies, zero DELETE policies |
 | 2 | Compare fresh build against production structure | No differences in tables, columns, constraints, policies or grants |
 | 3 | Query `information_schema.role_table_grants` on the fresh build for `levav_app` | `SELECT` on `users`; `SELECT, INSERT, UPDATE` on the other four; no DELETE anywhere |
-| 4 | `grep -rn "db:migrate\|db:generate\|db/migrations" .` excluding `node_modules` | No hits |
+| 4 | `grep -rn "db:migrate\|db:generate\|db/migrations" . --exclude-dir=node_modules --exclude-dir=docs --exclude-dir=.git` | No hits |
 | 5 | Run the app against the fresh database | Register, log in, complete onboarding, load dashboard — all succeed |
 | 6 | Inspect the committed capture for row data or secrets | None present |
 
 ## Dependencies
 
-None. This packet is independent of WP-0001 through WP-0004 and can run in parallel with them. It touches `supabase/`, `db/migrations/` and two `package.json` scripts; WP-0002 touches `tsconfig` and different scripts, so the two do not contend beyond a possible trivial `package.json` merge.
+**WP-0001 must be ACCEPTED first.** WP-0001's own dependency section states that it "blocks WP-0002 and every later packet", and this packet is a later packet. An earlier draft of this section claimed independence on the grounds that the two touch different files. That was wrong twice over: it contradicted an existing sequencing contract on a file-contention argument the contract never rested on, and it would have had this packet validate against pre-reset documentation and the partial typecheck gate, so its acceptance evidence could go stale the moment WP-0001 landed.
+
+File contention with WP-0002 remains low — this packet touches `supabase/`, `db/migrations/` and two `package.json` scripts, WP-0002 touches `tsconfig` and different scripts — but that governs ordering *after* the gate, not whether the gate applies.
 
 ## Open product decisions
 
