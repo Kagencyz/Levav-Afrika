@@ -21,6 +21,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 | PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
 | PDR-0013 | What is New editorial scope | APPROVED | 2026-08-12 |
+| PDR-0015 | Claude acts as Engineering Command while Codex is unavailable | APPROVED | 2026-08-13 |
 
 ---
 
@@ -244,3 +245,26 @@ Levav 28 Day 15 must gate on evidence sufficiency rather than calendar completio
 **State:** **ESCALATED to human owner** (Master PRD §49) · **Requirements:** QW-008
 
 Funding model, escrow provider, milestone release conditions, partial completion, revision limits, cancellation, refunds, chargebacks and platform fee are all §49 decisions requiring human approval. Sprint 5 builds the **assignment lifecycle and payment state model** without committing to a provider, so that the commercial decision plugs in through an adapter (API-004). `src/pages/MilestonePayments.tsx` and `ContractWorkspace.tsx` stay deferred until this is resolved.
+
+## PDR-0015 — Claude acts as Engineering Command while Codex is unavailable
+
+**State:** APPROVED · **Requirements:** §41 (write ownership), §42 (handoff), §45 CODEX-*, §46 Sprint 0 · **Applies to:** from 2026-08-13 until Codex returns
+
+**Numbering note.** PDR-0014 (Supabase CLI owns migrations) is issued and open in PR #18 but not yet merged to `main`. This record takes 0015 to avoid a collision; if #18 is abandoned, 0014 is left permanently unused rather than recycled.
+
+**Context.** `CLAUDE.md` states that Claude "reads all code and never edits it — not `src/`, `server/`, `api/`, `db/`, tests, build config or deployment config", and the Master PRD splits the roles: Codex owns executable implementation, Claude owns product meaning and acceptance. Codex is currently unavailable. Four Sprint 0 packets are `READY_FOR_BUILD` with no one to build them, and Sprint 0 gates every later sprint. The separation was protecting quality; with one side absent it is protecting nothing and blocking everything.
+
+**Decision.** The repository owner authorises Claude to act as **acting Engineering Command** in addition to Product Command, for the duration of Codex's absence.
+
+**This is a suspension of one rule, not of the model.** The following bind:
+
+1. **Implementation follows issued packets.** Claude implements against `READY_FOR_BUILD` Work Packets, in their stated dependency order. No ad-hoc code changes, no opportunistic refactors, no scope a packet does not name.
+2. **Claude does not accept its own work.** Implemented packets are marked `BUILT_PENDING_ACCEPTANCE`, never `ACCEPTED`. Acceptance under `ACCEPTANCE_REVIEW_PROTOCOL.md` remains with Codex on return, or with the owner. **This is the load-bearing safeguard** — the protocol's value is that the builder is not the accepter, and that survives.
+3. **Independent verification is mandatory.** Every change is reviewed by an agent that did not write it, and the automated PR review remains in force. In the session that produced this decision, that review caught three real defects in Claude's own work, including a Work Packet whose acceptance criteria could not be satisfied. Self-review is not a substitute.
+4. **Tests are never weakened to pass.** A failing test is reported, not adjusted. An allowlist is never edited to turn a gate green without a stated reason. This was already binding and is restated because the person who would have caught a violation is the person now writing the code.
+5. **Every implemented packet leaves a handover note** recording what was done, what was verified, what was skipped and why, and anything the returning engineer should distrust.
+6. **Product invariants continue to bind Claude as builder.** Wearing the engineering role does not license a shortcut past the ten invariants in `CLAUDE.md`, and does not license a `BLOCKED_PRODUCT_DECISION` being answered by the same agent that raised it.
+
+**Rejected alternative.** Waiting for Codex. Sprint 0 blocks every later sprint, the packets are written and verified, and the cost of idling is measured in the whole programme's schedule. The risk of building without a separate reviewer is real but is mitigated by safeguards 2 and 3; the risk of a stalled Sprint 0 is not mitigated by anything.
+
+**Reversal.** When Codex returns, this decision lapses automatically and the `CLAUDE.md` bar reinstates without a further PDR. Codex's first task is to review everything built under this authorisation — the handover notes exist for that purpose, and nothing built here is accepted until it does.
