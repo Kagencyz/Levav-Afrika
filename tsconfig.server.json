@@ -19,8 +19,7 @@
     "server/routes/auth.ts",
     "server/routes/onboarding.ts",
     "server/routes/talent.ts",
-    "db/**/*.ts",
-    "contracts/**/*.ts"
+    "db/**/*.ts"
   ],
   "exclude": ["**/*.test.ts"]
 }

@@ -2,11 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { appRouter } from './router';
 
 /**
- * Regression guard: the quarantined routers (employer, job, application,
- * message, notification, review, upload, wri) have known missing
- * authorization checks (docs/SECURITY_AUDIT.md) and must stay unreachable
- * until fixed. If a procedure appears here that is not on the allowlist,
- * someone wired one in — fail loudly.
+ * Security regression guard: assert the complete registered procedure set.
+ * Any addition or removal is an API-surface change and must fail loudly until
+ * this allowlist is updated by an approved Work Packet.
  */
 const ALLOWED_PROCEDURES = [
   'auth.register',

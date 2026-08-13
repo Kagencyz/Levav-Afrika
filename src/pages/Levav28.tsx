@@ -9,7 +9,6 @@ import {
   setCurrentDay,
   isDayUnlocked,
   isDayCompleted,
-  awardWriPoints,
 } from "@/lib/levavData";
 import type { Levav28Day, Levav28Task } from "@/lib/levavData";
 
@@ -67,19 +66,6 @@ function getPhaseForDay(dayNumber: number): PhaseConfig {
   if (dayNumber <= 21) return PHASES.OWN;
   return PHASES.EXECUTE;
 }
-
-/* ------------------------------------------------------------------ */
-/*  DIMENSION BADGE DATA                                               */
-/* ------------------------------------------------------------------ */
-
-const WRI_DIMENSIONS = [
-  { key: "T", name: "Talent", color: "#C6FF34" },
-  { key: "E", name: "Execution", color: "#7E3BED" },
-  { key: "C", name: "Clarity", color: "#3B82F6" },
-  { key: "R", name: "Resilience", color: "#EF4444" },
-  { key: "I", name: "Influence", color: "#F59E0B" },
-  { key: "V", name: "Vision", color: "#EC4899" },
-];
 
 /* ------------------------------------------------------------------ */
 /*  MINI HELPERS                                                       */
@@ -157,67 +143,6 @@ function ConfettiCelebration({ active }: { active: boolean }) {
         <ConfettiPiece key={p.id} delay={p.delay} x={p.x} color={p.color} />
       ))}
     </div>
-  );
-}
-
-/** ---- WRI Unlock Modal ------------------------------------------- */
-function WriUnlockModal({
-  open,
-  dimension,
-  points,
-  onClose,
-}: {
-  open: boolean;
-  dimension: string;
-  points: number;
-  onClose: () => void;
-}) {
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="fixed inset-0 z-[90] flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={onClose}
-          />
-          <motion.div
-            className="relative bg-[#111] border border-[#C6FF34]/30 rounded-3xl p-8 max-w-sm w-full text-center"
-            initial={{ scale: 0.5, y: 50, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.5, y: 50, opacity: 0 }}
-            transition={{ type: "spring", damping: 15, stiffness: 200 }}
-          >
-            <motion.div
-              className="text-6xl mb-4"
-              animate={{ rotate: [0, -10, 10, -10, 0], scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              🎉
-            </motion.div>
-            <h3 className="text-2xl font-bold text-white mb-2">
-              WRI Dimension Unlocked!
-            </h3>
-            <p className="text-[#C6FF34] text-lg font-semibold mb-1">
-              {dimension}
-            </p>
-            <p className="text-white/50 text-sm mb-6">
-              +{points} WRI points awarded
-            </p>
-            <button
-              onClick={onClose}
-              className="w-full py-3 rounded-xl bg-[#C6FF34] text-black font-bold hover:bg-[#d4ff5c] transition-colors"
-            >
-              Amazing!
-            </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
 
@@ -338,11 +263,6 @@ export default function Levav28() {
   const [selectedDay, setSelectedDay] = useState<number>(getCurrentDay());
   const [progress, setProgress] = useState(getLevav28Progress());
   const [taskTick, setTaskTick] = useState(0); // force re-render on task toggle
-  const [showWriModal, setShowWriModal] = useState(false);
-  const [wriUnlockInfo, setWriUnlockInfo] = useState({
-    dimension: "",
-    points: 0,
-  });
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
   const [justCompletedTask, setJustCompletedTask] = useState<string | null>(
@@ -425,22 +345,6 @@ export default function Levav28() {
         setTimeout(() => setJustCompletedTask(null), 1200);
       }
 
-      // Check if all tasks for this day are now completed
-      const dayData = LEVAV28_DAYS.find((d) => d.day === day);
-      if (dayData) {
-        const updatedProgress = getLevav28Progress();
-        const allDone = dayData.tasks.every(
-          (t) => updatedProgress[day]?.[t.id]?.completed
-        );
-        if (allDone && dayData.wriUnlock) {
-          awardWriPoints(`levav28-day${day}-complete`);
-          setWriUnlockInfo({
-            dimension: dayData.wriUnlock,
-            points: 25,
-          });
-          setTimeout(() => setShowWriModal(true), 400);
-        }
-      }
     },
     []
   );
@@ -465,13 +369,6 @@ export default function Levav28() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       <ConfettiCelebration active={confettiActive} />
-
-      <WriUnlockModal
-        open={showWriModal}
-        dimension={wriUnlockInfo.dimension}
-        points={wriUnlockInfo.points}
-        onClose={() => setShowWriModal(false)}
-      />
 
       <CompletionModal
         open={showCompletionModal}
@@ -1112,53 +1009,6 @@ export default function Levav28() {
                 </div>
               </div>
 
-              {/* WRI Dimensions */}
-              <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
-                <h3 className="text-xs font-bold text-white/30 uppercase tracking-wider mb-4">
-                  WRI Dimensions
-                </h3>
-                <div className="grid grid-cols-3 gap-3">
-                  {WRI_DIMENSIONS.map((dim) => {
-                    // Check if any completed day unlocks this dimension
-                    const isUnlocked = LEVAV28_DAYS.some(
-                      (d) =>
-                        d.wriUnlock === dim.name && isDayCompleted(d.day)
-                    );
-                    return (
-                      <div
-                        key={dim.key}
-                        className={cn(
-                          "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all",
-                          isUnlocked
-                            ? "bg-white/[0.04] border-white/10"
-                            : "bg-transparent border-white/[0.03] opacity-30"
-                        )}
-                      >
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black"
-                          style={{
-                            backgroundColor: isUnlocked
-                              ? `${dim.color}15`
-                              : "#ffffff08",
-                            color: isUnlocked ? dim.color : "#444",
-                          }}
-                        >
-                          {dim.key}
-                        </div>
-                        <span
-                          className={cn(
-                            "text-[10px] font-medium",
-                            isUnlocked ? "text-white/60" : "text-white/20"
-                          )}
-                        >
-                          {dim.name}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Motivation card */}
               <div
                 className="rounded-2xl p-5 border"
@@ -1270,49 +1120,6 @@ export default function Levav28() {
                   >
                     {stats.currentPhase}
                   </span>
-                </div>
-
-                <h4 className="text-xs font-bold text-white/30 uppercase tracking-wider mb-3">
-                  WRI Dimensions
-                </h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {WRI_DIMENSIONS.map((dim) => {
-                    const isUnlocked = LEVAV28_DAYS.some(
-                      (d) =>
-                        d.wriUnlock === dim.name && isDayCompleted(d.day)
-                    );
-                    return (
-                      <div
-                        key={dim.key}
-                        className={cn(
-                          "flex flex-col items-center gap-1 p-2.5 rounded-xl border",
-                          isUnlocked
-                            ? "bg-white/[0.04] border-white/10"
-                            : "bg-transparent border-white/[0.03] opacity-30"
-                        )}
-                      >
-                        <div
-                          className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-black"
-                          style={{
-                            backgroundColor: isUnlocked
-                              ? `${dim.color}15`
-                              : "#ffffff08",
-                            color: isUnlocked ? dim.color : "#444",
-                          }}
-                        >
-                          {dim.key}
-                        </div>
-                        <span
-                          className={cn(
-                            "text-[10px] font-medium",
-                            isUnlocked ? "text-white/60" : "text-white/20"
-                          )}
-                        >
-                          {dim.name}
-                        </span>
-                      </div>
-                    );
-                  })}
                 </div>
 
                 {/* Motivation */}

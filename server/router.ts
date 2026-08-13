@@ -6,11 +6,9 @@ import { talentRouter } from './routes/talent.js';
 import { onboardingRouter } from './routes/onboarding.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { organizationRouter } from './routes/organization.js';
-// Stage A: upload, employer, job, application, message, notification, review,
-// and wri are intentionally NOT imported — see docs/NEXT_MILESTONE.md §4.
-// They must stay unreachable, not merely unregistered.
-// onboarding was added deliberately for the upgrade brief §3 signup flow —
-// see docs/UPGRADE_BRIEF.md and docs/UPGRADE_GAP_REPORT.md.
+// The registered router surface is intentionally explicit and guarded by
+// server/router.test.ts. Additions and removals require an approved Work Packet.
+
 
 export const appRouter = router({
   auth: authRouter,

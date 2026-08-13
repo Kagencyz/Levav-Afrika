@@ -10,7 +10,6 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@db': path.resolve(__dirname, './db'),
       '@api': path.resolve(__dirname, './server'),
-      '@contracts': path.resolve(__dirname, './contracts'),
     },
   },
   server: {

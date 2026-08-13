@@ -16,19 +16,6 @@ import {
    ║  + employer section + trust signals. Upgrade brief §2.2.      ║
    ╚═══════════════════════════════════════════════════════════════╝ */
 
-const wriDimensions = [
-  { label: 'Technical', value: 78 },
-  { label: 'Reliability', value: 84 },
-  { label: 'Communication', value: 71 },
-  { label: 'Leadership', value: 62 },
-];
-
-const evidence = [
-  'Levav 28™ · Day 28 capstone project',
-  'QuickWork™ · 12 gigs completed, 4.9★',
-  'Levav Impact™ · 40 verified service hours',
-];
-
 const trustSignals = [
   { icon: BadgeCheck, title: 'Verified opportunities', desc: 'Every listing has an identified, verified publisher.' },
   { icon: Lock, title: 'Protected data', desc: 'You control what each employer sees, at every stage.' },
@@ -59,8 +46,7 @@ export default function ProfilePreviewSection() {
             </h2>
             <p className="text-base sm:text-lg text-white/60 leading-relaxed mb-6 font-body">
               Keep your traditional CV — and grow beyond it. Your Levav ID&trade;
-              is a living professional record: your WRI&trade; measures readiness,
-              and your work evidence shows what you can actually do.
+              is intended to become a living professional record, bringing your profile and evidence together as those services are built.
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-start gap-3 text-sm text-white/70">
@@ -69,7 +55,7 @@ export default function ProfilePreviewSection() {
               </li>
               <li className="flex items-start gap-3 text-sm text-white/70">
                 <FolderCheck size={16} className="text-[#C6FF34] mt-0.5 shrink-0" />
-                Levav 28&trade;, QuickWork&trade;, volunteering, and courses enrich it automatically.
+                Add real work and learning records as each evidence service becomes available.
               </li>
               <li className="flex items-start gap-3 text-sm text-white/70">
                 <Lock size={16} className="text-[#C6FF34] mt-0.5 shrink-0" />
@@ -103,45 +89,16 @@ export default function ProfilePreviewSection() {
                 </div>
                 <span className="text-xs text-white/45">Software Developer · Lusaka, Zambia</span>
               </div>
-              <div className="ml-auto text-center shrink-0">
-                <div className="text-2xl font-bold text-[#C6FF34] font-display leading-none">74</div>
-                <div className="text-[9px] uppercase tracking-wider text-white/40 mt-1">WRI&trade;</div>
+              <div className="ml-auto rounded-full border border-white/10 px-3 py-1 text-[10px] uppercase tracking-wider text-white/45">
+                Profile concept
               </div>
             </div>
 
-            <div className="space-y-2.5 mb-6">
-              {wriDimensions.map((dim, i) => (
-                <div key={dim.label} className="flex items-center gap-3">
-                  <span className="text-[10px] uppercase tracking-wider text-white/40 w-24 shrink-0">
-                    {dim.label}
-                  </span>
-                  <div className="flex-1 h-1.5 rounded-full bg-white/[0.07] overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-[#C6FF34] to-[#7E3BED]"
-                      initial={{ width: '0%' }}
-                      animate={isInView ? { width: `${dim.value}%` } : {}}
-                      transition={{ duration: 1, delay: 0.4 + i * 0.12 }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-white/70 w-7 text-right shrink-0">
-                    {dim.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-white/[0.06] pt-4">
-              <div className="text-[10px] uppercase tracking-wider text-white/35 mb-2.5">
-                Work evidence
-              </div>
-              <div className="space-y-2">
-                {evidence.map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-xs text-white/65">
-                    <FolderCheck size={13} className="text-[#7E3BED] shrink-0" />
-                    {item}
-                  </div>
-                ))}
-              </div>
+            <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+              <div className="text-[10px] uppercase tracking-wider text-white/35">Professional record</div>
+              <p className="mt-2 text-sm leading-6 text-white/65">
+                A structured place for your experience, skills and evidence, with visibility you control.
+              </p>
             </div>
           </motion.div>
         </div>
