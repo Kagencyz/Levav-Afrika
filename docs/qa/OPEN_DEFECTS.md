@@ -12,6 +12,8 @@ This register exists because a defect list relayed through chat did not survive 
 
 **None against Codex.**
 
+**Sprint 0 is delivered and closed.** `main` at `d5134e4`, verified on a fresh checkout. See `SPRINT0_VERDICTS.md`.
+
 **Blocked on environment, not on engineering:** Codex's checkout has no `origin` remote configured, so it cannot fetch any Product Command document. The canonical remote is:
 
 ```

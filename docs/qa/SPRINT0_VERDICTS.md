@@ -7,6 +7,36 @@ Verdicts were produced by running the gates and the negative tests independently
 
 ---
 
+## Sprint 0 — CLOSED, DELIVERED 2026-08-12
+
+**`main` is at `d5134e4`.** WP-0001, WP-0002 and WP-0003 are delivered, not merely accepted.
+
+Verified by Claude on a **fresh detached checkout of `d5134e4`**, independent of Codex's report and of any local working tree:
+
+| Check | Result |
+|---|---|
+| `npm ci` | exit 0 |
+| `npm run typecheck` | exit 0 — **136 current / 136 baselined**, server project clean |
+| `npm test` | 56 passing across 9 files |
+| `npm run build` | exit 0 — 2,494.97 kB / 633.14 kB gzip, Vite phase 25.89 s |
+| WRI writers, `wriService`, `auditService` in `src`/`server` | none |
+| Deleted routers (`employer`, `upload`, `wri`, +5) | absent from `main` |
+| `retiredLocalState.ts`, `wriRetirement.test.ts`, CI workflow, baseline, IMPLEMENTATION_STATE | present |
+| Codex WP-0002 and WP-0003 reports | on `main` |
+
+**The post-merge baseline held at 136.** The drift I flagged as a risk did not occur — the pre-merge figure is the merged figure, and `IMPLEMENTATION_STATE.md` needs no correction.
+
+### Sprint 0 exit gate (Master PRD §46)
+
+| Gate | Status |
+|---|---|
+| Both agents agree on current implementation truth | **Met** — `AGENTS.md` rewritten, 11 stale documents archived, `IMPLEMENTATION_STATE.md` on `main` |
+| No stale document can override the Master PRD | **Met** |
+| Auth remains working | **Met** — unchanged throughout; auth tests green |
+| Typecheck, tests and build have known verified states | **Met** — both projects gated, shrink-only baseline, CI on push and PR |
+
+**Sprint 0 is closed.** One packet remains open in the sprint's own numbering — WP-0004, the copy architecture — which is authorised and independent; it does not hold the gate.
+
 ## Verdicts
 
 | Packet | Verdict |
