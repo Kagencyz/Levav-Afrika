@@ -35,7 +35,21 @@ Verified by Claude on a **fresh detached checkout of `d5134e4`**, independent of
 | Auth remains working | **Met** — unchanged throughout; auth tests green |
 | Typecheck, tests and build have known verified states | **Met** — both projects gated, shrink-only baseline, CI on push and PR |
 
-**Sprint 0 is closed.** One packet remains open in the sprint's own numbering — WP-0004, the copy architecture — which is authorised and independent; it does not hold the gate.
+**Sprint 0 is closed, and WP-0004 is now accepted too** — the whole of Sprint 0's numbering is complete.
+
+### WP-0004 — accepted 2026-08-14, 13/13 criteria
+
+Verified independently on `agent/wp-0004-copy-architecture`, rebased on `main` @ `e7866f3`:
+
+- **Unknown key is a compile-time error**, not a runtime fallback — probe file rejected by `tsc`.
+- **Drift guard fails on a planted prohibited term** and passes clean.
+- Ten spot-checked strings **byte-identical** to the dictionary.
+- `gig` gone from `onboardingRouting.ts`; `onboardingRouting.test.ts` and `src/pages/Onboarding.tsx` **unmodified**.
+- Typecheck holds at **136** — baseline did not grow. **61 tests across 11 files.** Build exit 0.
+- **D-0004-1 fixed correctly.** Both sentence forms now resolve `auth.throttle.message`; the disabled-button countdown uses `auth.throttle.action`. The diff is pure copy substitution — `RATE_LIMIT_COOLDOWN_MS` and `rateLimitCountdown` are preserved and used identically, so throttle timing, counters and lockout are untouched.
+- Bundle 2,494.97 → **2,523.24 kB** (+28 kB raw, **+8.6 kB gzip**). Not material; see follow-up F-05.
+
+**Authorised:** commit, push `agent/wp-0004-copy-architecture`, open the PR, base `main`. Nothing is stacked behind it.
 
 ## Verdicts
 
@@ -44,6 +58,7 @@ Verified by Claude on a **fresh detached checkout of `d5134e4`**, independent of
 | **WP-0001** — Repository truth and authority reset | **ACCEPTED** |
 | **WP-0002** — Real verification gates and CI | **ACCEPTED** — re-reviewed 2026-08-12, no defects |
 | **WP-0003** — Remove client-side WRI scoring | **ACCEPTED** |
+| **WP-0004** — Typed copy architecture | **ACCEPTED** 2026-08-14 — 13/13 criteria |
 
 WP-0001 and WP-0003 were accepted at `0f11ffb` in an earlier review; that commit is unchanged, is confirmed on `origin/agent/wp-0001-wp-0003` by SHA, and the verdict **stands**.
 

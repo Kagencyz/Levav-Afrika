@@ -10,20 +10,7 @@ This register exists because a defect list relayed through chat did not survive 
 
 ## Open defects
 
-### WP-0004 — D-0004-1 — S2 — apply the newly approved throttle keys
-
-**Raised 2026-08-14.** The only defect. Everything else in the packet is verified passing.
-
-Amendment A1 Criterion 3 requires every user-facing string in the six migrated files to resolve through the copy module. Three client-side sign-in throttle strings in `src/pages/Auth.tsx` remain inline because no key existed. **Keys now exist** — `COPY_DICTIONARY_S17_AUTH_WELCOME.md` §17.11:
-
-- `auth.throttle.message` — replaces **both** shipped sentence forms, which are the same message written twice
-- `auth.throttle.action` — the countdown on the disabled button
-
-**Not exempt.** These are user-facing strings on the most security-sensitive surface in the product.
-
-**Fix:** substitute the copy. Do not touch throttle timing, counters or lockout logic — this is a copy change only.
-
-**Confirmed correct, do not redo:** the four over-length validation messages you removed as unreachable were the right call. `maxLength` prevents the state, and you declined to invent replacement copy rather than filling a gap with a guess.
+**None.**
 
 ---
 
@@ -54,6 +41,7 @@ Not defects against any current packet — each was checked and found not to vio
 | F-01 | `src/pages/SkillGap.tsx` — `getUserWRI()` still exists with a hard-coded `return 72` fallback; `currentWRI` (line 305) and `targetWRI = 95` (line 306) are computed and **never rendered** | WP-0003 AC4 requires that no surface *renders* a numeric WRI. Verified: neither variable is referenced anywhere else in the file, and the page shows the approved empty state instead | Sprint 3 (WRI engine) or the first packet to touch SkillGap. Delete `getUserWRI`, both variables, and the `talent_profile.wri` read path |
 | F-02 | `src/pages/TalentProfile.tsx` — mock talent objects still carry `wri: 87`, `wri: 82`, … | Dead data. Every render path was removed; the named D4 symbols are gone | Whichever packet rebuilds TalentProfile |
 | F-03 | Landing page copy — "Gigs and freelance projects. Stay active, keep earning." (PathsSection) uses a term PDR-0003 prohibits; "A 28-day transformation…" is empty-inspiration framing under Language System §2.2 | WP-0003 explicitly scoped out copy rewrites beyond the named WRI strings | WP-0004 and the Language packets |
+| F-05 | The copy module ships **every** dictionary key, including sections for surfaces that do not exist yet (evidence, disputes, Impact dashboards, Feed). ~8.6 kB gzip today | Criterion 2 required all keys present, so this is the packet working as specified, not a defect | Revisit with the route-splitting work owed before the Feed — per-surface copy chunks would drop it |
 | F-04 | The `talent_profile` localStorage key can carry a `wri` field, read by `SkillGap` and `SmartMatchWidget` | Nothing writes it; the read is inert. Adding it to the retired-key list now would imply a live vector that does not exist | Revisit if any writer is ever introduced; otherwise resolved by F-01 |
 
 ---
