@@ -43,6 +43,13 @@
       "when": 1786500305646,
       "tag": "0005_thick_otto_octavius",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786729872299,
+      "tag": "0006_heavy_maria_hill",
+      "breakpoints": true
     }
   ]
 }

@@ -12,8 +12,10 @@ import {
   pgPolicy,
   pgRole,
   index,
+  integer,
+  boolean,
 } from 'drizzle-orm/pg-core';
-import { authUid, authUsers, authenticatedRole } from 'drizzle-orm/supabase';
+import { anonRole, authUid, authUsers, authenticatedRole } from 'drizzle-orm/supabase';
 
 // Stage B: only the four approved foundational entities are modeled here.
 // Levav 28, Learn, QuickWork, SkillSpace, Impact, Champions, subscriptions,
@@ -82,6 +84,14 @@ export const personalStatusEnum = pgEnum('personal_status', [
   'changing_careers',
   'returning_to_work',
   'running_organization',
+]);
+
+export const careerSeniorityEnum = pgEnum('career_seniority', [
+  'entry',
+  'mid',
+  'senior',
+  'lead',
+  'executive',
 ]);
 
 export const users = pgTable(
@@ -371,4 +381,138 @@ export const organizationMembers = pgTable(
       withCheck: sql`true`,
     }),
   ]
+).enableRLS();
+
+const publicTaxonomyPolicies = (name: string) => [
+  pgPolicy(`${name}_public_select`, {
+    for: 'select' as const,
+    to: [anonRole, authenticatedRole],
+    using: sql`true`,
+  }),
+  pgPolicy(`${name}_service_select`, {
+    for: 'select' as const,
+    to: levavAppRole,
+    using: sql`true`,
+  }),
+  pgPolicy(`${name}_service_insert`, {
+    for: 'insert' as const,
+    to: levavAppRole,
+    withCheck: sql`true`,
+  }),
+  pgPolicy(`${name}_service_update`, {
+    for: 'update' as const,
+    to: levavAppRole,
+    using: sql`true`,
+    withCheck: sql`true`,
+  }),
+];
+
+export const careerFamilies = pgTable(
+  'career_families',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    slug: varchar('slug', { length: 100 }).notNull(),
+    name: varchar('name', { length: 160 }).notNull(),
+    version: integer('version').notNull().default(1),
+    active: boolean('active').notNull().default(true),
+    supersedesId: uuid('supersedes_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('career_families_slug_version_unique').on(table.slug, table.version),
+    index('career_families_active_idx').on(table.active),
+    ...publicTaxonomyPolicies('career_families'),
+  ],
+).enableRLS();
+
+export const careerRoles = pgTable(
+  'career_roles',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    familyId: uuid('family_id').notNull().references(() => careerFamilies.id),
+    slug: varchar('slug', { length: 120 }).notNull(),
+    name: varchar('name', { length: 180 }).notNull(),
+    seniority: careerSeniorityEnum('seniority').notNull(),
+    version: integer('version').notNull().default(1),
+    active: boolean('active').notNull().default(true),
+    supersedesId: uuid('supersedes_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('career_roles_slug_version_unique').on(table.slug, table.version),
+    index('career_roles_family_active_idx').on(table.familyId, table.active),
+    ...publicTaxonomyPolicies('career_roles'),
+  ],
+).enableRLS();
+
+export const industries = pgTable(
+  'industries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    slug: varchar('slug', { length: 120 }).notNull(),
+    name: varchar('name', { length: 180 }).notNull(),
+    version: integer('version').notNull().default(1),
+    active: boolean('active').notNull().default(true),
+    supersedesId: uuid('supersedes_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('industries_slug_version_unique').on(table.slug, table.version),
+    index('industries_active_idx').on(table.active),
+    ...publicTaxonomyPolicies('industries'),
+  ],
+).enableRLS();
+
+export const roleAliases = pgTable(
+  'role_aliases',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    roleId: uuid('role_id').notNull().references(() => careerRoles.id),
+    alias: varchar('alias', { length: 180 }).notNull(),
+    normalizedAlias: varchar('normalized_alias', { length: 180 }).notNull(),
+    language: varchar('language', { length: 20 }).notNull().default('en'),
+    region: varchar('region', { length: 80 }),
+    version: integer('version').notNull().default(1),
+    active: boolean('active').notNull().default(true),
+    supersedesId: uuid('supersedes_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('role_aliases_value_region_version_unique').on(
+      table.normalizedAlias,
+      table.region,
+      table.version,
+    ),
+    index('role_aliases_role_active_idx').on(table.roleId, table.active),
+    index('role_aliases_normalized_idx').on(table.normalizedAlias),
+    ...publicTaxonomyPolicies('role_aliases'),
+  ],
+).enableRLS();
+
+export const taxonomyAuditLog = pgTable(
+  'taxonomy_audit_log',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    actorUserId: uuid('actor_user_id').notNull().references(() => users.id),
+    action: varchar('action', { length: 80 }).notNull(),
+    entityType: varchar('entity_type', { length: 80 }).notNull(),
+    entityId: uuid('entity_id').notNull(),
+    before: jsonb('before'),
+    after: jsonb('after'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('taxonomy_audit_actor_idx').on(table.actorUserId),
+    index('taxonomy_audit_entity_idx').on(table.entityType, table.entityId),
+    pgPolicy('taxonomy_audit_service_select', {
+      for: 'select',
+      to: levavAppRole,
+      using: sql`true`,
+    }),
+    pgPolicy('taxonomy_audit_service_insert', {
+      for: 'insert',
+      to: levavAppRole,
+      withCheck: sql`true`,
+    }),
+  ],
 ).enableRLS();

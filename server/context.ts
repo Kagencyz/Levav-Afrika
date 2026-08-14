@@ -25,6 +25,12 @@ export interface SessionIntent {
   clearToken?: boolean;
 }
 
+const clientIpBySession = new WeakMap<SessionIntent, string>();
+
+export function clientIpForSession(session: SessionIntent): string {
+  return clientIpBySession.get(session) ?? 'unknown';
+}
+
 export async function createContext(req: Request) {
   const cookies = parseCookies(req.headers.get('cookie'));
   let token: string | null = cookies[AUTH_COOKIE_NAME] ?? null;
@@ -38,6 +44,10 @@ export async function createContext(req: Request) {
 
   const user = token ? await verifyToken(token) : null;
   const session: SessionIntent = {};
+  const clientIp = req.headers.get('cf-connecting-ip')
+    ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    ?? 'unknown';
+  clientIpBySession.set(session, clientIp);
 
   return { user, session };
 }
