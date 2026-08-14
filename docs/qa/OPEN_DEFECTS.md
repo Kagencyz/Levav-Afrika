@@ -10,7 +10,17 @@ This register exists because a defect list relayed through chat did not survive 
 
 ## Open defects
 
-**None.**
+**None against Codex.**
+
+**Blocked on environment, not on engineering:** Codex's checkout has no `origin` remote configured, so it cannot fetch any Product Command document. The canonical remote is:
+
+```
+https://github.com/Kagencyz/Levav-Afrika.git
+```
+
+Verified from the product owner's checkout, not guessed. Codex was right to refuse to act on a guessed address, and right to refuse to reproduce Claude-owned documents from a chat message.
+
+**WP-0002 verdict withdrawn** — Claude reviewed a different implementation than Codex built. See `SPRINT0_VERDICTS.md` §0. Codex should push its own WP-0002 branch for re-review.
 
 ---
 
