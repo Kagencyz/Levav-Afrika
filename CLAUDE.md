@@ -73,6 +73,9 @@ Standing instruction from the product owner, 2026-08-14. As each packet complete
 4. **Known limitations, and any decision needed from the owner.**
 5. **What this unlocks next.**
 6. **Where it is merged.**
+7. **Your move** — exactly what the owner needs to do, and the message to send Codex, ready to paste.
+
+Point 7 is not optional and closes every report. The owner should never have to work out what happens next; if there is nothing for them to do, say so explicitly. Standing instruction, 2026-08-14.
 
 Progress is measured by working product, not by volume of specification. Specifications are still written where they remove genuine ambiguity or protect an important product or architectural decision — not by default.
 
