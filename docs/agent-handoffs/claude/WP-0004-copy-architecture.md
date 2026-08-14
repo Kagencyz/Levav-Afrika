@@ -108,3 +108,112 @@ Neither blocks the packet.
 ## Report back
 
 §42.2 format, plus a table of every string whose **wording** changed on the three migrated surfaces — old text, new key, new text. Claude reviews that table as product copy, separately from the code.
+
+---
+
+# Amendment A1 — Binding scope and complete approved copy
+
+**Status: WP-0004 AMENDMENT READY_FOR_BUILD** · Issued 2026-08-12 · Authored against the actual files on `main` @ `d5134e4`
+
+Codex correctly refused to invent governed copy. The original packet said "three surfaces" without naming files, and the dictionary lacked keys for strings those files actually contain. Both gaps are closed here. **Every string in scope now has an approved key. Codex invents nothing.**
+
+Approved copy: **`docs/product/COPY_DICTIONARY_S17_AUTH_WELCOME.md`** (§17), plus §0, §3 and §16 of the main dictionary.
+
+## A1.1 — The three migration groups, by exact file
+
+**Group A — global states (2 files)**
+
+| File | Keys |
+|---|---|
+| `src/pages/NotFound.tsx` | §17.9 `notfound.*` |
+| `src/components/OfflineBanner.tsx` | §17.10 `global.offline.banner` |
+
+**Group B — signup and first-run (3 files)**
+
+| File | Keys |
+|---|---|
+| `src/pages/Auth.tsx` | §17.1–17.5, plus existing §1 `auth.*` |
+| `src/pages/Welcome.tsx` | §17.6, plus §16 `onboarding.intentions.*` and `onboarding.situation.*` |
+| `src/lib/onboardingRouting.ts` | §17.7, §17.8, §16 `intent.*` and `situation.*` |
+
+**Group C — WRI empty states (1 file)**
+
+| File | Keys |
+|---|---|
+| `src/pages/SkillGap.tsx` | §3 `wri.confidence.none.*` |
+
+`src/pages/Onboarding.tsx` also renders the WRI empty state and is **excluded** — see A1.3.
+
+**Total: six files.** Nothing else migrates in WP-0004.
+
+## A1.2 — Inline strings that may remain
+
+Explicitly permitted to stay inline, so their presence is not a defect:
+
+- Everything in `src/pages/Onboarding.tsx`, including its WRI empty state (A1.3).
+- `aria-label`, `alt` text and visually-hidden text in the six files. Accessibility strings are governed by WP-0103's accessibility pass; migrating them now doubles the work with no benefit.
+- Developer-facing strings never rendered to a user: console messages, test fixtures, code comments.
+- Brand marks rendered as part of a logo asset rather than as text.
+
+Everything else user-facing in the six files must resolve through the copy module.
+
+## A1.3 — Legacy `src/pages/Onboarding.tsx`: EXCLUDED
+
+**Decision: excluded from WP-0004 entirely. Do not migrate a single string.**
+
+It is 1,570 lines of identity fields, contact fields, career fields, education, skill selection, a Levav 28 questionnaire and a completion summary. **WP-0102 replaces it.** PDR-0014 changes the model it implements — from goals plus personal status to four independent axes — so the screen is not being edited, it is being rebuilt.
+
+Authoring approved copy for a hundred-plus strings on a screen scheduled for replacement would waste the effort twice: once writing it, once deleting it. Worse, it would bake vocabulary into the dictionary that PDR-0014 has already superseded.
+
+Its route stays live and its behaviour is untouched until WP-0102 lands.
+
+## A1.4 — `src/lib/onboardingRouting.ts`: MIGRATE NOW, labels only
+
+**Decision: yes, it migrates in WP-0004 — but labels only, never slugs.**
+
+Two reasons it cannot wait. It carries live PDR-0003 violations — `'Find QuickWork™ or freelance gigs'` and `'Post a quick job or gig'` — and it carries the only user-facing vocabulary that Welcome renders, so migrating Welcome without it leaves half a screen inline.
+
+**Strictly in scope:** replace the `label` and `desc` strings with the §16 and §17.7/17.8 keys, via the mapping tables in those sections.
+
+**Strictly out of scope:** the `slug` values, the `GoalSlug` and `StatusSlug` types, `FIRST_DESTINATION` routing, and anything the server shares. Slugs are data; changing them is a migration and belongs to WP-0102. `onboardingRouting.test.ts` must pass **unmodified** — it enforces slug parity with `server/routes/onboarding.ts`, and that parity must not move in this packet.
+
+The `desc` field is retired (§17.7). Render the label alone.
+
+## A1.5 — Global error and empty-state files: exactly two
+
+`src/pages/NotFound.tsx` and `src/components/OfflineBanner.tsx`. Nothing else.
+
+`src/components/ProtectedRoute.tsx` was considered and **excluded** — it redirects rather than rendering user-facing copy.
+
+## A1.6 — Replacement acceptance criteria
+
+These supersede criteria 1–8 in the original packet.
+
+1. The copy module exists and is typed. An unknown key is a **TypeScript error**, not a runtime fallback. Demonstrated.
+2. Every key in main-dictionary §0, §3, §12, §13, §14, §15, §16 **and** §17 is present and byte-identical to the dictionary.
+3. All six files in A1.1 resolve **every** user-facing string through the module, except those permitted in A1.2.
+4. `grep -rn "gig" src/lib/onboardingRouting.ts` returns nothing.
+5. `onboardingRouting.test.ts` passes **unmodified**. Slugs, types and routing are unchanged.
+6. `src/pages/Onboarding.tsx` is **not modified**. `git diff --stat` shows no change to it.
+7. Interpolation works and is tested: `auth.verify.sentto` with an email, `welcome.step` with two numbers, `notfound.path` with a path.
+8. The drift guard fails on a deliberately added prohibited term and passes on `main`. Both demonstrated.
+9. A stub second locale resolves with no call-site change. Demonstrated, not committed.
+10. `docs/implementation/COPY_ARCHITECTURE.md` exists and covers adding a key, adding a locale, and the no-invented-copy rule.
+11. Typecheck, tests and build pass. **The frontend baseline may shrink but must not grow.**
+12. Bundle size not materially increased. Report before and after.
+13. The implementation report lists every string whose **wording changed**, as old text → key → new text. Claude reviews that as copy, separately from the code.
+
+## A1.7 — Expect wording to change
+
+Most of these strings change wording, deliberately. `"Account created!"` becomes `"Your Levav ID is created. Confirm your email to continue."`; `"First name is required"` becomes `"Enter your first name."`; `"Page Not Found"` becomes `"This page does not exist"`. Exclamation marks go. Sentence case arrives.
+
+That is the packet working, not a regression. Criterion 13 exists so Claude reviews those changes as product copy rather than as a diff.
+
+## A1.8 — Superseded keys
+
+Two pairs in the main dictionary are superseded by §17 and must be **removed** as part of this packet, so no key has two definitions:
+
+- §0 `global.error.notfound.title` and `global.error.notfound.body` → replaced by §17.9 `notfound.*`
+- §1 `onboarding.goals.title`, `onboarding.goals.subtitle`, `onboarding.status.title` → replaced by §16 `onboarding.intentions.*` and `onboarding.situation.*`
+
+Claude will apply these removals to the dictionary. Codex seeds from the dictionary as it stands when the work starts; if both definitions are present, **§17 and §16 win** and Codex reports the collision rather than choosing.

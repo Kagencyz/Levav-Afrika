@@ -8,6 +8,8 @@ Approved strings, keyed. Codex implements these verbatim. A string not in this d
 **Locale:** `en-ZM` is the base. Keys are stable across locales; values are not.
 **Interpolation:** `{name}` style. Never concatenate sentence fragments in code — plurals and other languages break.
 
+**§17 lives in `COPY_DICTIONARY_S17_AUTH_WELCOME.md`** — Auth, Welcome and global-state copy, authored for WP-0004 Amendment A1. It is part of this dictionary; Codex seeds from both files.
+
 ---
 
 ## 0. Global
@@ -30,8 +32,6 @@ Approved strings, keyed. Codex implements these verbatim. A string not in this d
 | `global.error.network.body` | Levav will keep your draft and submit it when your connection returns. |
 | `global.error.permission.title` | You do not have access to this |
 | `global.error.permission.body` | If you think this is wrong, ask an administrator of the organisation to check your access. |
-| `global.error.notfound.title` | This page does not exist |
-| `global.error.notfound.body` | The link may be out of date. Go to your home page to continue. |
 | `global.lowdata.toggle` | Low-data mode |
 | `global.lowdata.description` | Loads text first and images only when you tap them. |
 
@@ -48,9 +48,6 @@ Approved strings, keyed. Codex implements these verbatim. A string not in this d
 | `auth.verify.body` | We sent a confirmation link to {email}. Open it to finish setting up your Levav ID. |
 | `auth.verify.ratelimited` | Too many confirmation emails have been sent to this address. Wait a few minutes and try again. |
 | `auth.error.credentials` | That email address and password do not match an account. |
-| `onboarding.goals.title` | What do you want to do on Levav? |
-| `onboarding.goals.subtitle` | Choose everything that applies. You can change this later. |
-| `onboarding.status.title` | Where are you right now? |
 | `onboarding.complete.title` | Your Levav ID is ready |
 | `onboarding.complete.body` | Next: build evidence of what you can do. Levav 28 Day 1 takes about 20 minutes. |
 | `onboarding.complete.action` | Start Levav 28 |
