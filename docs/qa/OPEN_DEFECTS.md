@@ -20,7 +20,7 @@ https://github.com/Kagencyz/Levav-Afrika.git
 
 Verified from the product owner's checkout, not guessed. Codex was right to refuse to act on a guessed address, and right to refuse to reproduce Claude-owned documents from a chat message.
 
-**WP-0002 verdict withdrawn** — Claude reviewed a different implementation than Codex built. See `SPRINT0_VERDICTS.md` §0. Codex should push its own WP-0002 branch for re-review.
+**WP-0002 is ACCEPTED** (re-reviewed 2026-08-12). The earlier withdrawal is lifted and D-0002-1 is void — see `SPRINT0_VERDICTS.md` §0. Codex is authorised to commit, push `agent/wp-0002-verification-gates` and open a draft PR.
 
 ---
 

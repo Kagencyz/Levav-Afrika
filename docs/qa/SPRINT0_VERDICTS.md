@@ -12,7 +12,7 @@ Verdicts were produced by running the gates and the negative tests independently
 | Packet | Verdict |
 |---|---|
 | **WP-0001** — Repository truth and authority reset | **ACCEPTED** |
-| **WP-0002** — Real verification gates and CI | **WITHDRAWN — see §0. Awaiting re-review of the correct artifact** |
+| **WP-0002** — Real verification gates and CI | **ACCEPTED** — re-reviewed 2026-08-12, no defects |
 | **WP-0003** — Remove client-side WRI scoring | **ACCEPTED** |
 
 WP-0001 and WP-0003 were accepted at `0f11ffb` in an earlier review; that commit is unchanged, is confirmed on `origin/agent/wp-0001-wp-0003` by SHA, and the verdict **stands**.
@@ -21,33 +21,31 @@ WP-0001 and WP-0003 were accepted at `0f11ffb` in an earlier review; that commit
 
 ---
 
-## 0. WITHDRAWN — WP-0002 was reviewed against the wrong artifact
+## 0. WP-0002 — withdrawal resolved, packet ACCEPTED
 
-**Recorded 2026-08-12, after Codex reported its environment state.**
+**Sequence of record, so the history is not misleading.**
 
-Codex named two files that **do not exist** in the tree Claude reviewed:
+The WP-0002 verdict was withdrawn on 2026-08-12 after Codex reported filenames (`scripts/check-frontend-types.mjs`, `typecheck.frontend-baseline.json`) and a baseline count (135) that did not match the tree Claude had reviewed. On that evidence Claude could not establish that it had reviewed Codex's artifact, and withdrew rather than let an unverified acceptance stand.
 
-| | Tree Claude reviewed | Codex's tree |
-|---|---|---|
-| Checker script | `scripts/typecheck-baseline.mjs` | `scripts/check-frontend-types.mjs` |
-| Baseline file | `typecheck-baseline.json` | `typecheck.frontend-baseline.json` |
-| Baseline count | 136 errors / 72 signatures | 135 errors / 72 signatures |
-| Refusal path exit code | 0 — reported as defect D-0002-1 | 1 — already correct |
+Codex has since formally submitted `agent/wp-0002-verification-gates` for review. Claude re-verified that branch:
 
-Different filenames, different counts, different behaviour. **These are two separate implementations of WP-0002, and the one Claude tested is not Codex's deliverable.**
+- The tree is **byte-identical** to what was originally reviewed — same content hashes, unchanged mtimes.
+- Baseline is **136 errors across 72 signatures**, matching Codex's submission.
+- Codex's earlier report described a **different environment**, not a different deliverable. That environment is not the one under review and is not relevant to this verdict.
 
-**Provenance of what Claude tested:** uncommitted files on local branch `agent/wp-0002-verification-gates`, dated 12 August, on the product owner's machine. That branch has **never been pushed** and its author is unknown to Product Command. It may be an earlier attempt, another agent's work, or an abandoned draft. Claude should have established provenance before reviewing it and did not.
+**Withdrawal lifted. WP-0002 is ACCEPTED.**
 
-**Consequences:**
+### D-0002-1 is VOID — and the fault was Claude's measurement, not Codex's code
 
-1. **The WP-0002 ACCEPTED verdict is withdrawn.** It is not transferable to Codex's implementation.
-2. **Defect D-0002-1 is void.** It described the wrong artifact. Codex's refusal path already exits non-zero, which Codex verified in `scripts/check-frontend-types.mjs`.
-3. **The 136-error baseline figure is not authoritative.** Codex's tree records 135. Neither has been reconciled against `origin/main`, and the correct figure is whatever a fresh checkout of the merged result produces.
-4. **The uncommitted `agent/wp-0002-verification-gates` tree must not be merged.** Its provenance is unestablished. It should be set aside until someone can say where it came from.
+The original finding claimed `npm run typecheck:baseline` exits 0 when refusing to grow the baseline. **That was wrong.**
 
-**What is unaffected:** WP-0001 and WP-0003 were reviewed against commit `0f11ffb`, which is on `origin` and which Codex itself reported publishing as PR #15. That identification is by SHA, not by inference. Those verdicts stand.
+`scripts/typecheck-baseline.mjs:36` calls `process.exit(1)` on the refusal branch, and a direct re-measurement confirms **exit = 1**.
 
-**To re-review WP-0002**, Codex pushes its own branch and Claude reviews that, by SHA, with provenance established first.
+The error: the original check ran `npm run typecheck:baseline 2>&1 | tail -6; echo "exit = $?"`, which captured **`tail`'s** exit status rather than npm's. Piping before reading `$?` reports the wrong code.
+
+That is precisely the failure mode WP-0002 exists to eliminate — a gate reported as passing when it was not measured properly — committed by the reviewer while reviewing the gate. Codex was correct when it stated the refusal path already exits non-zero.
+
+**Correction to method, now standing:** exit codes are measured directly on the command, never through a pipe.
 
 ---
 
@@ -70,7 +68,7 @@ Different filenames, different counts, different behaviour. **These are two sepa
 |---|---|---|
 | 1 | New frontend error vs `npm run typecheck` | **Fails, exit 1.** Names the file, code and message |
 | 2 | New frontend error vs `npm run build` | **Fails, exit 1, and Vite never runs** — no build output produced |
-| 3 | Baseline regeneration with an extra error | **Refuses.** "Refusing to grow the frontend baseline from 136 to 137." File unchanged at 136 |
+| 3 | Baseline regeneration with an extra error | **Refuses, exit 1.** "Refusing to grow the frontend baseline from 136 to 137." File unchanged at 136 |
 | 4 | Reintroduced WRI-writing export | **Guard fails** (`src/lib/wriRetirement.test.ts`) |
 | 5a | Adding a registered tRPC procedure | **Exact-surface test fails** |
 | 5b | Removing a registered tRPC procedure | **Exact-surface test fails** |
@@ -96,6 +94,37 @@ This does not block acceptance: the enforcing gate (`typecheck`) exits 1 correct
 **Fix when convenient**, not as a blocking round.
 
 ---
+
+## Re-review evidence — all sixteen submitted items verified
+
+Verified 2026-08-12 against `agent/wp-0002-verification-gates`, tree confirmed unchanged by content hash.
+
+| # | Submitted claim | Verified |
+|---|---|---|
+| 1 | Baseline exactly 136 errors | ✅ 136 / 72 signatures |
+| 2 | `typecheck` covers clean server + baselined frontend | ✅ both run; server clean |
+| 3 | An existing baselined error passes | ✅ passes at 136 |
+| 4 | New error raises 136 → 137 and fails the gate | ✅ fails, exit 1, names file/code/message |
+| 5 | `build` fails at typecheck, Vite never runs | ✅ exit 1, no Vite output |
+| 6 | `typecheck:baseline` refuses 136 → 137 | ✅ refuses, **exit 1**, file unchanged |
+| 7 | Temporary proof error removed | ✅ tree carries only the six intended changes |
+| 8 | `npm ci` succeeds | ✅ exit 0 — lockfile in sync with the modified `package.json` |
+| 9 | 56 tests across 9 files | ✅ re-run after clean install |
+| 10 | Production build succeeds on the clean tree | ✅ |
+| 11 | CI runs install, typecheck, test, build on push and PR | ✅ `.github/workflows/verify.yml` |
+| 12 | No deploy step; no `DATABASE_URL` or Supabase key | ✅ |
+| 13 | `eslint.config.js` deleted, lint explicitly deferred | ✅ — one of the two outcomes WP-0002 §6 permitted |
+| 14 | `IMPLEMENTATION_STATE.md` records verified figures | ✅ 56/9, 0 server errors, 136 baseline |
+| 15 | `OPEN_DEFECTS.md` reads "None" | ✅ on this branch |
+| 16 | Auth, routes, database, API and user-visible behaviour unchanged | ✅ no change under `src/`, `server/`, `db/`, `api/` |
+
+## Authorisation and PR base
+
+**Codex is authorised to commit, push `agent/wp-0002-verification-gates` and open a draft PR.**
+
+**Base the PR on `agent/wp-0001-wp-0003`, not on `main`.** This branch is stacked on `0f11ffb`, which PR #15 carries. Basing on `main` would show WP-0001 and WP-0003 changes inside the WP-0002 diff and make the review meaningless. GitHub retargets a stacked PR to `main` automatically when #15 merges.
+
+Merge order stays: **PR #15 first, then WP-0002** — that is the order the figures were measured in.
 
 ## Reporting discrepancies — for accuracy, not fault
 
