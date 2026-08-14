@@ -168,3 +168,20 @@ Distinct from §0's `global.error.network.*`, which is a blocking error state. T
 ---
 
 **Prohibited across all of the above:** "gig" in any form, "volunteer" as a person's identity, exclamation marks, "journey" as marketing filler, "Oops", and any promise of a timeline Levav cannot honour.
+
+## 17.11 Auth — sign-in throttle
+
+**Approved 2026-08-14**, resolving the open decision in the WP-0004 implementation report. These are **not exempt** from Criterion 3 — they are user-facing strings on the most security-sensitive surface in the product, which is where wording matters most.
+
+The three shipped strings collapse to **two keys**. `Too many attempts. Please wait {seconds} seconds.` and `Too many attempts. Please wait {seconds} seconds before retrying.` are the same message written twice; carrying both is precisely the drift the copy module exists to prevent.
+
+| Key | Value |
+|---|---|
+| `auth.throttle.message` | Too many sign-in attempts. For your security, wait {seconds} seconds before trying again. |
+| `auth.throttle.action` | Wait {seconds}s |
+
+`auth.throttle.message` replaces both sentence forms. `auth.throttle.action` is the countdown on the disabled button and stays terse because it sits inside a control.
+
+**Why the wording changed.** "Too many attempts" alone reads as an accusation aimed at the person, when the actual cause is usually a mistyped password. Naming the reason — *for your security* — turns a rebuke into an explanation, and the throttle is a protection for the account holder, so it should read like one.
+
+**The security behaviour does not change.** This is a copy substitution only. Throttle timing, counters and lockout logic stay exactly as they are.

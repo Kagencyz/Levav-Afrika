@@ -10,6 +10,25 @@ This register exists because a defect list relayed through chat did not survive 
 
 ## Open defects
 
+### WP-0004 — D-0004-1 — S2 — apply the newly approved throttle keys
+
+**Raised 2026-08-14.** The only defect. Everything else in the packet is verified passing.
+
+Amendment A1 Criterion 3 requires every user-facing string in the six migrated files to resolve through the copy module. Three client-side sign-in throttle strings in `src/pages/Auth.tsx` remain inline because no key existed. **Keys now exist** — `COPY_DICTIONARY_S17_AUTH_WELCOME.md` §17.11:
+
+- `auth.throttle.message` — replaces **both** shipped sentence forms, which are the same message written twice
+- `auth.throttle.action` — the countdown on the disabled button
+
+**Not exempt.** These are user-facing strings on the most security-sensitive surface in the product.
+
+**Fix:** substitute the copy. Do not touch throttle timing, counters or lockout logic — this is a copy change only.
+
+**Confirmed correct, do not redo:** the four over-length validation messages you removed as unreachable were the right call. `maxLength` prevents the state, and you declined to invent replacement copy rather than filling a gap with a guess.
+
+---
+
+## Previously open
+
 **None against Codex.**
 
 **Sprint 0 is delivered and closed.** `main` at `d5134e4`, verified on a fresh checkout. See `SPRINT0_VERDICTS.md`.
