@@ -8,7 +8,7 @@
 ## Implementation summary
 
 - `npm run typecheck` now runs the clean server project and the baselined frontend project.
-- The frontend baseline records 136 errors across 72 stable signatures. A signature is file + TypeScript code + flattened message; occurrence counts preserve duplicates.
+- The frontend baseline records 136 errors across 72 stable signatures. A signature is file + TypeScript code + flattened message; occurrence counts preserve duplicates. Repository-root paths embedded by TypeScript are normalized to `<repo>` so the same diagnostic has the same identity locally, in GitHub Actions and on Vercel.
 - New frontend diagnostics fail the gate. Existing diagnostics pass. Baseline regeneration refuses growth and exits non-zero.
 - `npm run build` runs the complete type gate before Vite.
 - GitHub Actions runs install, typecheck, test and build on pushes and pull requests, with no deployment step or production secrets.

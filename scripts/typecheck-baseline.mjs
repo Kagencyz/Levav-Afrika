@@ -73,7 +73,12 @@ function countDiagnostics(items) {
   const counts = new Map();
   for (const diagnostic of items) {
     const file = diagnostic.file ? relative(root, diagnostic.file.fileName).replaceAll("\\", "/") : "<global>";
-    const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, " ").replace(/\s+/g, " ").trim();
+    const message = ts
+      .flattenDiagnosticMessageText(diagnostic.messageText, " ")
+      .replaceAll(root.replaceAll("\\", "/"), "<repo>")
+      .replaceAll(root, "<repo>")
+      .replace(/\s+/g, " ")
+      .trim();
     const key = `${file} | TS${diagnostic.code} | ${message}`;
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
