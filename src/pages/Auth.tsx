@@ -7,6 +7,7 @@ import { sanitizeInput, isValidEmail } from '@/lib/safeJSON';
 import { StableInput } from '@/components/StableInputs';
 import { trpc } from '@/providers/trpc';
 import GlassCard from '@/components/GlassCard';
+import { t } from '@/copy';
 
 /** Rate limit: max attempts before cooldown */
 const MAX_ATTEMPTS = 5;
@@ -53,10 +54,10 @@ export default function Auth() {
 
   useEffect(() => {
     if (searchParams.get('confirmed') === '1') {
-      toast.success('Email confirmed. Sign in to continue.');
+      toast.success(t('auth.verify.confirmed'));
     }
     if (searchParams.get('error_code') === 'otp_expired') {
-      toast.error('That confirmation link has expired. Request a fresh email below.');
+      toast.error(t('auth.verify.expired'));
       setMode('signup');
     }
   }, [searchParams]);
@@ -104,41 +105,33 @@ export default function Auth() {
       const lastName = formData.lastName.trim();
 
       if (!firstName) {
-        newErrors.firstName = 'First name is required';
-      } else if (firstName.length > MAX_NAME_LENGTH) {
-        newErrors.firstName = `First name must be less than ${MAX_NAME_LENGTH} characters`;
+        newErrors.firstName = t('auth.validation.firstname.required');
       }
 
       if (!lastName) {
-        newErrors.lastName = 'Last name is required';
-      } else if (lastName.length > MAX_NAME_LENGTH) {
-        newErrors.lastName = `Last name must be less than ${MAX_NAME_LENGTH} characters`;
+        newErrors.lastName = t('auth.validation.lastname.required');
       }
     }
 
     const email = formData.email.trim();
     if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (email.length > MAX_EMAIL_LENGTH) {
-      newErrors.email = `Email must be less than ${MAX_EMAIL_LENGTH} characters`;
+      newErrors.email = t('auth.validation.email.required');
     } else if (!isValidEmail(email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('auth.validation.email.invalid');
     }
 
     const password = formData.password;
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth.validation.password.required');
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    } else if (password.length > MAX_PASSWORD_LENGTH) {
-      newErrors.password = `Password must be less than ${MAX_PASSWORD_LENGTH} characters`;
+      newErrors.password = t('auth.validation.password.tooshort');
     }
 
     if (mode === 'signup') {
       if (!formData.confirmPassword) {
-        newErrors.confirmPassword = 'Please confirm your password';
+        newErrors.confirmPassword = t('auth.validation.confirmpassword.required');
       } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
+        newErrors.confirmPassword = t('auth.validation.password.mismatch');
       }
     }
 
@@ -152,12 +145,12 @@ export default function Auth() {
 
     // SECURITY FIX: Check rate limit before processing
     if (isRateLimited) {
-      toast.error(`Too many attempts. Please wait ${rateLimitCountdown} seconds.`);
+      toast.error(t('auth.throttle.message', { seconds: rateLimitCountdown }));
       return;
     }
     if (attemptCountRef.current >= MAX_ATTEMPTS) {
       startRateLimit();
-      toast.error(`Too many attempts. Please wait ${RATE_LIMIT_COOLDOWN_MS / 1000} seconds.`);
+      toast.error(t('auth.throttle.message', { seconds: RATE_LIMIT_COOLDOWN_MS / 1000 }));
       return;
     }
 
@@ -185,7 +178,7 @@ export default function Auth() {
         });
         if (result.requiresEmailConfirmation) {
           attemptCountRef.current = 0;
-          toast.success('Confirmation email sent.');
+          toast.success(t('auth.success.registered'));
           setConfirmationEmail(email);
           setFormData((current) => ({ ...current, password: '', confirmPassword: '' }));
           return;
@@ -194,7 +187,7 @@ export default function Auth() {
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();
         attemptCountRef.current = 0;
-        toast.success('Account created!');
+        toast.success(t('auth.success.registered'));
         // Preference selection next (upgrade brief §3); a goal carried from
         // a landing-page path card rides along to pre-select itself.
         const goal = searchParams.get('goal');
@@ -212,7 +205,7 @@ export default function Auth() {
         await utils.auth.me.fetch().catch(() => null);
         await utils.auth.me.invalidate();
         attemptCountRef.current = 0;
-        toast.success('Welcome back!');
+        toast.success(t('auth.success.signedin'));
         navigate(intent === 'employer' ? '/employers' : '/dashboard');
       }
     } catch (err) {
@@ -222,13 +215,13 @@ export default function Auth() {
       // unexpected server error) must never be shown verbatim — it can leak
       // implementation details and is rarely meaningful to the user.
       if (/email already registered/i.test(rawMessage)) {
-        setErrors({ email: 'This email is already registered — try signing in.' });
+        setErrors({ email: t('auth.error.duplicate') });
       } else if (/invalid email or password/i.test(rawMessage)) {
-        setErrors({ password: 'Invalid email or password.' });
+        setErrors({ password: t('auth.error.credentials') });
       } else if (/confirmation email limit reached/i.test(rawMessage)) {
-        toast.error('Confirmation email limit reached. Please wait an hour and try again.');
+        toast.error(t('auth.error.ratelimited'));
       } else {
-        toast.error('Something went wrong. Please try again.');
+        toast.error(t('auth.error.generic'));
       }
     } finally {
       setIsLoading(false);
@@ -253,14 +246,14 @@ export default function Auth() {
             <Sparkles size={20} className="text-black" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">
-            {mode === 'login' ? 'Welcome Back' : intent === 'employer' ? 'Create Employer Account' : 'Join Levav\u2122'}
+            {mode === 'login' ? t('auth.talent.signin.title') : intent === 'employer' ? t('auth.employer.signup.title') : t('auth.talent.signup.title')}
           </h1>
           <p className="text-sm text-[#A0A0A0]">
             {mode === 'login'
-              ? 'Sign in to your account to continue'
+              ? t('auth.talent.signin.subtitle')
               : intent === 'employer'
-                ? 'Confirm your work email, then register your organization'
-                : 'Create your account and start your journey'}
+                ? t('auth.employer.signup.subtitle')
+                : t('auth.talent.signup.subtitle')}
           </p>
         </div>
 
@@ -269,10 +262,9 @@ export default function Auth() {
             <div className="text-center space-y-5" aria-live="polite">
               <MailCheck className="w-12 h-12 text-[#C6FF34] mx-auto" />
               <div>
-                <h2 className="text-xl font-semibold text-white">Check your email</h2>
+                <h2 className="text-xl font-semibold text-white">{t('auth.verify.heading')}</h2>
                 <p className="text-sm text-white/60 mt-2">
-                  We sent a confirmation link to <strong className="text-white">{confirmationEmail}</strong>.
-                  Confirm it, then return here to sign in.
+                  {t('auth.verify.sentto', { email: confirmationEmail })}
                 </p>
               </div>
               <button
@@ -281,24 +273,24 @@ export default function Auth() {
                 onClick={async () => {
                   try {
                     await resendMutation.mutateAsync({ email: confirmationEmail, intent });
-                    toast.success('A fresh confirmation email was sent.');
+                    toast.success(t('auth.verify.resend.sent'));
                   } catch (error) {
                     const message = error instanceof Error ? error.message : '';
                     toast.error(/wait before/i.test(message)
-                      ? 'Please wait before requesting another email.'
-                      : 'Could not resend the email. Please try again.');
+                      ? t('auth.verify.resend.toosoon')
+                      : t('auth.verify.resend.failed'));
                   }
                 }}
                 className="btn-lime w-full disabled:opacity-50"
               >
-                {resendMutation.isPending ? 'Sending…' : 'Resend confirmation email'}
+                {resendMutation.isPending ? t('auth.verify.resend.sending') : t('auth.verify.resend.action')}
               </button>
               <button
                 type="button"
                 onClick={() => { setConfirmationEmail(null); setMode('login'); }}
                 className="text-sm text-white/60 hover:text-white"
               >
-                I have confirmed my email — sign in
+                {t('auth.verify.action.signin')}
               </button>
             </div>
           ) : (
@@ -316,7 +308,7 @@ export default function Auth() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">
-                      First Name
+                      {t('auth.field.firstname')}
                     </label>
                     <StableInput
                       type="text"
@@ -325,7 +317,6 @@ export default function Auth() {
                         setFormData({ ...formData, firstName: e.target.value });
                         if (errors.firstName) setErrors((prev) => { const n = { ...prev }; delete n.firstName; return n; });
                       }}
-                      placeholder="John"
                       maxLength={MAX_NAME_LENGTH}
                       className={`w-full px-4 py-3 bg-white/[0.03] border rounded-xl text-white placeholder:text-[#666666] focus:outline-none focus:border-[#C6FF34]/50 transition-colors ${errors.firstName ? 'border-red-400/50 focus:border-red-400' : 'border-white/[0.06]'}`}
                     />
@@ -335,7 +326,7 @@ export default function Auth() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">
-                      Last Name
+                      {t('auth.field.lastname')}
                     </label>
                     <StableInput
                       type="text"
@@ -344,7 +335,6 @@ export default function Auth() {
                         setFormData({ ...formData, lastName: e.target.value });
                         if (errors.lastName) setErrors((prev) => { const n = { ...prev }; delete n.lastName; return n; });
                       }}
-                      placeholder="Doe"
                       maxLength={MAX_NAME_LENGTH}
                       className={`w-full px-4 py-3 bg-white/[0.03] border rounded-xl text-white placeholder:text-[#666666] focus:outline-none focus:border-[#C6FF34]/50 transition-colors ${errors.lastName ? 'border-red-400/50 focus:border-red-400' : 'border-white/[0.06]'}`}
                     />
@@ -357,7 +347,7 @@ export default function Auth() {
 
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Email
+                  {t('auth.field.email')}
                 </label>
                 <StableInput
                   type="email"
@@ -366,7 +356,7 @@ export default function Auth() {
                     setFormData({ ...formData, email: e.target.value });
                     if (errors.email) setErrors((prev) => { const n = { ...prev }; delete n.email; return n; });
                   }}
-                  placeholder="you@example.com"
+                  placeholder={t('auth.placeholder.email')}
                   maxLength={MAX_EMAIL_LENGTH}
                   className={`w-full px-4 py-3 bg-white/[0.03] border rounded-xl text-white placeholder:text-[#666666] focus:outline-none focus:border-[#C6FF34]/50 transition-colors ${errors.email ? 'border-red-400/50 focus:border-red-400' : 'border-white/[0.06]'}`}
                 />
@@ -377,7 +367,7 @@ export default function Auth() {
 
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Password
+                  {t('auth.field.password')}
                 </label>
                 <div className="relative">
                   <StableInput
@@ -387,7 +377,7 @@ export default function Auth() {
                       setFormData({ ...formData, password: e.target.value });
                       if (errors.password) setErrors((prev) => { const n = { ...prev }; delete n.password; return n; });
                     }}
-                    placeholder="Enter your password"
+                    placeholder={t('auth.placeholder.password')}
                     minLength={6}
                     maxLength={MAX_PASSWORD_LENGTH}
                     className={`w-full px-4 py-3 pr-12 bg-white/[0.03] border rounded-xl text-white placeholder:text-[#666666] focus:outline-none focus:border-[#C6FF34]/50 transition-colors ${errors.password ? 'border-red-400/50 focus:border-red-400' : 'border-white/[0.06]'}`}
@@ -408,7 +398,7 @@ export default function Auth() {
               {mode === 'signup' && (
                 <div>
                   <label className="block text-sm font-medium text-white mb-2">
-                    Confirm Password
+                    {t('auth.field.confirmpassword')}
                   </label>
                   <div className="relative">
                     <StableInput
@@ -418,7 +408,7 @@ export default function Auth() {
                         setFormData({ ...formData, confirmPassword: e.target.value });
                         if (errors.confirmPassword) setErrors((prev) => { const n = { ...prev }; delete n.confirmPassword; return n; });
                       }}
-                      placeholder="Confirm your password"
+                      placeholder={t('auth.placeholder.confirmpassword')}
                       minLength={6}
                       maxLength={MAX_PASSWORD_LENGTH}
                       className={`w-full px-4 py-3 pr-12 bg-white/[0.03] border rounded-xl text-white placeholder:text-[#666666] focus:outline-none focus:border-[#C6FF34]/50 transition-colors ${errors.confirmPassword ? 'border-red-400/50 focus:border-red-400' : 'border-white/[0.06]'}`}
@@ -439,16 +429,14 @@ export default function Auth() {
 
               {mode === 'signup' && (
                 <p className="text-xs text-white/40 leading-relaxed">
-                  One free account for everything — you&apos;ll choose what you
-                  want to do (find work, hire, develop, volunteer...) right
-                  after this step.
+                  {t('auth.signup.subtitle')}
                 </p>
               )}
 
               {/* Rate limit warning */}
               {isRateLimited && (
                 <p className="text-red-400 text-xs text-center">
-                  Too many attempts. Please wait {rateLimitCountdown} seconds before retrying.
+                  {t('auth.throttle.message', { seconds: rateLimitCountdown })}
                 </p>
               )}
 
@@ -460,11 +448,11 @@ export default function Auth() {
                 {isLoading ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : isRateLimited ? (
-                  `Wait ${rateLimitCountdown}s`
+                  t('auth.throttle.action', { seconds: rateLimitCountdown })
                 ) : mode === 'login' ? (
-                  'Sign In'
+                  t('auth.login.action')
                 ) : (
-                  'Create Account'
+                  t('auth.signup.action')
                 )}
                 <ArrowRight size={16} />
               </button>
@@ -475,12 +463,12 @@ export default function Auth() {
           {/* Toggle */}
           {!confirmationEmail && <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
             <p className="text-sm text-[#A0A0A0]">
-              {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
+              {mode === 'login' ? t('auth.switch.tosignup.prompt') : t('auth.switch.tosignin.prompt')}{' '}
               <button
                 onClick={toggleMode}
                 className="text-[#C6FF34] font-medium hover:underline"
               >
-                {mode === 'login' ? 'Sign Up' : 'Sign In'}
+                {mode === 'login' ? t('auth.switch.tosignup.action') : t('auth.switch.tosignin.action')}
               </button>
             </p>
           </div>}

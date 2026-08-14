@@ -3,31 +3,32 @@
  * (upgrade brief §3). The slugs must stay in sync with
  * server/routes/onboarding.ts — enforced by onboardingRouting.test.ts.
  */
+import { t } from '@/copy';
 
 export const SIGNUP_GOALS = [
-  { slug: 'develop', label: 'Develop myself professionally', desc: 'Grow through a Levav 28™ pathway built for you' },
-  { slug: 'find-job', label: 'Find a full-time or part-time job', desc: 'Verified roles matched to your profile' },
-  { slug: 'find-quickwork', label: 'Find QuickWork™ or freelance gigs', desc: 'Stay active and earning with project work' },
-  { slug: 'hire', label: 'Hire talent for an organisation', desc: 'Workforce-ready people with real evidence' },
-  { slug: 'post-quickwork', label: 'Post a quick job or gig', desc: 'Get matched with capable talent fast' },
-  { slug: 'find-volunteer', label: 'Find volunteer opportunities', desc: 'Serve, contribute, and build experience' },
-  { slug: 'post-volunteer', label: 'Post volunteer opportunities', desc: 'For verified organisations offering service roles' },
-  { slug: 'learn', label: 'Learn through courses and programmes', desc: 'Close real skill gaps with guided learning' },
-  { slug: 'community', label: 'Build my professional network', desc: 'Follow, share, and grow with professionals' },
+  { slug: 'develop', label: t('intent.develop') },
+  { slug: 'find-job', label: t('intent.find_work') },
+  { slug: 'find-quickwork', label: t('intent.find_quickwork') },
+  { slug: 'hire', label: t('intent.hire') },
+  { slug: 'post-quickwork', label: t('intent.post_quickwork') },
+  { slug: 'find-volunteer', label: t('intent.contribute') },
+  { slug: 'post-volunteer', label: t('intent.post_contribution') },
+  { slug: 'learn', label: t('intent.learn') },
+  { slug: 'community', label: t('intent.network') },
 ] as const;
 
 export type GoalSlug = (typeof SIGNUP_GOALS)[number]['slug'];
 
 export const PERSONAL_STATUSES = [
-  { slug: 'employed', label: 'Employed' },
-  { slug: 'unemployed', label: 'Unemployed' },
-  { slug: 'self_employed', label: 'Self-employed' },
-  { slug: 'freelancing', label: 'Freelancing' },
-  { slug: 'studying', label: 'Studying' },
-  { slug: 'volunteering', label: 'Volunteering' },
-  { slug: 'changing_careers', label: 'Changing careers' },
-  { slug: 'returning_to_work', label: 'Returning to work' },
-  { slug: 'running_organization', label: 'Running an organisation or business' },
+  { slug: 'employed', label: t('situation.employed') },
+  { slug: 'unemployed', label: t('situation.not_working') },
+  { slug: 'self_employed', label: t('situation.self_employed') },
+  { slug: 'freelancing', label: t('situation.freelancing') },
+  { slug: 'studying', label: t('situation.studying') },
+  { slug: 'volunteering', label: t('situation.legacy.volunteering') },
+  { slug: 'changing_careers', label: t('situation.legacy.changing_careers') },
+  { slug: 'returning_to_work', label: t('situation.career_break') },
+  { slug: 'running_organization', label: t('situation.running_organisation') },
 ] as const;
 
 export type StatusSlug = (typeof PERSONAL_STATUSES)[number]['slug'];
