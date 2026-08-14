@@ -601,6 +601,97 @@ Extends §7. Governed by `FEED_AND_NETWORK_SPEC.md`.
 
 **Prohibited across these surfaces:** "trending", "viral", "top creator", "influencer", engagement counts displayed next to any readiness value, follower counts on cards, streaks, "you're on a roll", any prompt pressuring a member to post, and any suggestion that posting affects readiness or hiring.
 
+## 16. Onboarding axes, Personal Home and organisation context
+
+Governed by `ONBOARDING_AND_CAPABILITY_MODEL.md` (PDR-0014).
+
+### Employment situation (§1)
+
+| Key | Value |
+|---|---|
+| `onboarding.situation.title` | Where are you with work right now? |
+| `onboarding.situation.help` | This is private. It shapes what Levav shows you and is never shown to employers. |
+| `situation.employed` | Employed |
+| `situation.self_employed` | Self-employed |
+| `situation.running_organisation` | Running an organisation |
+| `situation.freelancing` | Freelancing |
+| `situation.studying` | Studying |
+| `situation.not_working` | Not currently working |
+| `situation.career_break` | On a career break |
+| `situation.unspecified` | I would rather not say |
+
+### Opportunity posture (§2)
+
+| Key | Value |
+|---|---|
+| `onboarding.posture.title` | Are you open to new opportunities? |
+| `onboarding.posture.privacy` | **This is private.** Levav never tells an employer that you are looking — including an employer you already work for. |
+| `posture.actively_seeking` | Actively looking for work |
+| `posture.open` | Open to the right opportunity |
+| `posture.not_seeking` | Not looking right now |
+| `posture.unspecified` | I would rather not say |
+
+### Platform intentions (§3)
+
+| Key | Value |
+|---|---|
+| `onboarding.intentions.title` | What do you want to do on Levav? |
+| `onboarding.intentions.help` | Choose everything that applies. Most people do more than one. |
+| `intent.develop` | Build and prove my readiness |
+| `intent.find_work` | Find a job |
+| `intent.find_quickwork` | Find QuickWork assignments |
+| `intent.learn` | Learn and close skill gaps |
+| `intent.contribute` | Contribute my skills through Impact |
+| `intent.network` | Connect with other professionals |
+| `intent.hire` | Hire people for an organisation |
+| `intent.post_quickwork` | Post QuickWork assignments |
+| `intent.represent_organisation` | Represent an organisation |
+
+### Personal Home (§7, §8)
+
+| Key | Value |
+|---|---|
+| `home.title` | Home |
+| `home.more.title` | Everything else on Levav |
+| `home.more.help` | Available whenever you want it. |
+| `home.reorder` | Reorder what you see |
+| `home.reorder.saved` | Saved. This is the order you will see from now on. |
+| `home.gated.organisation` | Publishing opportunities and hiring need a verified organisation. |
+| `home.gated.organisation.action` | Create an organisation, or ask to join one |
+| `home.gated.verification` | Your organisation is not verified yet. You can publish once verification completes. |
+| `home.notyet.title` | Not available yet |
+| `home.notyet.body` | Levav has not built this yet. It is specified and scheduled — nothing about your account is limiting you. |
+| `home.module.failed` | This section did not load. The rest of your home page still works. |
+| `home.offline` | Showing what Levav last knew. Some of this may be out of date. |
+
+### Context switcher (§9)
+
+| Key | Value |
+|---|---|
+| `context.personal` | Personal |
+| `context.switch` | Switch workspace |
+| `context.organisation.active` | You are working in {organisation} |
+| `context.personal.note` | Your profile, evidence and readiness stay personal. They are not part of any organisation workspace. |
+| `context.leave` | Back to personal |
+
+### Organisation and verification (§10, §11)
+
+| Key | Value |
+|---|---|
+| `org.create.title` | Create an organisation |
+| `org.join.title` | Ask to join an organisation |
+| `org.join.pending` | Your request is with {organisation}. An owner or admin will decide. |
+| `org.verification.notsubmitted` | Submit your organisation for verification to publish opportunities and hire. |
+| `org.verification.pending` | Submitted and under review. We will tell you as soon as there is a decision. |
+| `org.verification.rejected` | Verification was not granted. Reason: {reason} |
+| `org.verification.resubmit` | Submit again |
+| `org.verification.verified` | {organisation} is verified. |
+| `org.role.insufficient` | Your role in {organisation} does not allow this. An owner or admin can change it. |
+| `org.hiring.title` | What are you hiring for? |
+| `org.hiring.criteria.rejected` | Levav cannot use this as a hiring criterion. Employment decisions may only weight job-related requirements. |
+
+**Prohibited across these surfaces:** any promised verification timeline, "coming soon" with a date, showing opportunity posture in any organisation surface, any role label applied to a person's account, and any completeness percentage or profile-strength score.
+
 ## 10. Strings that must be deleted
 
 Present in the codebase today and prohibited from this point. Codex removes them as it touches each surface, and never reintroduces the pattern.

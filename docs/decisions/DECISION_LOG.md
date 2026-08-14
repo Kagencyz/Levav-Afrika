@@ -21,6 +21,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 | PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
 | PDR-0013 | What is New editorial scope | APPROVED | 2026-08-12 |
+| PDR-0014 | Four-axis onboarding model; capabilities are derived, never declared | APPROVED | 2026-08-12 |
 
 ---
 
@@ -232,6 +233,29 @@ Two sections carry named hazards. **Professional growth** is where a workforce p
 Three rules make contribution safe rather than corrupting: the editorial standard applies identically to a member, a partner and Levav itself; commercial interest is declared on the card where the reader sees it, not in a policy page; and **money never buys a card** — a partnership buys consideration, never publication. Contributing affects no readiness value by any route.
 
 **Still escalated (§49).** Scope and the contributor model are settled; **editorial ownership is not.** Who holds responsibility, which publishers Levav sources from, and what republication rights it has all need a named human owner before a single card ships. Curation is an editorial position with reputational and legal consequences, and no agent may assume it.
+
+## PDR-0014 — Four-axis onboarding model; capabilities are derived, never declared
+
+**State:** APPROVED · **Decided:** 2026-08-12 from product-owner direction · **Requirements:** AUTH-001/002/003, ONB-001/003, EMP-001/002, SEC-004, PRIV-001, §48
+**Specified in:** `docs/product/ONBOARDING_AND_CAPABILITY_MODEL.md` · **Binds:** WP-0102 (amended), WP-0105, WP-0106
+
+**Context.** The product owner listed ten kinds of person onboarding must distinguish — unemployed and seeking, employed but open, employed and seeking growth, wanting Levav 28, wanting community, wanting Learn/QuickWork/Impact, wanting to hire, wanting to post QuickWork, representing an organisation, and doing several at once — and asked explicitly that this not collapse into a single account-role enum.
+
+**Decision.** Four independent axes.
+
+**A · Employment situation** — what is true now, single-select, seven values. **B · Opportunity posture** — actively seeking, open, or not seeking. **C · Platform intentions** — multi-select, nine values. **D · Capabilities** — derived from rows, server-enforced, never declared.
+
+Every one of the ten cases is a combination of A, B and C. None is a role. The distinction the owner drew between "employed but open" and "employed and seeking growth" is a **posture** difference, not a different kind of user — which is exactly why a role enum would have destroyed it.
+
+**Why the axes must stay separate.** Collapsing them produces the failure AUTH-001 exists to prevent: a person who is both a talent and an employer needs two accounts, and their evidence fragments. Levav's shipped schema already gets this right — capability is a join, not a column — and this decision preserves that. Nothing here adds a role column to `users`.
+
+**The safety rule inside it.** Opportunity posture is private, and `actively_seeking` is **never** disclosed to any employer at any tier until Sprint 6 delivers explicit member-controlled discoverability. People are dismissed for looking for work, and a member's own employer may hold an organisation account. This is a safety requirement, not a preference.
+
+**Declaring grants nothing.** Selecting "hire" does not make someone an employer; it shows them the path to create or join an organisation. Capability arrives when the membership row exists and verification passes, enforced server-side.
+
+**Nothing is hidden.** Modules a member cannot yet use are shown with the condition and the action that satisfies it, not removed. Hiding means members never learn what Levav does, and people with several capabilities become invisible to themselves. The `home.module.eligibility_shown` event then measures demand for capabilities not yet built.
+
+**Vocabulary changes to the shipped enum.** `volunteering` and `changing_careers` are removed as situations — one is an activity, the other a direction. `returning_to_work` merges into `career_break`. `unemployed` becomes `not_working`, labelled "Not currently working": the state is recorded honestly, but the label describes a circumstance rather than assigning an identity. Migrated values are marked inferred and confirmed by the member before use (ONB-001).
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 

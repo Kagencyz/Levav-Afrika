@@ -116,3 +116,45 @@ Record the taxonomy version used at capture, so a later taxonomy change does not
 2. **Whether work mode belongs here or in the QuickWork capacity profile.** Proposed: capture a simple preference here, with the detailed capacity model staying in Sprint 5.
 
 Implement the proposals and note them in the report.
+
+
+---
+
+# Amendment A1 — Four-axis model (supersedes the situation and preference scope above)
+
+**Issued:** 2026-08-12 · **Authority:** PDR-0014 · **Binding spec:** `docs/product/ONBOARDING_AND_CAPABILITY_MODEL.md`
+
+The product owner has broadened this packet's scope. The original text proposed capturing a personal status, an optional target role and a simple work preference. That is now insufficient, and Codex must not infer the rest.
+
+**What changes**
+
+1. **Employment situation** replaces `personalStatus`, with the seven-value vocabulary in the model §1, and the migration in that section. Migrated values are marked inferred and confirmed by the member before use — no silent reclassification (ONB-001).
+2. **Opportunity posture** is a new, separate, single-select axis (model §2). It is **private**, and `actively_seeking` must have no employer read path whatsoever. Implement it as private-by-construction, not private-by-default-setting.
+3. **Platform intentions** stay multi-select and are corrected for PDR-0003: the shipped strings "Find QuickWork™ or freelance gigs" and "Post a quick job or gig" are replaced by the model §3 labels.
+4. **Declaring an intention grants no capability** (model §4). Selecting `hire` or `represent_organisation` routes to the create-or-join-organisation path; it never writes a membership, a role or an entitlement.
+5. **Situation, posture and intentions are each independently skippable.** `unspecified` is valid throughout and blocks nothing (ONB-003).
+6. **Editing later** is a single settings surface (model §6), and changing any axis never alters capability, evidence or access.
+
+**Additional acceptance criteria**
+
+10. Situation, posture and intentions are three separate columns. No combined enum, and no role column added to `users`.
+11. A member can complete onboarding having answered none of the three; routing still works.
+12. No employer-reachable endpoint returns opportunity posture. Negative test required.
+13. Selecting `hire` creates no membership row, no `orgRole`, no entitlement. Negative test required.
+14. Migrated `volunteering` / `changing_careers` / `returning_to_work` values are marked inferred and are not used for ordering until confirmed.
+15. `grep -rn "gig" src/lib/onboardingRouting.ts` returns nothing.
+16. Analytics events per model §13, with no values in payloads.
+
+**Additional test scenarios**
+
+| # | Scenario | Expected |
+|---|---|---|
+| 10 | Employed + open to opportunities | Both stored separately; posture private |
+| 11 | Employed + not seeking + intention `develop` | Distinguishable from #10 in the data, not only in the UI |
+| 12 | Not working + actively seeking | Stored; no employer read path exists |
+| 13 | Five intentions selected | All stored; primary retained; routing works |
+| 14 | Select `hire` | No membership, role or entitlement created |
+| 15 | Skip all three axes | Onboarding completes; member reaches a working destination |
+| 16 | Pre-existing record with `volunteering` | Migrated, marked inferred, member asked to confirm |
+
+**Dependencies unchanged:** WP-0101 must be ACCEPTED first.

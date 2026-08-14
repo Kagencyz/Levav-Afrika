@@ -86,8 +86,8 @@ These conflict with approved product direction and must not be carried forward:
 | WP-0102 | Intelligent onboarding | ONB-001/002/003, AUTH-001, LANG-002/003 | READY_FOR_BUILD |
 | WP-0103 | Professional profile | PROF-001/002/003, AUTH-003, DATA-MODEL-003, SEC-004 | READY_FOR_BUILD |
 | WP-0104 | Secure account email change | PROF-004, AUTH-001, SEC-006/008/010 | READY_FOR_BUILD |
-| WP-0105 | Personal Home on real services | ONB-003, AUTH-001 | Scoped, **not issued** — awaits WP-0103 |
-| WP-0106 | Organisation membership and verification | AUTH-002, EMP-001 | Scoped, **not issued** — awaits WP-0103 |
+| WP-0105 | Personal Home on real services | ONB-003, AUTH-001/002, PRIV-001, PDR-0014 | READY_FOR_BUILD |
+| WP-0106 | Organisation membership, verification, employer context | AUTH-002/003, EMP-001/002, SEC-005/006/007, PDR-0014 | READY_FOR_BUILD |
 | WP-0201 | Evidence node storage, lifecycle, visibility | EVD-001…004, DATA-MODEL-001/003, AUTH-003, SEC-004 | READY_FOR_BUILD |
 | WP-0202 | Event pipeline and sole ingestion writer | EVENT-001/002, DATA-MODEL-002, API-006 | READY_FOR_BUILD |
 | WP-0203 | Dispute workflow | TRUST-002, EVD-002, WRI-GOV-001, SEC-010 | READY_FOR_BUILD |
