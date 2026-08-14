@@ -60,6 +60,21 @@ Established by running commands, not by reading documents.
 8. **Protected data is enforced server-side.** UI hiding is not security; Claude tests the direct API path (SEC-004, §47).
 9. **Nothing is fabricated** — no salary benchmark, no unsourced news, no AI-invented fact (COMP-003, FEED-005, AI-007).
 10. **Copy comes from the approved dictionary.** Invented product copy is a defect (LANG-005).
+11. **If readiness changes, we can explain what evidence caused it.** The product owner's standing test, 2026-08-14. Any change to a WRI value must be traceable to specific evidence nodes. A readiness change nobody can account for is a defect regardless of how it was produced.
+12. **Levav interprets, the person confirms.** Wherever Levav infers something about a person — title, CV, career direction, experience, skill — the interpretation is offered for confirmation, never silently applied (PDR-0016).
+
+## Progress reporting format
+
+Standing instruction from the product owner, 2026-08-14. As each packet completes, report in this shape and keep it short:
+
+1. **What has actually been built.**
+2. **What the owner can now see or test.**
+3. **Which important acceptance criteria are satisfied.**
+4. **Known limitations, and any decision needed from the owner.**
+5. **What this unlocks next.**
+6. **Where it is merged.**
+
+Progress is measured by working product, not by volume of specification. Specifications are still written where they remove genuine ambiguity or protect an important product or architectural decision — not by default.
 
 ## Rules for reviewing Codex work
 

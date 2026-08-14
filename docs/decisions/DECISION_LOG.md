@@ -14,14 +14,16 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0004 | Levav 28 prototype content is retired, not migrated | APPROVED | 2026-08-12 |
 | PDR-0005 | Frontend typecheck becomes a required gate with a bounded debt allowance | APPROVED | 2026-08-12 |
 | PDR-0006 | Unreachable routers are deleted, not preserved | APPROVED | 2026-08-12 |
-| PDR-0007 | Day 15 evidence-sufficiency threshold | **ESCALATED** | 2026-08-12 |
-| PDR-0008 | QuickWork payment, escrow and dispute model | **ESCALATED** | 2026-08-12 |
+| PDR-0007 | Day 15 evidence-sufficiency threshold | APPROVED | 2026-08-14 |
+| PDR-0008 | QuickWork payment model — provider-agnostic | APPROVED | 2026-08-14 |
 | PDR-0009 | Unimplemented controls state their absence; retired local keys are cleared | APPROVED | 2026-08-12 |
 | PDR-0010 | Nominated written work samples may become evidence; publishing never does | **PROPOSED** | 2026-08-12 |
 | PDR-0011 | Sprint 1 ships without AI inference; the user declares, the system does not guess | APPROVED | 2026-08-12 |
 | PDR-0012 | Absence of evidence is never a low score | APPROVED | 2026-08-12 |
 | PDR-0013 | What is New editorial scope | APPROVED | 2026-08-12 |
 | PDR-0014 | Four-axis onboarding model; capabilities are derived, never declared | APPROVED | 2026-08-12 |
+| PDR-0015 | Impact evidence threshold — hours alone never count | APPROVED | 2026-08-14 |
+| PDR-0016 | Understand the person; preserve their own words | APPROVED | 2026-08-14 |
 
 ---
 
@@ -259,12 +261,65 @@ Every one of the ten cases is a combination of A, B and C. None is a role. The d
 
 ## PDR-0007 — Day 15 evidence-sufficiency threshold
 
-**State:** **ESCALATED to human owner** (Master PRD §49) · **Requirements:** L28-005
+**State:** APPROVED by the product owner, 2026-08-14 · **Requirements:** L28-005 · **Implemented by:** Sprint 4
 
-Levav 28 Day 15 must gate on evidence sufficiency rather than calendar completion. The threshold — how many observations, across how many dimensions, at what measurement quality — is a launch policy decision, not an agent decision. Claude will prepare options with trade-offs before Sprint 4. **Neither agent may set this value as permanent policy.** Sprint 4 implements it as a configurable, versioned parameter with a provisional default that is clearly labelled provisional.
+Day 15 opportunity expansion gates on evidence, never on the calendar. Provisional pilot thresholds, **all four required**:
 
-## PDR-0008 — QuickWork payment, escrow and dispute model
+1. At least **10** eligible evidence-producing observations.
+2. Evidence across at least **5** relevant WRI dimensions.
+3. At least **80%** completion of the required activities available through Day 15.
+4. **No unresolved integrity issue** affecting the evidence relied upon.
 
-**State:** **ESCALATED to human owner** (Master PRD §49) · **Requirements:** QW-008
+**Every value is configurable and versioned. None is scientific truth.** They are a pilot starting point, and pilot data decides whether they are right (WRI-004).
 
-Funding model, escrow provider, milestone release conditions, partial completion, revision limits, cancellation, refunds, chargebacks and platform fee are all §49 decisions requiring human approval. Sprint 5 builds the **assignment lifecycle and payment state model** without committing to a provider, so that the commercial decision plugs in through an adapter (API-004). `src/pages/MilestonePayments.tsx` and `ContractWorkspace.tsx` stay deferred until this is resolved.
+**What meeting the threshold means, and does not.** It means Levav has enough evidence to responsibly begin opening additional relevant opportunities. It is **not** a declaration that the person is ready. Copy must not imply graduation, completion or a readiness verdict — `levav28.checkpoint.met` is the approved string. A user below the threshold receives targeted development tasks, never a dead end.
+
+## PDR-0008 — QuickWork payment model, provider-agnostic
+
+**State:** APPROVED by the product owner, 2026-08-14 · **Requirements:** QW-003, QW-008, API-004, API-006 · **Implemented by:** Sprint 5
+
+**The load-bearing decision.** QuickWork is designed against a **payment provider adapter**, not against a provider. Adding, swapping or running multiple providers — by country, payment method, commercial terms or capability — must never require redesigning QuickWork. Zambia is the starting market and must not become an architectural limitation.
+
+**Providers to evaluate for Zambia:** Flutterwave, TechPay, and one further credible local gateway. Selection weighs the whole operating relationship, not API convenience: mobile money, cards, ZMW support, settlement periods, fees, payout, refunds, payment-protection capability, reliability, reconciliation, dispute handling, integration and support quality, regulatory standing, and ability to expand across African markets.
+
+**Assignment lifecycle** — product states, independent of how any provider moves money:
+
+`Draft → Pending Verification → Open → Matched → Funded → Payment Confirmed → Active → Submitted → Under Review → Completed → Paid/Released`, with `Disputed` and `Cancelled` as exception states.
+
+This supersedes the shorter sequence in `COPY_DICTIONARY.md` §5. Sprint 5 adds `Funded`, `Payment Confirmed`, `Under Review` and `Paid/Released`, retiring `Client Review`. Claude issues revised copy with the Sprint 5 packets.
+
+**Milestones are in scope.** A one-hour assignment and a three-month project must not carry the same commercial structure. Where appropriate a client funds and approves in stages.
+
+**Client review period: 72 hours**, provisional and configurable. Within it the client may accept, request an allowed revision, or raise a dispute. Client inaction follows whatever protection process the selected provider legally supports.
+
+### "Escrow" is prohibited unless it is legally true
+
+Levav must not describe an arrangement as escrow or protected funds unless the payment partner legally and technically provides it. Calling a delayed transfer "escrow" claims a legal protection the user does not have — an unsupported claim under Language System §2.3, and a more consequential one than most, because people rely on it when deciding to do work before being paid.
+
+**Levav should avoid becoming custodian of customer funds** where a licensed partner can hold them instead.
+
+## PDR-0015 — Impact evidence threshold: hours alone never count
+
+**State:** APPROVED by the product owner, 2026-08-14 · **Requirements:** IMPACT-002, IMPACT-005, EVD-003 · **Implemented by:** Sprint 8
+
+Resolves open decision 1 in `LEVAV_IMPACT_SPEC.md`.
+
+**Provisional pilot threshold: 4 verified hours** before Impact evidence may materially contribute to WRI. Configurable; pilot data decides whether it is right.
+
+**Four hours alone never raise readiness.** The threshold is necessary, not sufficient. Contribution evidence may inform WRI only where there is also meaningful evidence of what the person did — role, responsibilities, expected outputs, completion, organisation verification, demonstrated behaviours, and structured feedback where appropriate.
+
+**Shorter contributions still exist.** A verified contribution below the threshold is recorded in the Evidence Graph, appears in the member's contribution history and on their profile if they permit it, and simply carries no eligible dimensions. Being recorded and affecting readiness remain different things.
+
+**Not to be confused with the hours ceiling.** This is a floor for *evidence eligibility*. The maximum-hours control in `LEVAV_IMPACT_SPEC.md` §2, which prevents contribution becoming disguised employment, is a separate decision and remains open.
+
+## PDR-0016 — Understand the person; preserve their own words
+
+**State:** APPROVED by the product owner, 2026-08-14 · **Requirements:** ONB-001, ONB-002, PROF-001, AI-004 · **Applies:** product-wide
+
+Originating in `resolveTitle` (WP-0101) and now a **standing principle across Levav**.
+
+Levav must understand a person's professional capability without requiring them to rename themselves to fit its taxonomy. Someone who is a Bursar stays a Bursar; the system reasons over a canonical role while the person's own description is preserved verbatim and shown back to them unchanged.
+
+Generalised: **wherever Levav interprets a person — a title, a CV, a career direction, an experience, a skill — the interpretation is offered for confirmation, never silently applied.** Levav may help a person understand themselves better. It may not define them without their agreement.
+
+Binds on WP-0101, WP-0102, WP-0103, and every AI capability from Sprint 4 onward (AI-004).
