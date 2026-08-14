@@ -51,6 +51,30 @@ Verified independently on `agent/wp-0004-copy-architecture`, rebased on `main` @
 
 **Authorised:** commit, push `agent/wp-0004-copy-architecture`, open the PR, base `main`. Nothing is stacked behind it.
 
+## WP-0101 — Career taxonomy, ACCEPTED 2026-08-14
+
+Verified on `agent/wp-0101-career-taxonomy`, stacked on WP-0004.
+
+**The two controls I check hardest, both intact.** `server/router.test.ts` was **extended, not weakened** — nine taxonomy procedures added to the allowlist, nothing removed. `server/context.ts` adds client-IP capture for rate limiting and does not touch authentication.
+
+| Criterion | Verified |
+|---|---|
+| 4 tables + audit, reversible migration, RLS, **no DELETE grant** | ✅ RLS on 5 tables; rollback script present |
+| Versioned, active flag, supersede leaves original readable | ✅ test asserts supersede-not-delete with before/after audit row |
+| Seed ≥16 families, ≥8 industries, ≥5 roles per family | ✅ **16 families, 13 industries, 81 roles, minimum 5 per family**, five seniority bands |
+| African-first | ✅ agriculture, mining, construction, health, education, energy, logistics, trade, hospitality, public administration as first-class families |
+| Public reads; admin writes server-enforced | ✅ families list without a session; standard user rejected on write |
+| `resolveTitle` ranks candidates and **never mutates** | ✅ `transaction` asserted never called |
+| Unknown title returns no guess | ✅ empty candidates + anonymous backlog event, **asserted to exclude the user id** |
+| Input length capped before querying | ✅ |
+| `talents.category` untouched | ✅ |
+| No taxonomy UI | ✅ no `src/` change at all |
+| Gates | ✅ typecheck 136, **70 tests / 12 files**, build exit 0, bundle unchanged |
+
+**PDR-0016 is honoured precisely.** The test submits `'  Bursar  '` — with the whitespace — and asserts `ownTitle` comes back byte-identical while `candidates[0]` is Accountant, with a separate `normalizedTitle`. The person is understood without being renamed, and nothing about them is mutated. That is the principle working as intended, not merely declared.
+
+**Authorised:** commit, push, open a stacked draft PR based on `agent/wp-0004-copy-architecture`.
+
 ## Verdicts
 
 | Packet | Verdict |
@@ -59,6 +83,7 @@ Verified independently on `agent/wp-0004-copy-architecture`, rebased on `main` @
 | **WP-0002** — Real verification gates and CI | **ACCEPTED** — re-reviewed 2026-08-12, no defects |
 | **WP-0003** — Remove client-side WRI scoring | **ACCEPTED** |
 | **WP-0004** — Typed copy architecture | **ACCEPTED** 2026-08-14 — 13/13 criteria |
+| **WP-0101** — Career taxonomy | **ACCEPTED** 2026-08-14 — Sprint 1 begins |
 
 WP-0001 and WP-0003 were accepted at `0f11ffb` in an earlier review; that commit is unchanged, is confirmed on `origin/agent/wp-0001-wp-0003` by SHA, and the verdict **stands**.
 
