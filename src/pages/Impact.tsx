@@ -35,7 +35,6 @@ import {
   getImpactApplicants,
   applyToOpportunity,
   updateApplicantStatus,
-  awardWriPoints,
 } from "@/lib/levavData";
 import type { ImpactOpportunity, ImpactApplicant } from "@/lib/levavData";
 import { useAuth } from "@/hooks/useAuth";
@@ -334,19 +333,17 @@ function OpportunityHub({
       message: applyMessage.trim(),
       hoursCommitted: Number(applyHours) || selectedOpportunity.hoursRequired,
     });
-    awardWriPoints("impact-volunteer");
     setIsApplyModalOpen(false);
     setSelectedOpportunity(null);
     setRefreshKey((k) => k + 1);
-    showToast(`Applied to volunteer with ${selectedOpportunity.organization} — +15 WRI Leadership`);
+    showToast(`Application sent to ${selectedOpportunity.organization}.`);
   }, [selectedOpportunity, applyMessage, applyHours, user, showToast]);
 
   const handleMarkHoursComplete = React.useCallback(
     (applicantId: string) => {
       updateApplicantStatus(applicantId, "completed");
-      awardWriPoints("impact-hours-4");
       setRefreshKey((k) => k + 1);
-      showToast("Logged! Thank you for contributing — +10 WRI Leadership.");
+      showToast("Contribution marked complete.");
     },
     [showToast]
   );
@@ -529,7 +526,7 @@ function OpportunityHub({
               <EmptyState
                 icon={<Heart size={28} />}
                 title="No volunteering yet"
-                description="Browse opportunities and apply to start contributing — every hour builds your WRI™ Leadership score."
+                description="Contributing does not raise your WRI on its own. Only verified observations of your work can, in the same way as any other work."
               />
             )}
           </motion.div>

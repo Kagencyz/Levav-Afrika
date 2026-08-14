@@ -44,8 +44,6 @@ const {
   getSeedCommentOverrides,
   getFollowing,
   toggleFollow,
-  awardWriPoints,
-  getWriScore,
   FEED_POSTS,
 } = await import('./levavData');
 
@@ -203,21 +201,5 @@ describe('Feed: follow / unfollow', () => {
     expect(getFollowing()).toContain('author-1');
     toggleFollow('author-1');
     expect(getFollowing()).not.toContain('author-1');
-  });
-});
-
-describe('WRI: new scoring rules wired up this pass', () => {
-  it('awards leadership points for impact-volunteer once, not twice', () => {
-    awardWriPoints('impact-volunteer');
-    const afterFirst = getWriScore().leadership;
-    awardWriPoints('impact-volunteer');
-    expect(getWriScore().leadership).toBe(afterFirst);
-    expect(afterFirst).toBeGreaterThan(0);
-  });
-
-  it('awards communication points for feed-first-post', () => {
-    expect(getWriScore().communication).toBe(0);
-    awardWriPoints('feed-first-post');
-    expect(getWriScore().communication).toBeGreaterThan(0);
   });
 });

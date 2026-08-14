@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 import { trpc } from '@/providers/trpc';
-import { logWithCurrentUser } from '@/lib/auditService';
 
 export interface User {
   id: string | number;
@@ -32,7 +31,6 @@ export function useAuth() {
   }, [serverUser]);
 
   const logout = useCallback(() => {
-    logWithCurrentUser('logout', 'Authentication', 'info');
     // Clears the httpOnly auth cookie server-side — it can't be read or
     // cleared from JS. Feature-local prototype state (onboarding drafts,
     // profile forms) is still browser-local cleanup, not auth state.

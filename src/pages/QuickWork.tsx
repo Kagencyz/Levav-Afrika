@@ -42,7 +42,6 @@ import {
   getQuickworkApplications,
   getMyGigs,
   updateGigStatus,
-  awardWriPoints,
   getPostedGigs,
   postGig,
 } from '@/lib/levavData';
@@ -196,19 +195,17 @@ export default function QuickWork() {
     if (!selectedGig) return;
     applyToGig(selectedGig.id);
     updateGigStatus(selectedGig.id, 'applied');
-    awardWriPoints('quickwork-applied');
     setIsApplyModalOpen(false);
     setSelectedGig(null);
     setRefreshKey((k) => k + 1);
-    showToast(`Applied to "${selectedGig.title}" — +5 WRI Reliability`);
+    showToast(`Applied to "${selectedGig.title}".`);
   }, [selectedGig, showToast]);
 
   const handleMarkComplete = React.useCallback(
     (gigId: string) => {
       updateGigStatus(gigId, 'completed');
-      awardWriPoints('quickwork-completed');
       setRefreshKey((k) => k + 1);
-      showToast('Gig complete — +20 WRI Reliability. Request a review from your client.');
+      showToast('Work marked complete. Request a review from your client.');
     },
     [showToast]
   );
@@ -301,7 +298,7 @@ export default function QuickWork() {
             </h1>
             <p className="text-base sm:text-lg text-[#A0A0A0] max-w-xl mx-auto leading-relaxed font-body">
               No one with a working mind and a working body should have to wait around for a formal job offer.
-              Lend 3 hours, 2 days, or 2 months — get paid, build your reputation, and grow your WRI™ with every gig.
+              Take on short assignments, get paid, and build a record of delivered work.
             </p>
           </motion.div>
 
@@ -330,7 +327,7 @@ export default function QuickWork() {
               <ShieldCheck size={18} className="text-[#C6FF34] mb-2" />
               <p className="text-sm font-semibold text-white font-display mb-0.5">Every gig counts</p>
               <p className="text-xs text-[#888888] leading-relaxed font-body">
-                Applying, delivering, and getting reviewed all build your WRI™ Reliability score.
+                Applying does not change readiness. Delivered work may become evidence only when it is verified through the controlled evidence process.
               </p>
             </div>
           </motion.div>

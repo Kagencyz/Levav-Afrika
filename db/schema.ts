@@ -18,7 +18,7 @@ import { authUid, authUsers, authenticatedRole } from 'drizzle-orm/supabase';
 // Stage B: only the four approved foundational entities are modeled here.
 // Levav 28, Learn, QuickWork, SkillSpace, Impact, Champions, subscriptions,
 // payments, jobs, applications, messaging, reviews, and WRI are intentionally
-// NOT part of this schema — see docs/DOMAIN_MODEL.md and docs/NEXT_MILESTONE.md.
+// NOT part of this schema — see docs/DOMAIN_MODEL.md and the Master PRD.
 
 // Restricted runtime role used by the Hono/tRPC server (Slice 1 auth
 // architecture — see docs/full-stack/*.md). NOT service_role, NOT postgres.

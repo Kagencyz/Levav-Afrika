@@ -2,8 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { isValidEmail, sanitizeInput, safeJSONSet } from '@/lib/safeJSON';
-import { awardWriPoints } from '@/lib/levavData';
-import { logWithCurrentUser } from '@/lib/auditService';
 import { useOwnTalentProfile } from '@/hooks/useOwnTalentProfile';
 import { toast } from 'sonner';
 import {
@@ -1455,9 +1453,6 @@ export default function Onboarding() {
         skills: formData.primarySkills,
         location: sanitizeInput(`${formData.city}${formData.city && formData.country ? ', ' : ''}${formData.country}`),
       });
-
-      logWithCurrentUser('profile_update', 'Onboarding Complete', 'success', 'Completed Levav onboarding');
-      awardWriPoints('profile-complete');
       setIsComplete(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {

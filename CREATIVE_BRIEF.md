@@ -1,5 +1,7 @@
 # LEVAV™ HOMEPAGE — CREATIVE EXPERIENCE BRIEF
 
+> Visual direction only. Product claims in this document are superseded by Master PRD v4.1.
+
 ## Philosophy
 The homepage is not a landing page. It is a cinematic journey through the soul of Levav™.
 Each moment answers a fundamental question. Each moment creates an emotional response.
