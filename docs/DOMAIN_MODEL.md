@@ -1,8 +1,8 @@
 # Domain Model
 
-**Status:** Accepted. Reflects the schema as amended and migration-generated (not yet applied) — see `docs/DECISIONS.md` for the full approval history and what's actually been executed versus documented.
+**Status:** Accepted and applied. Reflects the live schema — see `docs/DECISIONS.md` for the full approval history.
 
-This is the authoritative definition of entities, relationships, and invariants for the current milestone's scope (identity, organizations, talent profiles). It is not a restatement of `docs/PRODUCT_SYSTEM_MAP.md` (which tracks concept-to-code *status*) — this document defines the *shape* those concepts take. Entities outside this milestone's scope (Job, Application, Message, Notification, Review, WRIScore) are listed for completeness and left otherwise unchanged from today's schema; see `docs/PRODUCT_SYSTEM_MAP.md` for their current status.
+This is the authoritative definition of entities, relationships, and invariants for the current milestone's scope (identity, organizations, talent profiles). It defines the *shape* those concepts take. Entities outside this milestone's scope (Job, Application, Message, Notification, Review) are listed for completeness.
 
 ## Business capability derivation (read this first)
 
@@ -11,7 +11,7 @@ This is the authoritative definition of entities, relationships, and invariants 
 - **Talent identity** is derived from the existence of a `talents` row referencing the user (`talents.userId`, enforced unique — 1:1). There is no `is_talent` flag anywhere; the row's existence *is* the fact.
 - **Organization membership/capability** is derived from the existence of one or more **active** `organizationMembers` rows referencing the user (`organizationMembers.userId` where `status = 'active'`), each carrying its own org-scoped `orgRole`.
 - **A single user may simultaneously be a Talent and an active member of one or more Organizations.** Nothing in the schema forces an exclusive choice — this was a genuine limitation of the earlier design (a single `role` enum value) that this schema does not have.
-- `users.accessLevel` (`standard | admin`) answers exactly one question — how much platform-wide access this account has — and nothing about what business role(s) the person plays. `admin` remains never self-assignable (see `docs/AUTHENTICATION_ARCHITECTURE.md`).
+- `users.accessLevel` (`standard | admin`) answers exactly one question — how much platform-wide access this account has — and nothing about what business role(s) the person plays. `admin` remains never self-assignable (see `docs/product/COVERAGE_MATRIX_v1.md`).
 
 Every other section below should be read through this lens: nowhere does a "role" gate access to a business capability. Capability comes from a join, not a column.
 
@@ -31,7 +31,7 @@ The platform-level identity. One row per person who can log in.
 | `deletedAt` | timestamp, nullable | Soft-delete. Normal deactivation sets this rather than hard-deleting the row; a true hard DELETE remains possible (e.g. legal erasure) and cascades per the FK behavior noted on dependent tables. |
 | `createdAt` / `updatedAt` | timestamp | |
 
-**Invariant:** `accessLevel` defaults to `standard` at registration and is not user-settable to anything else; `admin` is assigned out-of-band only (see `docs/AUTHENTICATION_ARCHITECTURE.md`). Registration no longer asks a user to "choose" talent or employer-team-member — there is nothing to choose at the platform level. Becoming a talent means creating a `talents` row; becoming an organization member means an `organizationMembers` row is created for them (typically via invitation).
+**Invariant:** `accessLevel` defaults to `standard` at registration and is not user-settable to anything else; `admin` is assigned out-of-band only (see `docs/product/COVERAGE_MATRIX_v1.md`). Registration no longer asks a user to "choose" talent or employer-team-member — there is nothing to choose at the platform level. Becoming a talent means creating a `talents` row; becoming an organization member means an `organizationMembers` row is created for them (typically via invitation).
 
 ### Talent (profile)
 
@@ -52,7 +52,7 @@ An individual's professional profile. **A user "is a talent" purely because this
 | `featured` | boolean | admin curation flag | Excluded — admin-only concept, out of scope |
 | `createdAt` / `updatedAt` | timestamp | | |
 
-**Invariant:** a Talent profile row can only be created, read, or updated by the User it belongs to (`userId` match) — or by a platform admin (`accessLevel = 'admin'`) — enforced server-side regardless of client-side display, per `docs/AUTHENTICATION_ARCHITECTURE.md`'s "server-authoritative identity."
+**Invariant:** a Talent profile row can only be created, read, or updated by the User it belongs to (`userId` match) — or by a platform admin (`accessLevel = 'admin'`) — enforced server-side regardless of client-side display; see `docs/product/COVERAGE_MATRIX_v1.md`.
 
 ### Organization
 
@@ -90,12 +90,12 @@ An individual's professional profile. **A user "is a talent" purely because this
 **Invariants:**
 - A `User` may belong to one or more Organizations simultaneously (multi-org membership is supported by the schema even though this milestone's UI may only exercise one — no schema rewrite needed later).
 - **A `User` can simultaneously have a Talent row *and* one or more active OrganizationMember rows.** There is no exclusivity constraint between the two — see "Business capability derivation" above.
-- `orgRole` gates what a member can do *within* that organization (e.g., only `owner`/`admin` org-roles manage verification or invite/remove other members) — this authorization logic is **not implemented in this milestone** (the `employer` router stays unregistered per `docs/NEXT_MILESTONE.md` §4) but the schema shape already supports it so it isn't rewritten later.
+- `orgRole` gates what a member can do *within* that organization (e.g., only `owner`/`admin` org-roles manage verification or invite/remove other members). The obsolete employer router is deleted; implementation status is tracked in `docs/product/COVERAGE_MATRIX_v1.md`.
 - A one-membership-per-user-per-organization uniqueness constraint applies on (`organizationId`, `userId`).
 
 ## Adjacent entities (unchanged this milestone, listed for completeness)
 
-These exist in the pre-migration schema and are not modified as part of this milestone. Full status in `docs/PRODUCT_SYSTEM_MAP.md`.
+These are adjacent concepts, not current live-schema entities. Full status is tracked in `docs/product/COVERAGE_MATRIX_v1.md`; their obsolete routers are deleted.
 
 | Entity | Relationship | Note |
 |---|---|---|
@@ -104,7 +104,6 @@ These exist in the pre-migration schema and are not modified as part of this mil
 | **Message** | between two Users | Unchanged |
 | **Notification** | belongs to a User | Unchanged |
 | **Review** | between two Users, referencing a Booking | Unchanged |
-| **WRIScore** | belongs to a Talent | Backend stub (`wri.ts`), unchanged |
 
 ## What is explicitly deferred (not modeled now)
 

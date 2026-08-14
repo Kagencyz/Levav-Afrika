@@ -25,7 +25,6 @@ import {
 
 /* ───────────────────── Types ───────────────────── */
 interface ScreeningCriteria {
-  minWRI: number;
   requiredSkills: string[];
   experience: string;
   location: string;
@@ -104,7 +103,6 @@ const LANGUAGES = [
 ];
 
 const DEFAULT_CRITERIA: ScreeningCriteria = {
-  minWRI: 50,
   requiredSkills: [],
   experience: "",
   location: "",
@@ -299,10 +297,6 @@ function calculateScreeningMatch(talent: Talent, criteria: ScreeningCriteria): n
   let score = 0;
   let maxScore = 0;
 
-  if (criteria.minWRI > 0) {
-    maxScore += 30;
-    if ((talent.wri || 0) >= criteria.minWRI) score += 30;
-  }
 
   if (criteria.requiredSkills?.length) {
     maxScore += 40;
@@ -612,15 +606,6 @@ function TalentPreviewCard({
               <MapPin size={11} className="text-white/30" />
               {talent.location}
             </span>
-            {talent.wri && (
-              <>
-                <span className="text-white/20">&#8226;</span>
-                <span className="flex items-center gap-1">
-                  <Star size={11} className="text-[#C6FF34]/60" />
-                  WRI {talent.wri}
-                </span>
-              </>
-            )}
             {talent.availability && (
               <>
                 <span className="text-white/20">&#8226;</span>
@@ -814,33 +799,6 @@ export default function Screening() {
                 </div>
 
                 <div className="space-y-5">
-                  {/* Minimum WRI Score - Slider */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className={labelBaseClass}>
-                        Minimum WRI Score
-                      </label>
-                      <span className="text-[#C6FF34] font-semibold text-sm min-w-[36px] text-right">
-                        {criteria.minWRI}
-                      </span>
-                    </div>
-                    <input
-                      type="range"
-                      min={50}
-                      max={100}
-                      value={criteria.minWRI}
-                      onChange={(e) =>
-                        updateField("minWRI", parseInt(e.target.value))
-                      }
-                      className="w-full h-2 bg-white/[0.1] rounded-full appearance-none cursor-pointer accent-[#C6FF34] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#C6FF34] [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(198,255,52,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#C6FF34] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                    />
-                    <div className="flex justify-between text-[10px] text-white/30 mt-1">
-                      <span>50</span>
-                      <span>75</span>
-                      <span>100</span>
-                    </div>
-                  </div>
-
                   {/* Required Skills */}
                   <div>
                     <label className={labelBaseClass}>Required Skills</label>
@@ -1268,12 +1226,6 @@ export default function Screening() {
                     Active Filters
                   </p>
                   <div className="space-y-2">
-                    {criteria.minWRI > 50 && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <Star size={12} className="text-[#C6FF34]" />
-                        <span className="text-white/50">WRI &ge; {criteria.minWRI}</span>
-                      </div>
-                    )}
                     {criteria.requiredSkills.length > 0 && (
                       <div className="flex items-center gap-2 text-xs">
                         <Code2 size={12} className="text-[#C6FF34]" />
@@ -1321,8 +1273,7 @@ export default function Screening() {
                         </span>
                       </div>
                     )}
-                    {!criteria.minWRI ===
-                      !criteria.requiredSkills.length &&
+                    {!criteria.requiredSkills.length &&
                       !criteria.experience &&
                       !criteria.location &&
                       !criteria.categories.length &&

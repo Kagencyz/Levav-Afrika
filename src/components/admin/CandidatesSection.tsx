@@ -35,12 +35,6 @@ const STATUS_STYLES: Record<string, string> = {
   completed: 'bg-[#7E3BED]/10 text-[#7E3BED] border-[#7E3BED]/20',
 };
 
-const WRI_COLOR = (score: number): string => {
-  if (score >= 70) return 'text-emerald-400';
-  if (score >= 50) return 'text-[#C6FF34]';
-  return 'text-amber-400';
-};
-
 const MOCK_CANDIDATES: CandidateRecord[] = [
   { id: '1', name: 'Amara Okafor', profession: 'Software Engineer', location: 'Lagos, Nigeria', wriScore: 78, levav28Day: 14, status: 'active', appliedJobs: 12 },
   { id: '2', name: 'Jean-Pierre Mulamba', profession: 'Data Analyst', location: 'Kinshasa, DRC', wriScore: 62, levav28Day: 8, status: 'onboarding', appliedJobs: 5 },
@@ -82,7 +76,6 @@ export default function CandidatesSection(): React.JSX.Element {
 
   const candidates = getCandidates();
   const totalCandidates = candidates.length || 385;
-  const wriAverage = 64;
   const levav28Active = 128;
   const readyToHire = 89;
 
@@ -97,7 +90,6 @@ export default function CandidatesSection(): React.JSX.Element {
 
   const kpiCards = [
     { label: 'Total Candidates', value: totalCandidates, icon: Users, accent: '#C6FF34' },
-    { label: 'WRI Average', value: wriAverage, icon: BarChart3, accent: '#7E3BED' },
     { label: 'Levav 28 Active', value: levav28Active, icon: Target, accent: '#C6FF34' },
     { label: 'Ready to Hire', value: readyToHire, icon: Briefcase, accent: '#7E3BED' },
   ];
@@ -196,7 +188,6 @@ export default function CandidatesSection(): React.JSX.Element {
                 <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">Name</th>
                 <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">Profession</th>
                 <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">Location</th>
-                <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">WRI Score</th>
                 <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">Levav 28</th>
                 <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">Status</th>
                 <th className="py-3 px-4 text-xs font-medium text-[#666666] uppercase tracking-wider">Applied</th>
@@ -206,7 +197,7 @@ export default function CandidatesSection(): React.JSX.Element {
             <tbody>
               {filteredCandidates.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-[#A0A0A0]">
+                  <td colSpan={7} className="py-12 text-center text-[#A0A0A0]">
                     No candidates found matching your filters.
                   </td>
                 </tr>
@@ -216,9 +207,6 @@ export default function CandidatesSection(): React.JSX.Element {
                     <td className="py-3 px-4 text-sm text-white font-medium">{c.name}</td>
                     <td className="py-3 px-4 text-sm text-[#A0A0A0]">{c.profession}</td>
                     <td className="py-3 px-4 text-sm text-[#A0A0A0]">{c.location}</td>
-                    <td className="py-3 px-4">
-                      <span className={`text-sm font-semibold ${WRI_COLOR(c.wriScore)}`}>{c.wriScore}</span>
-                    </td>
                     <td className="py-3 px-4 text-sm text-[#A0A0A0]">Day {c.levav28Day}</td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_STYLES[c.status] || STATUS_STYLES.active}`}>

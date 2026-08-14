@@ -13,7 +13,6 @@ export default defineConfig({
     options.alias = {
       '@db': path.resolve(__dirname, './db'),
       '@api': path.resolve(__dirname, './server'),
-      '@contracts': path.resolve(__dirname, './contracts'),
     };
   },
 });

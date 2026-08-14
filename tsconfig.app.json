@@ -10,8 +10,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@db/*": ["./db/*"],
-      "@api/*": ["./server/*"],
-      "@contracts/*": ["./contracts/*"]
+      "@api/*": ["./server/*"]
     },
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -26,4 +25,3 @@
   },
   "include": ["src", "api", "server", "db", "contracts"]
 }
-

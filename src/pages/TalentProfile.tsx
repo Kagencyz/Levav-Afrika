@@ -11,7 +11,6 @@ import {
   Briefcase,
   Bookmark,
   Heart,
-  Target,
   TrendingUp,
   Calendar,
   CheckCircle,
@@ -50,14 +49,6 @@ interface TalentProfile {
   bio: string;
   skills: string[];
   wri: number;
-  wriBreakdown?: {
-    technical: number;
-    communication: number;
-    reliability: number;
-    leadership: number;
-    creativity: number;
-    growth: number;
-  };
   portfolio?: Array<{ title: string; url?: string; desc?: string }>;
   reviews?: Array<{
     reviewer: string;
@@ -70,34 +61,6 @@ interface TalentProfile {
   profileCompletion?: number;
   avatar?: string | null;
 }
-
-/* ───────────────────── WRI Breakdown Helpers ───────────────────── */
-const DEFAULT_WRI_BREAKDOWN = {
-  technical: 82,
-  communication: 75,
-  reliability: 80,
-  leadership: 70,
-  creativity: 85,
-  growth: 76,
-};
-
-const WRI_COLORS: Record<string, string> = {
-  technical: "#C6FF34",
-  communication: "#7E3BED",
-  reliability: "#C6FF34",
-  leadership: "#7E3BED",
-  creativity: "#C6FF34",
-  growth: "#7E3BED",
-};
-
-const WRI_LABELS: Record<string, string> = {
-  technical: "Technical",
-  communication: "Communication",
-  reliability: "Reliability",
-  leadership: "Leadership",
-  creativity: "Creativity",
-  growth: "Growth",
-};
 
 /* ───────────────────── Mock Data (from TalentDirectory) ───────────────────── */
 const MOCK_TALENTS: TalentProfile[] = [
@@ -373,76 +336,6 @@ const tierConfig: Record<string, { color: string; bg: string; border: string }> 
   Silver: { color: "#A0A0A0", bg: "bg-white/10", border: "border-white/20", },
 };
 
-/* ───────────────────── Circular Gauge ───────────────────── */
-function CircularGauge({
-  value,
-  size = 140,
-  strokeWidth = 8,
-}: {
-  value: number;
-  size?: number;
-  strokeWidth?: number;
-}) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (value / 100) * circumference;
-
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth={strokeWidth}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#C6FF34"
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 1.5s ease" }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-white font-display text-3xl font-bold">{value}</span>
-        <span className="text-[#666666] text-[10px] uppercase tracking-wider">WRI</span>
-      </div>
-    </div>
-  );
-}
-
-/* ───────────────────── Progress Bar ───────────────────── */
-function ProgressBar({ label, score, color, index }: { label: string; score: number; color: string; index: number }) {
-  return (
-    <motion.div
-      className="flex items-center gap-3"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.3 + index * 0.1, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-    >
-      <span className="text-[#A0A0A0] text-xs w-28 flex-shrink-0 text-right">{label}</span>
-      <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ backgroundColor: color }}
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 1, delay: 0.5 + index * 0.1, ease: [0.19, 1, 0.22, 1] }}
-        />
-      </div>
-      <span className="text-white text-xs font-medium w-8 flex-shrink-0">{score}</span>
-    </motion.div>
-  );
-}
-
 /* ───────────────────── Card Component ───────────────────── */
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -577,8 +470,6 @@ export default function TalentProfile() {
   if (!talent) return <TalentNotFound />;
 
   const tierStyle = tierConfig[talent.tier] || tierConfig.Silver;
-  const wriBreakdown = talent.wriBreakdown || DEFAULT_WRI_BREAKDOWN;
-  const breakdownEntries = Object.entries(wriBreakdown);
   const avgRating = talent.reviews?.length
     ? (talent.reviews.reduce((s, r) => s + r.rating, 0) / talent.reviews.length).toFixed(1)
     : "0";
@@ -686,36 +577,6 @@ export default function TalentProfile() {
             initial="hidden"
             animate="visible"
           >
-            {/* ── WRI Score Section ── */}
-            <motion.div variants={fadeUp} custom={0}>
-              <Card>
-                <div className="flex items-center gap-2 mb-6">
-                  <Target className="w-4 h-4 text-[#C6FF34]" />
-                  <h2 className="text-white text-lg font-semibold">Workforce Readiness Index</h2>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center gap-8">
-                  {/* Circular Gauge */}
-                  <div className="flex-shrink-0">
-                    <CircularGauge value={talent.wri} size={140} strokeWidth={8} />
-                  </div>
-
-                  {/* Breakdown Bars */}
-                  <div className="flex-1 w-full space-y-3">
-                    {breakdownEntries.map(([key, score], i) => (
-                      <ProgressBar
-                        key={key}
-                        label={WRI_LABELS[key] || key}
-                        score={score}
-                        color={WRI_COLORS[key] || "#C6FF34"}
-                        index={i}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
             {/* ── About Section ── */}
             <motion.div variants={fadeUp} custom={1}>
               <Card>
@@ -909,11 +770,6 @@ export default function TalentProfile() {
             <Card>
               <h3 className="text-white font-semibold mb-4">Stats</h3>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[#666666] text-xs">WRI Score</span>
-                  <span className="text-[#C6FF34] text-sm font-semibold">{talent.wri}/100</span>
-                </div>
-                <div className="h-px bg-white/[0.06]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[#666666] text-xs">Tier</span>
                   <span

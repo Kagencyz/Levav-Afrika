@@ -2,8 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { isValidEmail, sanitizeInput, safeJSONSet } from '@/lib/safeJSON';
-import { awardWriPoints } from '@/lib/levavData';
-import { logWithCurrentUser } from '@/lib/auditService';
 import { useOwnTalentProfile } from '@/hooks/useOwnTalentProfile';
 import { toast } from 'sonner';
 import {
@@ -1205,11 +1203,12 @@ function SuccessState({
               <p className="text-white/50 text-sm">{formData.profession || 'Professional'}</p>
             </div>
           </div>
+          <div className="mb-4 rounded-xl border border-white/[0.06] p-4">
+            {/* TODO(WP-0004): resolve these through wri.confidence.none.* copy keys. */}
+            <p className="text-sm font-semibold text-white">No evidence yet</p>
+            <p className="mt-1 text-xs leading-relaxed text-white/50">You have not created evidence yet. Levav 28 Day 1 is the fastest way to start.</p>
+          </div>
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">WRI Score</p>
-              <p className="text-sm text-[#C6FF34] font-semibold">{Math.round((formData.confidenceLevel || 5) * 10)}/100</p>
-            </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Experience</p>
               <p className="text-sm text-white font-medium">{formData.yearsOfExperience || 'N/A'} years</p>
@@ -1456,8 +1455,6 @@ export default function Onboarding() {
         location: sanitizeInput(`${formData.city}${formData.city && formData.country ? ', ' : ''}${formData.country}`),
       });
 
-      logWithCurrentUser('profile_update', 'Onboarding Complete', 'success', 'Completed Levav onboarding');
-      awardWriPoints('profile-complete');
       setIsComplete(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {

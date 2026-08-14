@@ -34,7 +34,6 @@ import {
   getSeedCommentOverrides,
   getFollowing,
   toggleFollow,
-  awardWriPoints,
 } from '@/lib/levavData';
 import type { FeedPost, FeedComment, FeedMood } from '@/lib/levavData';
 import { useAuth } from '@/hooks/useAuth';
@@ -289,7 +288,6 @@ export default function Feed() {
       moodIcon: postMood,
       tag: postTag,
     });
-    awardWriPoints('feed-first-post');
     setPostBody('');
     setPostMood(undefined);
     setPostTag(undefined);

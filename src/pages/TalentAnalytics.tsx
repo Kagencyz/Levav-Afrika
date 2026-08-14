@@ -328,7 +328,6 @@ export default function TalentAnalytics() {
     profileViews: '156 this month',
     applicationSuccessRate: '62%',
     responseRate: '84%',
-    wriTrend: '+3 this month',
   });
 
   // Load from localStorage on mount
@@ -376,15 +375,6 @@ export default function TalentAnalytics() {
       color: '#3B82F6',
       trend: 'up' as const,
       trendLabel: '+5%',
-    },
-    {
-      title: 'WRI Trend',
-      value: kpiData.wriTrend,
-      subtitle: 'Workforce Readiness Index',
-      icon: Zap,
-      color: '#F59E0B',
-      trend: 'up' as const,
-      trendLabel: 'Improving',
     },
   ];
 
@@ -446,7 +436,7 @@ export default function TalentAnalytics() {
 
         {/* KPI Cards */}
         <motion.div
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
           variants={staggerContainer}
           initial="hidden"
           animate="visible"

@@ -740,12 +740,6 @@ export default function Settings() {
         <div className="space-y-4">
           {[
             {
-              key: 'showWriScore' as const,
-              label: 'Show WRI score',
-              desc: 'Display your Workforce Readiness Index on your profile',
-              icon: Eye,
-            },
-            {
               key: 'showRate' as const,
               label: 'Show rate',
               desc: 'Display your rate on your profile',

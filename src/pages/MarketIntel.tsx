@@ -51,7 +51,6 @@ interface DemandCell {
   region: string;
   level: 'High' | 'Medium' | 'Low';
 }
-
 const DEMAND_DATA: DemandCell[] = [
   { role: 'Frontend Developer', region: 'West Africa', level: 'High' },
   { role: 'Frontend Developer', region: 'East Africa', level: 'High' },
@@ -73,17 +72,8 @@ const DEMAND_DATA: DemandCell[] = [
   { role: 'Mobile Developer', region: 'Southern Africa', level: 'Medium' },
 ];
 
-// ─── WRI Distribution Data ───────────────────────────────
-const WRI_DISTRIBUTION = [
-  { range: '50-60', percentage: 5, count: 245, color: '#ef4444' },
-  { range: '60-70', percentage: 15, count: 735, color: '#f59e0b' },
-  { range: '70-80', percentage: 35, count: 1715, color: '#C6FF34' },
-  { range: '80-90', percentage: 30, count: 1470, color: '#7E3BED' },
-  { range: '90-100', percentage: 15, count: 735, color: '#10b981' },
-];
-
 // ─── Talent saved in localStorage ────────────────────────
-function getLocalTalent(): Array<{ wriScore?: number; role?: string; country?: string }> {
+function getLocalTalent(): Array<{ role?: string; country?: string }> {
   try {
     const data = JSON.parse(localStorage.getItem('talent_profiles') || '[]');
     return Array.isArray(data) ? data : [];
@@ -120,7 +110,6 @@ export default function MarketIntel() {
       <SalaryComparisonSection />
       <DemandHeatmapSection />
       <CostComparisonSection />
-      <WRIDistributionSection />
     </div>
   );
 }
@@ -645,179 +634,6 @@ function CostComparisonSection() {
                 <span className="text-white text-sm font-bold">${(result.totalCost * 12).toLocaleString()}/year</span>
               </div>
             </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════
-// SECTION 4: WRI DISTRIBUTION
-// ═══════════════════════════════════════════════════════════
-
-function WRIDistributionSection() {
-  const localTalent = getLocalTalent();
-  const localWRIs = localTalent
-    .map((t) => t.wriScore)
-    .filter((s): s is number => typeof s === 'number');
-
-  // Merge local data into distribution
-  const mergedDistribution = useMemo(() => {
-    const dist = WRI_DISTRIBUTION.map((d) => ({ ...d }));
-
-    localWRIs.forEach((score) => {
-      if (score >= 90) dist[4].count += 1;
-      else if (score >= 80) dist[3].count += 1;
-      else if (score >= 70) dist[2].count += 1;
-      else if (score >= 60) dist[1].count += 1;
-      else dist[0].count += 1;
-    });
-
-    // Recalculate percentages
-    const total = dist.reduce((sum, d) => sum + d.count, 0);
-    dist.forEach((d) => {
-      d.percentage = total > 0 ? Math.round((d.count / total) * 100) : 0;
-    });
-
-    return dist;
-  }, [localWRIs.length]);
-
-  const maxCount = Math.max(...mergedDistribution.map((d) => d.count));
-
-  return (
-    <section className="py-20 bg-black">
-      <div className="max-w-6xl mx-auto px-6">
-        <motion.div
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-        >
-          <span className="text-[#7E3BED] text-xs font-medium tracking-widest uppercase">Workforce Readiness</span>
-          <h2 className="font-display text-3xl sm:text-4xl text-white mt-2">
-            WRI Score Distribution
-          </h2>
-          <p className="text-white/50 text-sm mt-2 max-w-lg">
-            How talent scores are distributed across the Workforce Readiness Index. Higher scores indicate stronger readiness for remote work.
-          </p>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Histogram */}
-          <motion.div
-            className="lg:col-span-2 glass rounded-2xl p-6 sm:p-8"
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          >
-            <div className="flex items-end justify-between gap-3 h-64">
-              {mergedDistribution.map((bucket, i) => {
-                const heightPercent = maxCount > 0 ? (bucket.count / maxCount) * 100 : 0;
-
-                return (
-                  <div key={bucket.range} className="flex-1 flex flex-col items-center gap-3">
-                    {/* Tooltip-like info */}
-                    <div className="text-center">
-                      <span className="text-white text-sm font-bold">{bucket.percentage}%</span>
-                      <p className="text-white/30 text-[10px]">{bucket.count.toLocaleString()} talents</p>
-                    </div>
-
-                    {/* Bar */}
-                    <div className="w-full bg-white/[0.03] rounded-t-xl overflow-hidden relative" style={{ height: '180px' }}>
-                      <motion.div
-                        className="absolute bottom-0 left-0 right-0 rounded-t-xl"
-                        style={{ backgroundColor: bucket.color }}
-                        initial={{ height: 0 }}
-                        whileInView={{ height: `${heightPercent}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: i * 0.1, ease: [0.19, 1, 0.22, 1] }}
-                      />
-                    </div>
-
-                    {/* Label */}
-                    <span className="text-white/50 text-xs font-medium">{bucket.range}</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center justify-center gap-6 mt-6 pt-5 border-t border-white/[0.06]">
-              {mergedDistribution.map((bucket) => (
-                <div key={bucket.range} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: bucket.color }} />
-                  <span className="text-white/40 text-[10px]">{bucket.range}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Stats sidebar */}
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="glass rounded-xl p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-[#C6FF34]/10 flex items-center justify-center">
-                  <Users className="w-4 h-4 text-[#C6FF34]" />
-                </div>
-                <div>
-                  <p className="text-white/40 text-xs">Total Talent Pool</p>
-                  <p className="text-white text-xl font-bold">
-                    {mergedDistribution.reduce((s, d) => s + d.count, 0).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass rounded-xl p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-[#7E3BED]/10 flex items-center justify-center">
-                  <Activity className="w-4 h-4 text-[#7E3BED]" />
-                </div>
-                <div>
-                  <p className="text-white/40 text-xs">Average WRI Score</p>
-                  <p className="text-white text-xl font-bold">76.4</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass rounded-xl p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-white/40 text-xs">Top 10% (90+ WRI)</p>
-                  <p className="text-white text-xl font-bold">
-                    {mergedDistribution[4].count.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass rounded-xl p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-yellow-400" />
-                </div>
-                <div>
-                  <p className="text-white/40 text-xs">WRI 80+ command premium</p>
-                  <p className="text-[#C6FF34] text-xl font-bold">+35%</p>
-                </div>
-              </div>
-              <p className="text-white/30 text-xs mt-2">
-                Talent with WRI scores above 80 earn on average 35% more than those below.
-              </p>
-            </div>
-
-            {localWRIs.length > 0 && (
-              <div className="glass rounded-xl p-5 border-[#C6FF34]/20">
-                <p className="text-white/50 text-xs mb-2">From your saved talent</p>
-                <p className="text-white text-lg font-bold">{localWRIs.length} profiles</p>
-                <p className="text-white/30 text-xs">
-                  Avg WRI: {(localWRIs.reduce((a, b) => a + b, 0) / localWRIs.length).toFixed(1)}
-                </p>
-              </div>
-            )}
           </motion.div>
         </div>
       </div>

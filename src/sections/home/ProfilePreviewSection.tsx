@@ -12,21 +12,14 @@ import {
 } from 'lucide-react';
 
 /* ╔═══════════════════════════════════════════════════════════════╗
-   ║  PROFILE PREVIEW — Levav ID™, WRI™, work evidence, CV         ║
+   ║  PROFILE PREVIEW — Levav ID™, work evidence, CV               ║
    ║  + employer section + trust signals. Upgrade brief §2.2.      ║
    ╚═══════════════════════════════════════════════════════════════╝ */
 
-const wriDimensions = [
-  { label: 'Technical', value: 78 },
-  { label: 'Reliability', value: 84 },
-  { label: 'Communication', value: 71 },
-  { label: 'Leadership', value: 62 },
-];
-
 const evidence = [
   'Levav 28™ · Day 28 capstone project',
-  'QuickWork™ · 12 gigs completed, 4.9★',
-  'Levav Impact™ · 40 verified service hours',
+  'QuickWork™ · Completed work',
+  'Levav Impact™ · Service contribution',
 ];
 
 const trustSignals = [
@@ -59,8 +52,8 @@ export default function ProfilePreviewSection() {
             </h2>
             <p className="text-base sm:text-lg text-white/60 leading-relaxed mb-6 font-body">
               Keep your traditional CV — and grow beyond it. Your Levav ID&trade;
-              is a living professional record: your WRI&trade; measures readiness,
-              and your work evidence shows what you can actually do.
+              is intended to become a living professional record where work evidence
+              shows what you can actually do.
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-start gap-3 text-sm text-white/70">
@@ -103,31 +96,6 @@ export default function ProfilePreviewSection() {
                 </div>
                 <span className="text-xs text-white/45">Software Developer · Lusaka, Zambia</span>
               </div>
-              <div className="ml-auto text-center shrink-0">
-                <div className="text-2xl font-bold text-[#C6FF34] font-display leading-none">74</div>
-                <div className="text-[9px] uppercase tracking-wider text-white/40 mt-1">WRI&trade;</div>
-              </div>
-            </div>
-
-            <div className="space-y-2.5 mb-6">
-              {wriDimensions.map((dim, i) => (
-                <div key={dim.label} className="flex items-center gap-3">
-                  <span className="text-[10px] uppercase tracking-wider text-white/40 w-24 shrink-0">
-                    {dim.label}
-                  </span>
-                  <div className="flex-1 h-1.5 rounded-full bg-white/[0.07] overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-[#C6FF34] to-[#7E3BED]"
-                      initial={{ width: '0%' }}
-                      animate={isInView ? { width: `${dim.value}%` } : {}}
-                      transition={{ duration: 1, delay: 0.4 + i * 0.12 }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-white/70 w-7 text-right shrink-0">
-                    {dim.value}
-                  </span>
-                </div>
-              ))}
             </div>
 
             <div className="border-t border-white/[0.06] pt-4">
@@ -157,7 +125,7 @@ export default function ProfilePreviewSection() {
             For employers and <span className="text-[#7E3BED]">organisations</span>
           </h3>
           <p className="text-sm sm:text-base text-white/60 max-w-2xl mx-auto leading-relaxed mb-6 font-body">
-            Hire from evidence, post verified QuickWork&trade; gigs, or publish
+            Hire from evidence, post verified QuickWork&trade; projects, or publish
             volunteer opportunities — with pipelines, teams, and analytics built in.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

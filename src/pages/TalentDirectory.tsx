@@ -311,15 +311,10 @@ function TalentCard({
             ))}
           </div>
 
-          {/* Rate & WRI */}
+          {/* Rate */}
           <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
             {talent.rate && (
               <RateDisplay rate={talent.rate} showConverted />
-            )}
-            {talent.wri && (
-              <span className="text-[#666666] text-xs bg-white/5 rounded-lg px-2 py-1">
-                WRI: <span className="text-[#C6FF34] font-medium">{talent.wri}</span>
-              </span>
             )}
           </div>
         </div>
