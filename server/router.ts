@@ -6,12 +6,14 @@ import { talentRouter } from './routes/talent.js';
 import { onboardingRouter } from './routes/onboarding.js';
 import { dashboardRouter } from './routes/dashboard.js';
 import { organizationRouter } from './routes/organization.js';
+import { taxonomyRouter } from './routes/taxonomy.js';
 
 export const appRouter = router({
   auth: authRouter,
   dashboard: dashboardRouter,
   onboarding: onboardingRouter,
   organization: organizationRouter,
+  taxonomy: taxonomyRouter,
   talent: router({
     createOwnProfile: talentRouter.create,
     updateOwnProfile: talentRouter.update,
