@@ -10,7 +10,41 @@ This register exists because a defect list relayed through chat did not survive 
 
 ## Open defects
 
-**None.**
+### WP-0102 — reviewed 2026-08-15 — DEFECTS_FOUND (2)
+
+Reviewed at commit `be24ee3` on `agent/wp-0102-intelligent-onboarding`. **Codex has no token budget**, so this verdict is filed ahead of resumption — no review cycle is lost.
+
+Fourteen of sixteen criteria pass. The packet is close.
+
+#### D-0102-1 — S2 — a migrated member is never asked to confirm their reassigned situation
+
+**Requirements:** ONB-001, A1-14, PDR-0014 §1 · **Files:** `server/routes/onboarding.ts`, `src/pages/Welcome.tsx`
+
+Migration 0007 correctly remaps the retired enum values and sets `situation_inferred = true`. `loadOwnRecord` returns the flag to the client. **Nothing reads it.** No surface tells the member their answer was rewritten, and no path clears the flag except setting a situation from scratch.
+
+The result is exactly what ONB-001 forbids: someone who answered `volunteering` is now recorded as `not_working`, is never told, and is never asked. PDR-0014 §1 states migrated members are asked to confirm on next sign-in.
+
+**Fix:** surface the prompt using the approved copy in `COPY_DICTIONARY_S17_AUTH_WELCOME.md` §17.12. Confirming clears `situation_inferred` and sets `situation_confirmed_at`. Choosing differently writes the new value. Until confirmed the value stays inferred and no consumer may treat it as declared.
+
+**Note on scope.** A1-14 also required inferred values be excluded from ordering. Ordering is WP-0105 and does not exist yet, so there is nothing to exclude from — that half is not a defect today, but WP-0105 must honour it.
+
+#### D-0102-2 — S3 — situation and posture events carry no category
+
+**Requirements:** A1-16, capability model §13 · **File:** `server/routes/onboarding.ts:147-148`
+
+`onboarding.situation.set` and `onboarding.posture.set` fire with no payload. The model's §13 table specifies the situation and posture **value** — a fixed category, not free text — and without it the events cannot answer which situations members actually report, which is the product signal they exist for.
+
+**My ambiguity, not Codex's error:** §13's header says "no values in payloads" while its table asks for the category. Codex resolved that toward privacy, which was the safer reading. Clarified: **fixed enum categories are permitted; free text and identifiers are not.**
+
+**Fix:** emit the category on both events. Nothing else changes.
+
+---
+
+## Verified passing
+
+Migration reversible with a genuine down-path reconstructing `personal_status` · all career columns nullable · three separate columns, **no role column on `users`** · `gig` absent · every acceptance test asserts rather than describes — hire grants nothing, no employer read path for posture, own-title persisted byte-identically, cross-family and inactive roles rejected, another user's id never accepted · non-English title `'  Umphathi Wezimali  '` preserved with whitespace intact · **typecheck baseline shrank 136 → 132** · 79 tests / 13 files · build exit 0 · bundle down 28 kB.
+
+**Verified live at 360 px:** `/welcome` renders the approved §16 copy — "Welcome to Levav", "Step 1 of 3", all nine intent labels — with no horizontal overflow and no prohibited vocabulary.
 
 ---
 
