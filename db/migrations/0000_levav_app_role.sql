@@ -21,15 +21,40 @@ begin
 end
 $$;
 
--- Re-asserted unconditionally every time this migration runs, even if
--- the role already existed with different attributes. No PASSWORD
--- clause here either — omitting it never touches whatever password (or
--- lack of one) is already set.
-alter role levav_app
-  with login
-  noinherit
-  nocreatedb
-  nocreaterole
-  nosuperuser
-  noreplication
-  nobypassrls;
+-- Re-asserted every time this migration runs, in case the role already
+-- existed with different attributes. No PASSWORD clause here either —
+-- omitting it never touches whatever password (or lack of one) is set.
+--
+-- Two deliberate differences from the CREATE above (defect F-08):
+--
+-- 1. NOSUPERUSER is omitted. On PostgreSQL 17, ALTER ROLE ... NOSUPERUSER
+--    is rejected unless the caller is itself a superuser — even when the
+--    target role already lacks the attribute and the statement would be a
+--    no-op. Supabase applies migrations as `postgres`, which is not a
+--    superuser, so including it failed the whole migration. The CREATE
+--    above already sets NOSUPERUSER, and nothing in this project ever
+--    grants it, so re-asserting it bought nothing and cost everything.
+--
+-- 2. The statement is wrapped so insufficient privilege is survivable.
+--    A managed platform may restrict ALTER ROLE further in future; if it
+--    does, the role still exists with the attributes CREATE gave it, and
+--    a schema rebuild must not fail over an attribute re-assertion.
+--
+-- Before this fix a fresh database could not be built from these
+-- migrations at all: 0000 is atomic, so the failed ALTER rolled back the
+-- CREATE and levav_app was never created. Verified against a clean
+-- PostgreSQL 17 instance.
+do $$
+begin
+  alter role levav_app
+    with login
+    noinherit
+    nocreatedb
+    nocreaterole
+    noreplication
+    nobypassrls;
+exception
+  when insufficient_privilege then
+    raise notice 'levav_app attributes left unchanged: insufficient privilege to alter role';
+end
+$$;
