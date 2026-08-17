@@ -24,6 +24,7 @@ An approved PDR is authority level 2 — it amends the Master PRD. Anything not 
 | PDR-0014 | Four-axis onboarding model; capabilities are derived, never declared | APPROVED | 2026-08-12 |
 | PDR-0015 | Impact evidence threshold — hours alone never count | APPROVED | 2026-08-14 |
 | PDR-0016 | Understand the person; preserve their own words | APPROVED | 2026-08-14 |
+| PDR-0017 | Claude may implement when Engineering capacity is unavailable, under review | APPROVED | 2026-08-15 |
 
 ---
 
@@ -297,6 +298,23 @@ This supersedes the shorter sequence in `COPY_DICTIONARY.md` §5. Sprint 5 adds 
 Levav must not describe an arrangement as escrow or protected funds unless the payment partner legally and technically provides it. Calling a delayed transfer "escrow" claims a legal protection the user does not have — an unsupported claim under Language System §2.3, and a more consequential one than most, because people rely on it when deciding to do work before being paid.
 
 **Levav should avoid becoming custodian of customer funds** where a licensed partner can hold them instead.
+
+## PDR-0017 — Claude may implement when Engineering capacity is unavailable
+
+**State:** APPROVED by the product owner, 2026-08-15 · **Amends:** Master PRD §41 · **Requirements:** §40.3, §42.3, CODEX-006
+
+**Context.** Codex has exhausted its token budget twice. On the second occasion three fixes were blocked — two WP-0102 defects and the F-08 migration defect — with no capacity to apply them and no other implementer.
+
+**Decision.** Claude may write production code **only** under all four conditions:
+
+1. **Engineering capacity is genuinely unavailable.** Not "slow", not "busy".
+2. **The change is narrowly scoped and already specified** — a defect Claude has already recorded, with the fix stated. Never new feature work, never a design decision made while implementing.
+3. **Claude does not accept its own work.** Anything Claude writes returns `READY_FOR_REVIEW` and is reviewed by Codex before merge. Claude may never issue `ACCEPTED` on a packet it implemented.
+4. **It is disclosed in the commit**, so history shows who wrote what.
+
+**Why the third condition is the whole decision.** The dual-agent split exists because one agent owning both meaning and implementation reviews its own work, which is not review. Everything the arrangement has caught — the fabricated WRI on the landing page, eight unreachable routers, two divergent copy keys, and Claude's own wrong-artifact acceptance of WP-0002 — came from separation. That separation is suspended for authorship here, **not for acceptance.** Work Claude writes waits for Codex.
+
+**Standing preference, unchanged.** Codex implements. This is a fallback for capacity outages, not a new normal, and it lapses the moment Engineering has budget.
 
 ## PDR-0015 — Impact evidence threshold: hours alone never count
 
