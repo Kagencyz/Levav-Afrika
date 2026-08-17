@@ -13,6 +13,7 @@ const ALLOWED_PROCEDURES = [
   'onboarding.saveCareerDraft',
   'onboarding.confirmCareer',
   'onboarding.skipCareer',
+  'onboarding.confirmSituation',
   'onboarding.get',
   'organization.listMine',
   'organization.register',

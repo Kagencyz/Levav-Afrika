@@ -413,4 +413,8 @@ export const enZM = {
   "global.offline.banner": "You are offline. Levav will save what you do and sync it when you reconnect.",
   "auth.throttle.message": "Too many sign-in attempts. For your security, wait {seconds} seconds before trying again.",
   "auth.throttle.action": "Wait {seconds}s",
+  "onboarding.situation.inferred.title": "Check how Levav describes your situation",
+  "onboarding.situation.inferred.body": "We changed the options for describing work situations. Your previous answer no longer has an exact match, so Levav has put you down as \"{situation}\". Nothing uses this until you confirm it.",
+  "onboarding.situation.inferred.confirm": "That is right",
+  "onboarding.situation.inferred.change": "Choose a different one",
 } as const;

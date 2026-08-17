@@ -170,4 +170,62 @@ describe('intelligent onboarding', () => {
       userId: userB.userId,
     })).rejects.toMatchObject({ code: 'BAD_REQUEST' });
   });
+
+  // D-0102-1. A member whose situation was remapped by migration 0007 must be
+  // asked before Levav treats the remap as their answer (ONB-001).
+  it('clears the inferred flag when a migrated member confirms the remapped situation', async () => {
+    mocks.select.mockReturnValueOnce(selectResult([{
+      userId: userA.userId, employmentSituation: 'not_working', situationInferred: true,
+    }]));
+    const set = vi.fn((_input: Record<string, unknown>) => ({
+      where: () => ({ returning: vi.fn().mockResolvedValue([{ userId: userA.userId }]) }),
+    }));
+    mocks.update.mockReturnValueOnce({ set });
+
+    await caller().confirmSituation({});
+
+    const written = set.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(written.situationInferred).toBe(false);
+    expect(written.situationConfirmedAt).toBeInstanceOf(Date);
+    // Confirming keeps the remapped value — it does not silently rewrite it again.
+    expect(written).not.toHaveProperty('employmentSituation');
+  });
+
+  it('replaces the situation when the migrated member chooses a different one', async () => {
+    mocks.select.mockReturnValueOnce(selectResult([{
+      userId: userA.userId, employmentSituation: 'not_working', situationInferred: true,
+    }]));
+    const set = vi.fn((_input: Record<string, unknown>) => ({
+      where: () => ({ returning: vi.fn().mockResolvedValue([{ userId: userA.userId }]) }),
+    }));
+    mocks.update.mockReturnValueOnce({ set });
+
+    await caller().confirmSituation({ employmentSituation: 'career_break' });
+
+    const written = set.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(written.employmentSituation).toBe('career_break');
+    expect(written.situationInferred).toBe(false);
+  });
+
+  it('rejects confirmation when the member has no onboarding record', async () => {
+    mocks.select.mockReturnValueOnce(selectResult([]));
+    await expect(caller().confirmSituation({})).rejects.toThrow();
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
+  it('emits the situation and posture category so the events are answerable', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    mocks.select.mockReturnValueOnce(selectResult([]));
+    mockInsert({ userId: userA.userId });
+
+    await caller().complete({
+      intentions: ['develop'], employmentSituation: 'employed', opportunityPosture: 'not_seeking',
+    });
+
+    const emitted = info.mock.calls.map((call) => String(call[0]));
+    expect(emitted.some((line) => line.includes('onboarding.situation.set') && line.includes('employed'))).toBe(true);
+    expect(emitted.some((line) => line.includes('onboarding.posture.set') && line.includes('not_seeking'))).toBe(true);
+    // Categories only — never a free-text value or an identifier.
+    expect(emitted.every((line) => !line.includes(userA.userId))).toBe(true);
+  });
 });

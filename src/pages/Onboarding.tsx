@@ -60,6 +60,10 @@ export default function Onboarding() {
   const saveDraft = trpc.onboarding.saveCareerDraft.useMutation();
   const confirmCareer = trpc.onboarding.confirmCareer.useMutation();
   const skipCareer = trpc.onboarding.skipCareer.useMutation();
+  const confirmSituation = trpc.onboarding.confirmSituation.useMutation({
+    onSuccess: () => { void record.refetch(); },
+    onError: () => toast.error(t('global.error.generic.body')),
+  });
   const roles = trpc.taxonomy.listRoles.useQuery(
     { familyId: draft.familyId ?? EMPTY_UUID },
     { enabled: Boolean(draft.familyId) },
@@ -126,6 +130,21 @@ export default function Onboarding() {
   }
   if (record.isError || families.isError || industries.isError) {
     return <StateMessage title={t('global.error.generic.title')} body={t('global.error.generic.body')} />;
+  }
+
+  // D-0102-1. Migration 0007 remapped the situations PDR-0014 retired. ONB-001
+  // forbids silent reclassification, so the member is asked before Levav treats
+  // the remap as their answer. This gates the career step because it is the first
+  // authenticated surface they reach, and the value stays inert until answered.
+  if (record.data?.situationInferred && record.data.employmentSituation) {
+    return (
+      <SituationConfirmation
+        situation={record.data.employmentSituation}
+        pending={confirmSituation.isPending}
+        onConfirm={() => confirmSituation.mutate({})}
+        onChange={(next) => confirmSituation.mutate({ employmentSituation: next })}
+      />
+    );
   }
 
   return (
@@ -230,6 +249,88 @@ function Field({ label, help, children }: { label: string; help?: string; childr
 function Summary({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return <div><dt className="text-xs text-white/45">{label}</dt><dd className="mt-1 text-sm text-white">{value}</dd></div>;
+}
+
+const SITUATION_LABELS = {
+  employed: 'situation.employed',
+  self_employed: 'situation.self_employed',
+  running_organisation: 'situation.running_organisation',
+  freelancing: 'situation.freelancing',
+  studying: 'situation.studying',
+  not_working: 'situation.not_working',
+  career_break: 'situation.career_break',
+} as const;
+
+type SituationSlug = keyof typeof SITUATION_LABELS;
+
+/**
+ * D-0102-1. Shown only to members whose employment situation was remapped by
+ * migration 0007. Confirming clears `situation_inferred`; choosing a different
+ * option replaces the value. Either way the member has answered, which is what
+ * ONB-001 requires before Levav treats a remap as a declaration.
+ */
+function SituationConfirmation({
+  situation,
+  pending,
+  onConfirm,
+  onChange,
+}: {
+  situation: SituationSlug;
+  pending: boolean;
+  onConfirm: () => void;
+  onChange: (next: SituationSlug) => void;
+}) {
+  const [choice, setChoice] = useState<SituationSlug>(situation);
+  const [changing, setChanging] = useState(false);
+
+  return (
+    <main className="min-h-[calc(100dvh-72px)] px-4 py-8 pb-24 md:pb-12">
+      <div className="mx-auto w-full max-w-2xl">
+        <GlassCard className="p-4 sm:p-8" hover={false}>
+          <h1 className="font-display text-2xl font-bold text-white">
+            {t('onboarding.situation.inferred.title')}
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-white/60">
+            {t('onboarding.situation.inferred.body', { situation: t(SITUATION_LABELS[situation]) })}
+          </p>
+
+          {changing && (
+            <div className="mt-6">
+              <label className="mb-2 block text-xs uppercase tracking-wider text-white/50" htmlFor="situation-choice">
+                {t('onboarding.situation.title')}
+              </label>
+              <select
+                id="situation-choice"
+                value={choice}
+                onChange={(event) => setChoice(event.target.value as SituationSlug)}
+              >
+                {(Object.keys(SITUATION_LABELS) as SituationSlug[]).map((slug) => (
+                  <option key={slug} value={slug}>{t(SITUATION_LABELS[slug])}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {changing ? (
+              <button type="button" disabled={pending} onClick={() => onChange(choice)}>
+                {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : t('global.action.save')}
+              </button>
+            ) : (
+              <>
+                <button type="button" disabled={pending} onClick={onConfirm}>
+                  {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : t('onboarding.situation.inferred.confirm')}
+                </button>
+                <button type="button" disabled={pending} onClick={() => setChanging(true)}>
+                  {t('onboarding.situation.inferred.change')}
+                </button>
+              </>
+            )}
+          </div>
+        </GlassCard>
+      </div>
+    </main>
+  );
 }
 
 function StateMessage({ title, body }: { title: string; body?: string }) {

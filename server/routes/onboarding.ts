@@ -144,8 +144,14 @@ export const onboardingRouter = router({
         count: intentions.length,
         multiple: intentions.length > 1,
       });
-      if (input.employmentSituation) emitOnboardingEvent('onboarding.situation.set');
-      if (input.opportunityPosture) emitOnboardingEvent('onboarding.posture.set');
+      // The category is a fixed enum value, not free text or an identifier, so it
+      // carries no personal data and is what makes these events answerable (D-0102-2).
+      if (input.employmentSituation) {
+        emitOnboardingEvent('onboarding.situation.set', { situation: input.employmentSituation });
+      }
+      if (input.opportunityPosture) {
+        emitOnboardingEvent('onboarding.posture.set', { posture: input.opportunityPosture });
+      }
       emitOnboardingEvent('onboarding.step.completed', { step: 'preferences' });
       return result;
     }),
@@ -216,6 +222,36 @@ export const onboardingRouter = router({
     });
     return result;
   }),
+
+  // D-0102-1. Migration 0007 remapped the employment situations PDR-0014 retired and
+  // flagged every remapped row situation_inferred = true. ONB-001 forbids silent
+  // reclassification, so the member is asked before Levav treats the remap as their
+  // answer. Confirming clears the flag; supplying a different situation replaces it.
+  // Until one of those happens the value stays inferred and no consumer may read it
+  // as declared.
+  confirmSituation: authedProcedure
+    .input(z.object({ employmentSituation: z.enum(SITUATION_SLUGS).optional() }).strict())
+    .mutation(async ({ ctx, input }) => {
+      const existing = await loadOwnRecord(ctx.user.userId);
+      if (!existing) throw new TRPCError({ code: 'NOT_FOUND', message: 'No onboarding record.' });
+
+      const now = new Date();
+      const result = (await db
+        .update(userOnboarding)
+        .set({
+          ...(input.employmentSituation ? { employmentSituation: input.employmentSituation } : {}),
+          situationInferred: false,
+          situationConfirmedAt: now,
+          updatedAt: now,
+        })
+        .where(eq(userOnboarding.userId, ctx.user.userId))
+        .returning())[0];
+
+      emitOnboardingEvent('onboarding.situation.confirmed', {
+        changed: Boolean(input.employmentSituation),
+      });
+      return result;
+    }),
 
   get: authedProcedure.input(z.void()).query(({ ctx }) => loadOwnRecord(ctx.user.userId)),
 });
