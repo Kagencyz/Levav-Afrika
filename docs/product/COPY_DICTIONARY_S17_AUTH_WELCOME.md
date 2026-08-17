@@ -185,18 +185,3 @@ The three shipped strings collapse to **two keys**. `Too many attempts. Please w
 **Why the wording changed.** "Too many attempts" alone reads as an accusation aimed at the person, when the actual cause is usually a mistyped password. Naming the reason — *for your security* — turns a rebuke into an explanation, and the throttle is a protection for the account holder, so it should read like one.
 
 **The security behaviour does not change.** This is a copy substitution only. Throttle timing, counters and lockout logic stay exactly as they are.
-
-## 17.12 Onboarding — confirming a migrated situation
-
-**Approved 2026-08-15**, for defect D-0102-1. PDR-0014 retired `volunteering` and `changing_careers` as employment situations and merged `returning_to_work` into `career_break`. Migration 0007 remaps existing rows and flags them `situation_inferred = true`.
-
-ONB-001 forbids silent reclassification, so a member whose answer was rewritten must be **told and asked**, not quietly reassigned. These strings are that prompt.
-
-| Key | Value |
-|---|---|
-| `onboarding.situation.inferred.title` | Check how Levav describes your situation |
-| `onboarding.situation.inferred.body` | We changed the options for describing work situations. Your previous answer no longer has an exact match, so Levav has put you down as "{situation}". Nothing uses this until you confirm it. |
-| `onboarding.situation.inferred.confirm` | That is right |
-| `onboarding.situation.inferred.change` | Choose a different one |
-
-The body states three things deliberately: that Levav changed something, what it assumed on the member's behalf, and that the assumption is inert until confirmed. Dropping any one of them turns an honest prompt back into a silent reclassification with a dialog attached.

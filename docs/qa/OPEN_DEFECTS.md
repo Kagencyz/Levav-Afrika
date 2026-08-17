@@ -24,7 +24,18 @@ Migration 0007 correctly remaps the retired enum values and sets `situation_infe
 
 The result is exactly what ONB-001 forbids: someone who answered `volunteering` is now recorded as `not_working`, is never told, and is never asked. PDR-0014 §1 states migrated members are asked to confirm on next sign-in.
 
-**Fix:** surface the prompt using the approved copy in `COPY_DICTIONARY_S17_AUTH_WELCOME.md` §17.12. Confirming clears `situation_inferred` and sets `situation_confirmed_at`. Choosing differently writes the new value. Until confirmed the value stays inferred and no consumer may treat it as declared.
+**Approved copy — held here, not in the dictionary.** These four strings are approved and final, but they are deliberately **not** in `COPY_DICTIONARY_S17_AUTH_WELCOME.md` yet. The copy module's byte-identity test guards the seeded scope, so adding dictionary keys ahead of their implementation turns two accepted packets red. They move into §17 as part of fixing this defect.
+
+| Key | Value |
+|---|---|
+| `onboarding.situation.inferred.title` | Check how Levav describes your situation |
+| `onboarding.situation.inferred.body` | We changed the options for describing work situations. Your previous answer no longer has an exact match, so Levav has put you down as "{situation}". Nothing uses this until you confirm it. |
+| `onboarding.situation.inferred.confirm` | That is right |
+| `onboarding.situation.inferred.change` | Choose a different one |
+
+The body says three things deliberately: that Levav changed something, what it assumed on the member's behalf, and that the assumption is inert until confirmed. Drop any one and it becomes a silent reassignment with a dialog attached.
+
+**Fix:** add these four keys to §17, seed them, and surface the prompt. Confirming clears `situation_inferred` and sets `situation_confirmed_at`. Choosing differently writes the new value. Until confirmed the value stays inferred and no consumer may treat it as declared.
 
 **Note on scope.** A1-14 also required inferred values be excluded from ordering. Ordering is WP-0105 and does not exist yet, so there is nothing to exclude from — that half is not a defect today, but WP-0105 must honour it.
 
