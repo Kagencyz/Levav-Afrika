@@ -18,6 +18,15 @@ const ALLOWED_PROCEDURES = [
   'talent.getOwnProfile',
   'talent.list',
   'talent.getById',
+  'taxonomy.listFamilies',
+  'taxonomy.listRoles',
+  'taxonomy.listIndustries',
+  'taxonomy.resolveTitle',
+  'taxonomy.createFamily',
+  'taxonomy.createIndustry',
+  'taxonomy.createRole',
+  'taxonomy.createAlias',
+  'taxonomy.supersedeRole',
 ].sort();
 
 describe('appRouter surface', () => {

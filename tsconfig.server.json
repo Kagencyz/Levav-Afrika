@@ -19,6 +19,7 @@
     "server/routes/auth.ts",
     "server/routes/onboarding.ts",
     "server/routes/talent.ts",
+    "server/routes/taxonomy.ts",
     "db/**/*.ts",
     "contracts/**/*.ts"
   ],

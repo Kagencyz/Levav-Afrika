@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Home, AlertCircle } from 'lucide-react';
+import { t } from '@/copy';
 
 export default function NotFound() {
   const location = useLocation();
@@ -19,17 +20,17 @@ export default function NotFound() {
         </div>
 
         {/* Error Code */}
-        <h1 className="text-6xl font-bold text-[#C6FF34] font-display mb-2">404</h1>
+        <h1 className="text-6xl font-bold text-[#C6FF34] font-display mb-2">{t('notfound.code')}</h1>
 
         {/* Title */}
-        <h2 className="text-white text-2xl font-semibold mb-3">Page Not Found</h2>
+        <h2 className="text-white text-2xl font-semibold mb-3">{t('notfound.title')}</h2>
 
         {/* Message */}
         <p className="text-[#666666] mb-2">
-          The page you are looking for does not exist or has been moved.
+          {t('notfound.body')}
         </p>
         <p className="text-[#444444] text-sm mb-8 font-mono break-all">
-          {location.pathname}
+          {t('notfound.path', { path: location.pathname })}
         </p>
 
         {/* Actions */}
@@ -39,14 +40,14 @@ export default function NotFound() {
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/[0.05] border border-white/[0.1] text-[#A0A0A0] font-medium rounded-xl hover:bg-white/10 hover:text-white transition-all text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
-            Go Back
+            {t('notfound.action.back')}
           </button>
           <Link
             to="/"
             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#C6FF34] text-black font-semibold rounded-xl hover:bg-[#d4ff5c] transition-colors text-sm"
           >
             <Home className="w-4 h-4" />
-            Back to Home
+            {t('notfound.action.home')}
           </Link>
         </div>
       </motion.div>

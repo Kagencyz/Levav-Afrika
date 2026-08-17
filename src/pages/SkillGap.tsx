@@ -38,6 +38,7 @@ import {
   PolarRadiusAxis,
   Radar,
 } from "recharts";
+import { t } from "@/copy";
 
 /* ───────────────────── Animation Variants ───────────────────── */
 const fadeUp = {
@@ -446,9 +447,8 @@ export default function SkillGap() {
           </motion.div>
 
           <motion.div className="mx-auto max-w-2xl rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 text-center" variants={fadeUp} initial="hidden" animate="visible">
-            {/* TODO(WP-0004): resolve these through wri.confidence.none.* copy keys. */}
-            <h2 className="text-lg font-semibold text-white">No evidence yet</h2>
-            <p className="mt-2 text-sm leading-6 text-white/60">You have not created evidence yet. Levav 28 Day 1 is the fastest way to start.</p>
+            <h2 className="text-lg font-semibold text-white">{t('wri.confidence.none.label')}</h2>
+            <p className="mt-2 text-sm leading-6 text-white/60">{t('wri.confidence.none.body')}</p>
           </motion.div>
         </div>
       </section>

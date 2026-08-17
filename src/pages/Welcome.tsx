@@ -4,8 +4,8 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Check, ChevronRight, ChevronLeft, Loader2, Target, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/providers/trpc';
-import { useAuth } from '@/hooks/useAuth';
 import GlassCard from '@/components/GlassCard';
+import { t } from '@/copy';
 import {
   SIGNUP_GOALS,
   PERSONAL_STATUSES,
@@ -24,7 +24,6 @@ import {
 export default function Welcome() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
 
   // A goal carried from a landing-page path card pre-selects itself.
   const seedGoal = searchParams.get('goal');
@@ -44,15 +43,13 @@ export default function Welcome() {
     if (!status) return;
     try {
       await completeMutation.mutateAsync({ goals, personalStatus: status });
-      toast.success('You’re all set!');
+      toast.success(t('welcome.done'));
       navigate(destinationForGoals(goals));
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong';
-      toast.error(message);
+      console.error('Failed to save onboarding preferences', err);
+      toast.error(t('welcome.error'));
     }
   };
-
-  const firstName = user?.name?.split(' ')[0] ?? user?.firstName ?? '';
 
   return (
     <div className="min-h-[calc(100dvh-72px)] flex items-center justify-center px-4 py-12 pb-24 md:pb-12">
@@ -64,12 +61,12 @@ export default function Welcome() {
       >
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-display">
-            {firstName ? `Welcome, ${firstName}!` : 'Welcome to Levav™!'}
+            {t('welcome.title')}
           </h1>
           <p className="text-sm text-white/50">
             {step === 1
-              ? 'What do you want to do on Levav? Pick everything that applies — your first choice shapes where we take you.'
-              : 'And where are you right now? This shapes your Levav 28™ pathway and recommendations.'}
+              ? t('onboarding.intentions.help')
+              : t('onboarding.situation.help')}
           </p>
         </div>
 
@@ -87,8 +84,8 @@ export default function Welcome() {
                   <div className="w-9 h-9 rounded-xl bg-[#C6FF34]/10 border border-[#C6FF34]/20 flex items-center justify-center">
                     <Target size={17} className="text-[#C6FF34]" />
                   </div>
-                  <h2 className="text-base font-semibold text-white font-display">Your goals</h2>
-                  <span className="ml-auto text-xs text-white/35">Step 1 of 2</span>
+                  <h2 className="text-base font-semibold text-white font-display">{t('welcome.goals.heading')}</h2>
+                  <span className="ml-auto text-xs text-white/35">{t('welcome.step', { current: 1, total: 2 })}</span>
                 </div>
 
                 <div className="space-y-2.5 mb-6">
@@ -115,11 +112,10 @@ export default function Welcome() {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block text-sm font-medium text-white">{goal.label}</span>
-                          <span className="block text-xs text-white/40">{goal.desc}</span>
                         </span>
                         {isPrimary && (
                           <span className="text-[9px] font-semibold uppercase tracking-wider text-[#C6FF34] bg-[#C6FF34]/10 border border-[#C6FF34]/25 rounded-md px-1.5 py-0.5 shrink-0">
-                            Primary
+                            {t('welcome.primary.badge')}
                           </span>
                         )}
                       </button>
@@ -133,7 +129,7 @@ export default function Welcome() {
                   onClick={() => setStep(2)}
                   className="btn-lime w-full inline-flex items-center justify-center gap-2 py-3 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Continue
+                  {t('welcome.action.continue')}
                   <ChevronRight size={16} />
                 </button>
               </motion.div>
@@ -149,8 +145,8 @@ export default function Welcome() {
                   <div className="w-9 h-9 rounded-xl bg-[#7E3BED]/10 border border-[#7E3BED]/25 flex items-center justify-center">
                     <UserRound size={17} className="text-[#7E3BED]" />
                   </div>
-                  <h2 className="text-base font-semibold text-white font-display">Your current status</h2>
-                  <span className="ml-auto text-xs text-white/35">Step 2 of 2</span>
+                  <h2 className="text-base font-semibold text-white font-display">{t('welcome.status.heading')}</h2>
+                  <span className="ml-auto text-xs text-white/35">{t('welcome.step', { current: 2, total: 2 })}</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6">
@@ -180,11 +176,11 @@ export default function Welcome() {
                     {completeMutation.isPending ? (
                       <>
                         <Loader2 size={16} className="animate-spin" />
-                        Setting up...
+                        {t('welcome.saving')}
                       </>
                     ) : (
                       <>
-                        Take me there
+                        {t('welcome.action.finish')}
                         <ChevronRight size={16} />
                       </>
                     )}
@@ -195,7 +191,7 @@ export default function Welcome() {
                     className="inline-flex items-center justify-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors py-1.5"
                   >
                     <ChevronLeft size={15} />
-                    Back to goals
+                    {t('welcome.action.back')}
                   </button>
                 </div>
               </motion.div>
