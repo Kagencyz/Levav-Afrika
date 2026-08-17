@@ -1,21 +1,26 @@
 import { describe, it, expect } from 'vitest';
 import {
-  SIGNUP_GOALS,
+  PLATFORM_INTENTIONS,
   PERSONAL_STATUSES,
+  OPPORTUNITY_POSTURES,
   derivePrimaryGoal,
   destinationForGoals,
   isGoalSlug,
-  type GoalSlug,
+  type IntentionSlug,
 } from './onboardingRouting';
-import { GOAL_SLUGS, STATUS_SLUGS } from '../../server/routes/onboarding';
+import { INTENTION_SLUGS, POSTURE_SLUGS, SITUATION_SLUGS } from '../../server/routes/onboarding';
 
 describe('slug sync with server', () => {
   it('frontend goal slugs match the server enum exactly', () => {
-    expect(SIGNUP_GOALS.map((g) => g.slug).sort()).toEqual([...GOAL_SLUGS].sort());
+    expect(PLATFORM_INTENTIONS.map((g) => g.slug).sort()).toEqual([...INTENTION_SLUGS].sort());
   });
 
   it('frontend status slugs match the server enum exactly', () => {
-    expect(PERSONAL_STATUSES.map((s) => s.slug).sort()).toEqual([...STATUS_SLUGS].sort());
+    expect(PERSONAL_STATUSES.map((s) => s.slug).sort()).toEqual([...SITUATION_SLUGS].sort());
+  });
+
+  it('frontend posture slugs match the server enum exactly', () => {
+    expect(OPPORTUNITY_POSTURES.map((s) => s.slug).sort()).toEqual([...POSTURE_SLUGS].sort());
   });
 });
 
@@ -31,7 +36,7 @@ describe('primary goal derivation', () => {
 
 describe('destination routing', () => {
   it('routes every goal somewhere real', () => {
-    for (const goal of SIGNUP_GOALS) {
+    for (const goal of PLATFORM_INTENTIONS) {
       const dest = destinationForGoals([goal.slug]);
       expect(dest, `destination for ${goal.slug}`).toMatch(/^\//);
     }
@@ -43,13 +48,13 @@ describe('destination routing', () => {
   });
 
   it('falls back to dashboard with no goals', () => {
-    expect(destinationForGoals([] as GoalSlug[])).toBe('/dashboard');
+    expect(destinationForGoals([] as IntentionSlug[])).toBe('/dashboard');
   });
 });
 
 describe('isGoalSlug', () => {
   it('accepts known slugs and rejects unknowns', () => {
-    expect(isGoalSlug('find-job')).toBe(true);
+    expect(isGoalSlug('find_work')).toBe(true);
     expect(isGoalSlug('not-a-goal')).toBe(false);
     expect(isGoalSlug(null)).toBe(false);
   });

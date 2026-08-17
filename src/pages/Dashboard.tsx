@@ -126,7 +126,7 @@ export default function Dashboard() {
               <section aria-label="Account summary" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   { label: 'Profile', value: `${data.profileCompletion}%`, detail: data.talentProfile ? 'Database profile' : 'Not created', icon: UserRound },
-                  { label: 'Onboarding', value: data.onboarding ? 'Complete' : 'Pending', detail: data.onboarding ? goalLabels[data.onboarding.primaryGoal] ?? data.onboarding.primaryGoal : 'Choose your goals', icon: CheckCircle2 },
+                  { label: 'Onboarding', value: data.onboarding ? 'Complete' : 'Pending', detail: data.onboarding ? (data.onboarding.primaryGoal ? goalLabels[data.onboarding.primaryGoal] ?? data.onboarding.primaryGoal : 'Choose your goals') : 'Choose your goals', icon: CheckCircle2 },
                   { label: 'Organizations', value: String(data.organizations.length), detail: data.organizations.length ? 'Active memberships' : 'No memberships', icon: Building2 },
                   { label: 'Applications', value: String(data.applications.total), detail: data.applications.available ? 'Tracked applications' : 'Jobs system coming next', icon: BriefcaseBusiness },
                 ].map((stat, index) => (

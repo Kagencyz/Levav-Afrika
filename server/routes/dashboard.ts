@@ -38,9 +38,9 @@ export const dashboardRouter = router({
         .limit(1),
       db
         .select({
-          goals: userOnboarding.goals,
-          primaryGoal: userOnboarding.primaryGoal,
-          personalStatus: userOnboarding.personalStatus,
+          goals: userOnboarding.intentions,
+          primaryGoal: userOnboarding.primaryIntention,
+          personalStatus: userOnboarding.employmentSituation,
           completedAt: userOnboarding.completedAt,
         })
         .from(userOnboarding)

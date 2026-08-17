@@ -70,21 +70,26 @@ export const orgVerificationEnum = pgEnum('org_verification_status', [
 export const orgRoleEnum = pgEnum('org_role', ['owner', 'admin', 'recruiter', 'member']);
 export const orgMemberStatusEnum = pgEnum('org_member_status', ['invited', 'active', 'removed']);
 
-// Onboarding preference capture (upgrade brief §3): what the user wants to
-// do (goals, multi-select) and their personal status. This is preference
-// data, NOT identity — business capabilities remain derived from `talents` /
-// `organizationMembers` rows per the domain model.
-export const personalStatusEnum = pgEnum('personal_status', [
+// Onboarding preference capture: situation, posture and intentions are three
+// separate axes. They are preference data, NOT identity — business
+// capabilities remain derived from `talents` / `organizationMembers` rows.
+export const employmentSituationEnum = pgEnum('employment_situation', [
   'employed',
-  'unemployed',
   'self_employed',
+  'running_organisation',
   'freelancing',
   'studying',
-  'volunteering',
-  'changing_careers',
-  'returning_to_work',
-  'running_organization',
+  'not_working',
+  'career_break',
 ]);
+
+export const opportunityPostureEnum = pgEnum('opportunity_posture', [
+  'actively_seeking',
+  'open_to_opportunities',
+  'not_seeking',
+]);
+
+export const workModeEnum = pgEnum('work_mode', ['remote', 'hybrid', 'on_site']);
 
 export const careerSeniorityEnum = pgEnum('career_seniority', [
   'entry',
@@ -212,13 +217,29 @@ export const userOnboarding = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    // Multi-select signup goals (slugs, e.g. 'find-job', 'develop').
-    // Validated against the canonical list in server/routes/onboarding.ts.
-    goals: jsonb('goals').$type<string[]>().notNull().default([]),
-    // First selected goal — drives the user's first-run routing.
-    primaryGoal: varchar('primary_goal', { length: 40 }).notNull(),
-    personalStatus: personalStatusEnum('personal_status').notNull(),
-    completedAt: timestamp('completed_at', { withTimezone: true }).notNull().defaultNow(),
+    // The three preference axes are deliberately independent. None grants a
+    // capability; those remain derived from talents / organisation membership.
+    intentions: jsonb('intentions').$type<string[]>().notNull().default([]),
+    primaryIntention: varchar('primary_intention', { length: 40 }),
+    employmentSituation: employmentSituationEnum('employment_situation'),
+    situationInferred: boolean('situation_inferred').notNull().default(false),
+    situationConfirmedAt: timestamp('situation_confirmed_at', { withTimezone: true }),
+    opportunityPosture: opportunityPostureEnum('opportunity_posture'),
+
+    // Career answers are nullable because career onboarding is resumable and
+    // skippable. Draft input is kept separate until the member confirms it.
+    careerDraft: jsonb('career_draft').$type<Record<string, unknown>>(),
+    careerFamilyId: uuid('career_family_id').references(() => careerFamilies.id),
+    careerRoleId: uuid('career_role_id').references(() => careerRoles.id),
+    selfDescribedTitle: varchar('self_described_title', { length: 180 }),
+    targetRoleId: uuid('target_role_id').references(() => careerRoles.id),
+    seniority: careerSeniorityEnum('seniority'),
+    industryId: uuid('industry_id').references(() => industries.id),
+    workMode: workModeEnum('work_mode'),
+    taxonomyVersion: integer('taxonomy_version'),
+    careerConfirmedAt: timestamp('career_confirmed_at', { withTimezone: true }),
+    currentStep: varchar('current_step', { length: 40 }).notNull().default('intentions'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

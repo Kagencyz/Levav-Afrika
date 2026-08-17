@@ -11,6 +11,29 @@ const superseded = new Set([
   'onboarding.goals.title',
   'onboarding.goals.subtitle',
   'onboarding.status.title',
+  // WP-0102 retires the transitional slug-map rows and legacy labels from
+  // §17.7–17.8 after migrating persisted values to the four-axis model.
+  'develop',
+  'find-job',
+  'find-quickwork',
+  'learn',
+  'find-volunteer',
+  'community',
+  'hire',
+  'post-quickwork',
+  'post-volunteer',
+  'intent.post_contribution',
+  'employed',
+  'self_employed',
+  'freelancing',
+  'studying',
+  'unemployed',
+  'returning_to_work',
+  'running_organization',
+  'volunteering',
+  'changing_careers',
+  'situation.legacy.volunteering',
+  'situation.legacy.changing_careers',
 ]);
 
 const entries = new Map();
