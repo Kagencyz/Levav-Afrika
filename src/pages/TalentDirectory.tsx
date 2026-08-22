@@ -13,7 +13,6 @@ import {
   Sprout,
   LayoutGrid,
 } from "lucide-react";
-import { useNotifications } from "@/hooks/useNotifications";
 import { RateDisplay } from "@/components/CurrencyDisplay";
 import { trpc } from "@/providers/trpc";
 import { safeJSONParse } from "@/lib/safeJSON";
@@ -254,13 +253,10 @@ function TalentCard({
   };
   index: number;
 }) {
-  const { notifyProfileViewed } = useNotifications();
-
   return (
     <motion.div variants={fadeUp} custom={index}>
       <Link
         to={`/talent/${talent.id}`}
-        onClick={() => notifyProfileViewed(talent.name)}
         className="block bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/[0.12] transition-all group"
       >
         {/* Image */}

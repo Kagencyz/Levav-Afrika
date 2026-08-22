@@ -25,6 +25,9 @@ module.exports = {
         "medium-gray": "#666666",
         "dark-gray": "#111111",
         "card-bg": "#0A0A0A",
+        "gray-700": "var(--ds-gray-700)",
+        "gray-1000": "var(--ds-gray-1000)",
+        shadow: "var(--ds-shadow)",
       },
       fontFamily: {
         display: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', '"Helvetica Neue"', 'Arial', 'sans-serif'],

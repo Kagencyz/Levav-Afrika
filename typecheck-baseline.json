@@ -2,7 +2,7 @@
   "version": 1,
   "project": "tsconfig.app.json",
   "identity": "file + TypeScript error code + flattened message; occurrences preserve duplicates",
-  "count": 132,
+  "count": 128,
   "diagnostics": [
     {
       "key": "server/lib/s3.ts | TS2307 | Cannot find module '@aws-sdk/client-s3' or its corresponding type declarations.",
@@ -43,10 +43,6 @@
     {
       "key": "src/components/admin/UsersSection.tsx | TS2345 | Argument of type 'string | null' is not assignable to parameter of type 'string'. Type 'null' is not assignable to type 'string'.",
       "occurrences": 2
-    },
-    {
-      "key": "src/components/NotificationBell.tsx | TS2339 | Property 'notification' does not exist on type 'CreateTRPCReactBase<BuiltRouter<{ ctx: { user: { userId: string; email: string; accessLevel: string; } | null; session: SessionIntent; }; meta: object; errorShape: DefaultErrorShape; transformer: true; }, DecorateCreateRouterOptions<...>>, unknown> & DecorateRouterRecord<...>'.",
-      "occurrences": 4
     },
     {
       "key": "src/components/ReviewForm.tsx | TS2339 | Property 'review' does not exist on type 'CreateTRPCReactBase<BuiltRouter<{ ctx: { user: { userId: string; email: string; accessLevel: string; } | null; session: SessionIntent; }; meta: object; errorShape: DefaultErrorShape; transformer: true; }, DecorateCreateRouterOptions<...>>, unknown> & DecorateRouterRecord<...>'.",

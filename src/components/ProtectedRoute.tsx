@@ -2,6 +2,7 @@ import { Navigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { t } from '@/copy';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           className="flex flex-col items-center gap-4"
         >
           <Loader2 className="h-8 w-8 animate-spin text-[#C6FF34]" />
-          <p className="text-sm text-[#A0A0A0]">Loading...</p>
+          <p className="text-sm text-muted-foreground">{t('global.state.loading')}</p>
         </motion.div>
       </div>
     );

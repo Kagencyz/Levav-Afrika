@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, LayoutDashboard, Sparkles, ShieldCheck, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import NotificationBell from './NotificationBell';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,7 +78,7 @@ export default function Navbar() {
 
   const navLinkClass = (active: boolean) =>
     `relative px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md font-body ${
-      active ? 'text-[#C6FF34]' : 'text-[#A0A0A0] hover:text-white'
+      active ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-muted-foreground hover:text-foreground'
     }`;
 
   // Fully controlled dropdowns (rather than Radix's own onSelect-driven
@@ -102,21 +102,21 @@ export default function Navbar() {
   const NavIndicator = () => (
     <motion.div
       layoutId="navbar-indicator"
-      className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#C6FF34] rounded-full"
+      className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#78a600] dark:bg-[#C6FF34] rounded-full"
       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
     />
   );
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 h-[72px] glass-nav border-b border-white/[0.08]">
+      <nav className="fixed top-0 left-0 right-0 z-50 h-[72px] glass-nav border-b border-border">
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <span className="text-xl font-bold text-[#C6FF34] tracking-tight font-display">
+            <span className="text-xl font-bold text-[#78a600] dark:text-[#C6FF34] tracking-tight font-display">
               Levav&#8482;
             </span>
-            <span className="hidden sm:inline text-sm font-medium text-[#A0A0A0] font-body">
+            <span className="hidden sm:inline text-sm font-medium text-muted-foreground font-body">
               Talent Afrika
             </span>
           </Link>
@@ -131,7 +131,7 @@ export default function Navbar() {
             <DropdownMenu open={talentMenuOpen} onOpenChange={setTalentMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button
-                  className={`${navLinkClass(isTalentGroupActive)} inline-flex items-center gap-1 data-[state=open]:text-white`}
+                  className={`${navLinkClass(isTalentGroupActive)} inline-flex items-center gap-1 data-[state=open]:text-foreground`}
                 >
                   For Talent
                   <ChevronDown size={14} className="transition-transform data-[state=open]:rotate-180" />
@@ -140,14 +140,14 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="glass-strong border-white/[0.1] min-w-[190px] p-1.5"
+                className="bg-popover text-popover-foreground border-border min-w-[190px] p-1.5"
               >
                 {talentLinks.map((link) => (
                   <DropdownMenuItem
                     key={link.path}
                     onSelect={() => handleNavigate(link.path)}
                     className={`font-body cursor-pointer ${
-                      location.pathname.startsWith(link.path) ? 'text-[#C6FF34]' : 'text-white/80'
+                      location.pathname.startsWith(link.path) ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-foreground/80'
                     }`}
                   >
                     {link.label}
@@ -159,7 +159,7 @@ export default function Navbar() {
             <DropdownMenu open={employerMenuOpen} onOpenChange={setEmployerMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button
-                  className={`${navLinkClass(isEmployerGroupActive)} inline-flex items-center gap-1 data-[state=open]:text-white`}
+                  className={`${navLinkClass(isEmployerGroupActive)} inline-flex items-center gap-1 data-[state=open]:text-foreground`}
                 >
                   For Employers
                   <ChevronDown size={14} className="transition-transform data-[state=open]:rotate-180" />
@@ -168,14 +168,14 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="glass-strong border-white/[0.1] min-w-[190px] p-1.5"
+                className="bg-popover text-popover-foreground border-border min-w-[190px] p-1.5"
               >
                 {employerLinks.map((link) => (
                   <DropdownMenuItem
                     key={link.path}
                     onSelect={() => handleNavigate(link.path)}
                     className={`font-body cursor-pointer ${
-                      location.pathname.startsWith(link.path) ? 'text-[#C6FF34]' : 'text-white/80'
+                      location.pathname.startsWith(link.path) ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-foreground/80'
                     }`}
                   >
                     {link.label}
@@ -192,11 +192,11 @@ export default function Navbar() {
 
           {/* Right Side: Bell + Auth — hidden on mobile, flex on md+ */}
           <div className="hidden md:flex items-center gap-3">
-            <NotificationBell />
+            <ThemeSwitcher />
             {isAuthenticated && user ? (
               <DropdownMenu open={accountMenuOpen} onOpenChange={setAccountMenuOpen}>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors font-body rounded-full">
+                  <button className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-body rounded-full">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#C6FF34] to-[#7E3BED] flex items-center justify-center text-xs font-bold text-black">
                       {user.firstName?.[0]}{user.lastName?.[0]}
                     </div>
@@ -204,31 +204,31 @@ export default function Navbar() {
                     <ChevronDown size={14} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="glass-strong border-white/[0.1] min-w-[200px] p-1.5">
-                  <DropdownMenuItem onSelect={() => handleNavigate('/dashboard')} className="font-body cursor-pointer text-white/80">
+                <DropdownMenuContent align="end" className="bg-popover text-popover-foreground border-border min-w-[200px] p-1.5">
+                  <DropdownMenuItem onSelect={() => handleNavigate('/dashboard')} className="font-body cursor-pointer text-foreground/80">
                     <LayoutDashboard size={15} className="mr-1" />
                     Dashboard
                   </DropdownMenuItem>
                   {user.role === 'champion' && (
-                    <DropdownMenuItem onSelect={() => handleNavigate('/content-studio')} className="font-body cursor-pointer text-white/80">
+                    <DropdownMenuItem onSelect={() => handleNavigate('/content-studio')} className="font-body cursor-pointer text-foreground/80">
                       <Sparkles size={15} className="mr-1" />
                       Content Studio
                     </DropdownMenuItem>
                   )}
                   {user.role === 'admin' && (
-                    <DropdownMenuItem onSelect={() => handleNavigate('/admin')} className="font-body cursor-pointer text-white/80">
+                    <DropdownMenuItem onSelect={() => handleNavigate('/admin')} className="font-body cursor-pointer text-foreground/80">
                       <ShieldCheck size={15} className="mr-1" />
                       Admin
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuSeparator className="bg-white/[0.08]" />
+                  <DropdownMenuSeparator className="bg-border" />
                   <DropdownMenuItem
                     onSelect={() => {
                       closeAllMenus();
                       logout();
                       setTimeout(() => navigate('/'), 0);
                     }}
-                    className="font-body cursor-pointer text-white/80"
+                    className="font-body cursor-pointer text-foreground/80"
                   >
                     <LogOut size={15} className="mr-1" />
                     Log Out
@@ -239,7 +239,7 @@ export default function Navbar() {
               <>
                 <Link
                   to="/auth"
-                  className="text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors font-body"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors font-body"
                 >
                   Log In
                 </Link>
@@ -257,7 +257,7 @@ export default function Navbar() {
           <div className="flex md:hidden items-center">
             <button
               ref={menuTriggerRef}
-              className="flex items-center justify-center w-11 h-11 -mr-1.5 text-white rounded-xl active:bg-white/[0.06] transition-colors touch-manipulation"
+              className="flex items-center justify-center w-11 h-11 -mr-1.5 text-foreground rounded-xl active:bg-muted transition-colors touch-manipulation"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileOpen}
@@ -281,7 +281,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-2xl [backdrop-filter:blur(32px)_saturate(180%)] overflow-y-auto md:hidden"
+            className="fixed inset-0 z-[60] bg-background/95 text-foreground backdrop-blur-2xl [backdrop-filter:blur(32px)_saturate(180%)] overflow-y-auto md:hidden"
           >
             <div className="flex flex-col min-h-full pt-[88px] pb-8">
               {/* Notification bell — small, top-right utility icon rather than a full row */}
@@ -292,7 +292,9 @@ export default function Navbar() {
                 transition={{ delay: 0, duration: 0.3 }}
                 className="flex justify-end px-6 mb-2"
               >
-                <NotificationBell />
+                <div className="flex items-center gap-3">
+                  <ThemeSwitcher />
+                </div>
               </motion.div>
 
               {/* Link list — left-aligned rows with dividers */}
@@ -306,8 +308,8 @@ export default function Navbar() {
                   <Link
                     to="/"
                     onClick={() => setMobileOpen(false)}
-                    className={`block py-4 text-2xl font-semibold transition-colors font-display border-b border-white/[0.1] ${
-                      isHome ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
+                    className={`block py-4 text-2xl font-semibold transition-colors font-display border-b border-border ${
+                      isHome ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-foreground active:text-[#78a600] dark:active:text-[#C6FF34]'
                     }`}
                   >
                     Home
@@ -321,7 +323,7 @@ export default function Navbar() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ delay: 0.08, duration: 0.3 }}
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30 pt-5 pb-1.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground pt-5 pb-1.5">
                     For Talent
                   </p>
                   {talentLinks.map((link) => {
@@ -331,8 +333,8 @@ export default function Navbar() {
                         key={link.path}
                         to={link.path}
                         onClick={() => setMobileOpen(false)}
-                        className={`block py-3 text-xl font-medium transition-colors font-display border-b border-white/[0.1] ${
-                          active ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
+                        className={`block py-3 text-xl font-medium transition-colors font-display border-b border-border ${
+                          active ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-foreground active:text-[#78a600] dark:active:text-[#C6FF34]'
                         }`}
                       >
                         {link.label}
@@ -348,7 +350,7 @@ export default function Navbar() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ delay: 0.13, duration: 0.3 }}
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/30 pt-5 pb-1.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground pt-5 pb-1.5">
                     For Employers
                   </p>
                   {employerLinks.map((link) => {
@@ -358,8 +360,8 @@ export default function Navbar() {
                         key={link.path}
                         to={link.path}
                         onClick={() => setMobileOpen(false)}
-                        className={`block py-3 text-xl font-medium transition-colors font-display border-b border-white/[0.1] ${
-                          active ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
+                        className={`block py-3 text-xl font-medium transition-colors font-display border-b border-border ${
+                          active ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-foreground active:text-[#78a600] dark:active:text-[#C6FF34]'
                         }`}
                       >
                         {link.label}
@@ -377,8 +379,8 @@ export default function Navbar() {
                   <Link
                     to="/about"
                     onClick={() => setMobileOpen(false)}
-                    className={`block py-4 mt-5 text-2xl font-semibold transition-colors font-display border-b border-white/[0.1] ${
-                      isAboutActive ? 'text-[#C6FF34]' : 'text-white active:text-[#C6FF34]'
+                    className={`block py-4 mt-5 text-2xl font-semibold transition-colors font-display border-b border-border ${
+                      isAboutActive ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-foreground active:text-[#78a600] dark:active:text-[#C6FF34]'
                     }`}
                   >
                     About
@@ -396,7 +398,7 @@ export default function Navbar() {
                       <Link
                         to="/admin"
                         onClick={() => setMobileOpen(false)}
-                        className="block py-3 text-lg font-medium text-white/60 active:text-[#C6FF34] font-body border-b border-white/[0.1]"
+                        className="block py-3 text-lg font-medium text-muted-foreground active:text-[#78a600] dark:active:text-[#C6FF34] font-body border-b border-border"
                       >
                         Admin
                       </Link>
@@ -405,7 +407,7 @@ export default function Navbar() {
                       <Link
                         to="/content-studio"
                         onClick={() => setMobileOpen(false)}
-                        className="block py-3 text-lg font-medium text-white/60 active:text-[#C6FF34] font-body border-b border-white/[0.1]"
+                        className="block py-3 text-lg font-medium text-muted-foreground active:text-[#78a600] dark:active:text-[#C6FF34] font-body border-b border-border"
                       >
                         Content Studio
                       </Link>
@@ -430,7 +432,7 @@ export default function Navbar() {
                         logout();
                         navigate('/');
                       }}
-                      className="block w-full text-center text-sm font-medium text-white/50 active:text-white font-body mb-3"
+                      className="block w-full text-center text-sm font-medium text-muted-foreground active:text-foreground font-body mb-3"
                     >
                       Log Out
                     </button>
@@ -447,7 +449,7 @@ export default function Navbar() {
                     <Link
                       to="/auth"
                       onClick={() => setMobileOpen(false)}
-                      className="block w-full text-center text-sm font-medium text-white/50 active:text-white font-body mb-3"
+                      className="block w-full text-center text-sm font-medium text-muted-foreground active:text-foreground font-body mb-3"
                     >
                       Log In
                     </Link>

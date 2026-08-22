@@ -38,4 +38,14 @@ describe('application route map', () => {
   ])('has a declared destination for %s', (path) => {
     expect(routeExists(path)).toBe(true);
   });
+
+  it.each(['/welcome', '/onboarding', '/profile/create'])(
+    'protects the member-owned route %s',
+    (path) => {
+      const escapedPath = path.replace('/', '\\/');
+      expect(source).toMatch(new RegExp(
+        `path="${escapedPath}"[\\s\\S]*?<ProtectedRoute>[\\s\\S]*?</ProtectedRoute>`,
+      ));
+    },
+  );
 });

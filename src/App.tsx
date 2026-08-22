@@ -69,9 +69,30 @@ function AnimatedRoutes() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/welcome" element={<Welcome />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/profile/create" element={<ProfileCreate />} />
+            <Route
+              path="/welcome"
+              element={
+                <ProtectedRoute>
+                  <Welcome />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <Onboarding />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile/create"
+              element={
+                <ProtectedRoute>
+                  <ProfileCreate />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/apply/:jobId" element={<JobApply />} />
             <Route
               path="/messages"

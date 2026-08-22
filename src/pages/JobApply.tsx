@@ -17,7 +17,6 @@ import {
   DollarSign,
 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useOffline } from "@/hooks/useOffline";
 import { StableInput, StableTextarea } from "@/components/StableInputs";
 
@@ -138,7 +137,6 @@ function JobApplyInner() {
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { notifyApplicationSubmitted } = useNotifications();
   const { isOffline, queueAction } = useOffline();
 
   const MAX_COVER_LETTER_LENGTH = 2000;
@@ -218,7 +216,6 @@ function JobApplyInner() {
           createdAt: new Date().toISOString(),
         });
         safeJSONSet('levav_applications', applications);
-        notifyApplicationSubmitted(job?.title || `Job #${id}`);
         toast.success("Application submitted successfully!");
         setIsSubmitting(false);
         navigate("/dashboard");

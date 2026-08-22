@@ -17,7 +17,7 @@ export default function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="relative min-h-screen bg-midnight font-body">
+    <div className="relative min-h-screen bg-background text-foreground font-body transition-colors duration-200">
       {/* Slim top progress bar on every route change. Route transitions here
           are plain synchronous renders (no page-transition animation
           wrapper — see git history for why that was removed), and some

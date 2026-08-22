@@ -64,47 +64,77 @@ button, a, [role="button"] {
 
 @layer base {
   :root {
+    color-scheme: light;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+    --primary: 78 100% 60%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 262 82% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 38%;
+    --accent: 0 0% 93%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 0% / 0.12;
+    --input: 0 0% 0% / 0.12;
+    --ring: 78 100% 60%;
+    --radius: 0.625rem;
+
+    --lime: #C6FF34;
+    --violet: #7E3BED;
+    --midnight: #fafafa;
+    --surface: #ffffff;
+    --text-primary: #171717;
+    --text-secondary: #525252;
+    --text-muted: #737373;
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.74);
+    --ds-gray-700: hsla(0, 0%, 56%, 1);
+    --ds-gray-1000: hsla(0, 0%, 9%, 1);
+    --ds-shadow: rgba(0, 0, 0, 0.08);
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .dark {
+    color-scheme: dark;
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
     --card: 0 0% 4%;
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
-    --primary: 78 100% 60%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 262 82% 58%;
-    --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 8%;
     --muted-foreground: 0 0% 63%;
     --accent: 0 0% 8%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
     --border: 0 0% 100% / 0.06;
     --input: 0 0% 100% / 0.06;
-    --ring: 78 100% 60%;
-    --radius: 0.625rem;
-
-    --lime: #C6FF34;
-    --violet: #7E3BED;
     --midnight: #000000;
-    --surface: #0A0A0A;
-    --text-primary: #FFFFFF;
-    --text-secondary: #A0A0A0;
+    --surface: #0a0a0a;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
     --text-muted: #666666;
     --glass-border: rgba(255, 255, 255, 0.06);
     --glass-bg: rgba(255, 255, 255, 0.03);
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --ds-gray-700: hsla(0, 0%, 56%, 1);
+    --ds-gray-1000: hsla(0, 0%, 93%, 1);
+    --ds-shadow: rgba(255, 255, 255, 0.145);
   }
 
   * {
-    border-color: rgba(255, 255, 255, 0.06);
+    border-color: hsl(var(--border));
   }
 
   body {
-    background-color: #000000;
-    color: #FFFFFF;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -121,7 +151,7 @@ button, a, [role="button"] {
 
   ::selection {
     background: rgba(198, 255, 52, 0.3);
-    color: #FFFFFF;
+    color: hsl(var(--foreground));
   }
 
   ::-webkit-scrollbar {
@@ -129,7 +159,7 @@ button, a, [role="button"] {
   }
 
   ::-webkit-scrollbar-track {
-    background: #000000;
+    background: hsl(var(--background));
   }
 
   ::-webkit-scrollbar-thumb {
@@ -189,7 +219,7 @@ button, a, [role="button"] {
   /* Tuned for fixed nav chrome — heavier blur/saturation, no lift shadow
      (it sits flush against the viewport edge, not floating above content). */
   .glass-nav {
-    background: rgba(6, 6, 6, 0.72);
+    background: color-mix(in srgb, hsl(var(--background)) 78%, transparent);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
   }

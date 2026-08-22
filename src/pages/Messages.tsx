@@ -11,7 +11,6 @@ import {
   Video,
   ArrowLeft,
 } from 'lucide-react';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useOffline } from '@/hooks/useOffline';
 import { StableInput, StableTextarea } from '@/components/StableInputs';
 
@@ -115,7 +114,6 @@ export default function Messages() {
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { notifyMessageReceived } = useNotifications();
   const { isOffline, queueAction } = useOffline();
 
   // Persist conversations to localStorage
@@ -200,12 +198,6 @@ export default function Messages() {
       )
     );
 
-    // Mock: create a notification on the receiver's side
-    const conversation = conversations.find((c) => c.id === activeId);
-    if (conversation) {
-      notifyMessageReceived(conversation.name);
-    }
-
     setInputValue('');
     inputRef.current?.focus();
 
@@ -213,7 +205,7 @@ export default function Messages() {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 50);
-  }, [inputValue, activeId, conversations, notifyMessageReceived]);
+  }, [inputValue, activeId]);
 
   // Handle enter key
   const handleKeyDown = (e: React.KeyboardEvent) => {

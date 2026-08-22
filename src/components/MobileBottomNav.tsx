@@ -17,7 +17,7 @@ export default function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-white/[0.08] md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-border md:hidden"
     >
       <div className="flex items-center justify-around pt-2 bottom-nav-safe-pad">
         {navItems.map((item) => {
@@ -53,12 +53,12 @@ export default function MobileBottomNav() {
                   size={20}
                   strokeWidth={isActive ? 2.5 : 1.5}
                   className={
-                    isActive ? 'text-[#C6FF34]' : 'text-white/40'
+                    isActive ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-muted-foreground'
                   }
                 />
                 <span
                   className={`text-[10px] font-medium ${
-                    isActive ? 'text-[#C6FF34]' : 'text-white/40'
+                    isActive ? 'text-[#78a600] dark:text-[#C6FF34]' : 'text-muted-foreground'
                   }`}
                 >
                   {item.label}
